@@ -1,0 +1,29 @@
+{
+    "openapi":"3.0.0",
+    "info":{
+        "title": "Melinda Identifier Services API",
+        "version": "1.0.0"
+    },
+    "servers":[
+        {
+            "url" : ""
+        }
+    ],
+    "tags":[
+        {
+            "name": "users",
+            "description": "Operate on users"
+        },
+        {
+            "name": "publishers",
+            "description": "Operate on publishers"
+
+        }
+    ],
+    "paths":{
+
+    },
+    "components":{
+        
+    }
+}

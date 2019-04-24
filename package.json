@@ -35,6 +35,7 @@
   "dependencies": {
     "@natlibfi/melinda-commons": "^4.1.0",
     "@natlibfi/passport-atlassian-crowd": "^1.0.0",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "passport-http": "^0.3.0"
   },

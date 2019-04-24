@@ -20,9 +20,172 @@
 
         }
     ],
+    "security": [
+        { 
+           "httpBasic": []
+        }
+    ],
     "paths":{
+        "/users": {
+            "post": {
+                "summary": "Creates a new users",
+                "tags": [
+                    "users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "user response"
+                    },
+                    "201": {
+                        "description": "User successfully created",
+                        "headers": {
+                            "Location":{
+                                "description": "",
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "401": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "413": {
+                        "description": ""
+                    },
+                    "415": {
+                        "description": ""
+                    }
+                }
+            }
+        },
 
-    },
+        "/users/{id}": {
+            "get": {
+                "summary": "Retrieve user information",
+                "tags": [
+                    "users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": ""
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    },
+                    "404":{
+                        "description": ""
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update user information",
+                "tags": [
+                    "users"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The user was created"
+                    },
+                    "204": {
+                        "description": "The user was updated"
+                    },
+                    "400": {
+                        "description": "malformed content"
+                    },
+                    "401": {
+                        "description": "Authentication failed"
+                    },
+                    "403": {
+                        "description": "Not authorized"
+                    },
+                    "404": {
+                        "description": "The user doesnot exist"
+                    },
+                    "422": {
+                        "description": "Invalid syntax"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a user",
+                "description": "The user is completely removed including all related records in the queue",
+                "tags": [
+                    "users"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The user was removed"
+                    },
+                    "401": {
+                        "description": "Authentication failed"
+                    },
+                    "403": {
+                        "description": "Not authorized"
+                    },
+                    "404": {
+                        "description": "Content not found"
+                    }
+                }
+            }
+        },
+        "users/{id}/password": {
+            "post": {
+                "summary": "Change user password",
+                "tags": [
+                    "blobs"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Return the content"
+                    },
+                    "401": {
+                        "description": "Authentication failed"
+                    },
+                    "403": {
+                        "description": "Not authorized"
+                    },
+                    "404": {
+                        "description": "Content not found"
+                    }
+                }
+            }
+        },
+        "users/query": {
+            "post": {
+                "summary": "Query for users",
+                "tags": [
+                    "users"
+                ],
+                "parameters": []
+            }
+        },
+
     "components":{
         
     }

@@ -25,3 +25,30 @@
 * for the JavaScript code in this file.
 *
 */
+
+import express from 'express';
+import cors from 'cors';
+import {createUsersRouter, createPublishersRouter} from './routes'
+
+async function run(){
+    const app = express();
+
+    const port = process.env.PORT || 5000;
+
+    app.use(cors());
+
+    app.use('/users', createUsersRouter());
+    app.use('/publishers', createPublishersRouter());
+    app.use(express.static('/'))
+
+    app.get('/', (req, res)=>{
+      res.send('ok');
+      res.sendFile(path.join(__dirname, '/api.json'))
+    })
+
+    app.listen(port, () => {
+		console.log(port, 'Started melinda-record-import-api');
+	});
+}
+
+run();

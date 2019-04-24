@@ -37,7 +37,8 @@
     "@natlibfi/passport-atlassian-crowd": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "passport-http": "^0.3.0"
+    "passport-http": "^0.3.0",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.0",

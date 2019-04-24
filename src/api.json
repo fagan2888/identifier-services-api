@@ -1,15 +1,15 @@
 {
-    "openapi":"3.0.0",
-    "info":{
+    "openapi": "3.0.0",
+    "info": {
         "title": "Melinda Identifier Services API",
         "version": "1.0.0"
     },
-    "servers":[
+    "servers": [
         {
-            "url" : ""
+            "url": ""
         }
     ],
-    "tags":[
+    "tags": [
         {
             "name": "users",
             "description": "Operate on users"
@@ -17,15 +17,14 @@
         {
             "name": "publishers",
             "description": "Operate on publishers"
-
         }
     ],
     "security": [
-        { 
-           "httpBasic": []
+        {
+            "httpBasic": []
         }
     ],
-    "paths":{
+    "paths": {
         "/users": {
             "post": {
                 "summary": "Creates a new users",
@@ -39,7 +38,7 @@
                     "201": {
                         "description": "User successfully created",
                         "headers": {
-                            "Location":{
+                            "Location": {
                                 "description": "",
                                 "schema": {
                                     "type": "string"
@@ -65,7 +64,6 @@
                 }
             }
         },
-
         "/users/{id}": {
             "get": {
                 "summary": "Retrieve user information",
@@ -89,7 +87,7 @@
                     "403": {
                         "description": ""
                     },
-                    "404":{
+                    "404": {
                         "description": ""
                     }
                 }
@@ -185,8 +183,6 @@
                 "parameters": []
             }
         },
-
-    "components":{
-        
+        "components": {}
     }
 }

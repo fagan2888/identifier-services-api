@@ -32,7 +32,7 @@ export default function () {
     const user = {};
 
     return new Router()
-        // .get('/', test)
+        .get('/', test)
         .post('/', create)
         .get('/:id', read)
         .delete('/:id', remove)
@@ -41,14 +41,14 @@ export default function () {
         .post('./query', query)
 
     //for test
-    // async function test(req, res, next) {
-    //     try {
-    //         res.sendFile(path.join(__dirname, 'api.json'))
-    //     } catch (err) {
-    //         next(err);
-    //     }
-    // }
-
+    async function test(req, res, next) {
+        try {
+            res.json({test: 'hello'})
+        } catch (err) {
+            next(err);
+        }
+    }
+ 
     async function create(req, res, next) {
         try {
 

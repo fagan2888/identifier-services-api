@@ -28,6 +28,7 @@
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import {createUsersRouter, createPublishersRouter} from './routes'
 
 async function run(){
@@ -41,10 +42,7 @@ async function run(){
     app.use('/publishers', createPublishersRouter());
     app.use(express.static('/'))
 
-    app.get('/', (req, res)=>{
-      res.send('ok');
-      res.sendFile(path.join(__dirname, '/api.json'))
-    })
+    app.use('/', express.static(path.join(__dirname, '/')));
 
     app.listen(port, () => {
 		console.log(port, 'Started melinda-record-import-api');

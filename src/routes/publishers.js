@@ -26,51 +26,51 @@
  *
  */
 
-import { Router } from "express";
+import { Router } from 'express';
 
-export default function() {
-  return new Router()
-    .post("/", create)
-    .get("/:id", read)
-    .put("/:id", update)
-    .delete("/:id", remove)
-    .post("/query", query)
-    .post("/:id/publications", newPublication);
+export default function () {
+	return new Router()
+		.post('/', create)
+		.get('/:id', read)
+		.put('/:id', update)
+		.delete('/:id', remove)
+		.post('/query', query)
+		.post('/:id/publications', newPublication);
 
-  async function create(req, res, next) {
-    try {
-    } catch (err) {
-      next(err);
-    }
-  }
-  async function read(req, res, next) {
-    try {
-    } catch (err) {
-      next(err);
-    }
-  }
-  async function update(req, res, next) {
-    try {
-    } catch (err) {
-      next(err);
-    }
-  }
-  async function remove(req, res, next) {
-    try {
-    } catch (err) {
-      next(err);
-    }
-  }
-  async function query(req, res, next) {
-    try {
-    } catch (err) {
-      next(err);
-    }
-  }
-  async function newPublication(req, res, next) {
-    try {
-    } catch (err) {
-      next(err);
-    }
-  }
+	async function create(req, res, next) {
+		try {
+		} catch (err) {
+			next(err);
+		}
+	}
+	async function read(req, res, next) {
+		try {
+		} catch (err) {
+			next(err);
+		}
+	}
+	async function update(req, res, next) {
+		try {
+		} catch (err) {
+			next(err);
+		}
+	}
+	async function remove(req, res, next) {
+		try {
+		} catch (err) {
+			next(err);
+		}
+	}
+	async function query(req, res, next) {
+		try {
+		} catch (err) {
+			next(err);
+		}
+	}
+	async function newPublication(req, res, next) {
+		try {
+		} catch (err) {
+			next(err);
+		}
+	}
 }

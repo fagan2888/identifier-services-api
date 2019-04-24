@@ -63,7 +63,7 @@
   "eslintConfig": {
     "parser": "babel-eslint",
     "plugins": [
-      "import"
+      "import",
     ],
     "extends": [
       "xo",

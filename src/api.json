@@ -1,29 +1,269 @@
 {
-    "openapi":"3.0.0",
-    "info":{
-        "title": "Melinda Identifier Services API",
-        "version": "1.0.0"
-    },
-    "servers":[
-        {
-            "url" : ""
-        }
-    ],
-    "tags":[
-        {
-            "name": "users",
-            "description": "Operate on users"
-        },
-        {
-            "name": "publishers",
-            "description": "Operate on publishers"
-
-        }
-    ],
-    "paths":{
-
-    },
-    "components":{
-        
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Melinda Identifier Services API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": ""
     }
+  ],
+  "tags": [
+    {
+      "name": "users",
+      "description": "Operate on users"
+    },
+    {
+      "name": "publishers",
+      "description": "Operate on publishers"
+    }
+  ],
+  "paths": {
+    "/publishers": {
+      "post": {
+        "summary": "Create a new publisher",
+        "tags": [
+          "publishers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publisher"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New Publisher Created",
+            "headers": {
+              "Location": {
+                "description": " ",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Publisher does not exist or Bad Request"
+          },
+          "401": {
+            "description": "Authentication failed or Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden or Not authorized"
+          },
+          "413": {
+            "description": "Request body is too large"
+          },
+          "415": {
+            "description": "Content type was not specified or Unsupported Media Type"
+          },
+          "default": {
+            "description": "unexpected error"
+          }
+        }
+      }
+    },
+    "/publishers/{id}": {
+      "get": {
+        "summary": "Retrive a publisher",
+        "tags": [
+          "publishers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "read",
+            "description": "ID of publisher to fetch",
+            "require": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Publishers"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed"
+          },
+          "403": {
+            "description": "Not authorized or Forbidden"
+          },
+          "404": {
+            "description": "No record found"
+          },
+          "default": {
+            "description": "unexpected error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a publisher",
+        "tags": [
+          "publishers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Publishers"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "The publisher was updated"
+          },
+          "204": {
+            "description": "No new content to be updated"
+          },
+          "400": {
+            "description": "Malformed content or Bad request"
+          },
+          "401": {
+            "description": "Authentication failed"
+          },
+          "403": {
+            "description": "Not authorized or Forbidden"
+          },
+          "404": {
+            "description": "The publisher does not exist"
+          },
+          "422": {
+            "description": "Invalid syntax"
+          },
+          "default": {
+            "description": "unexpected error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a publisher",
+        "description": "The publisher is removed",
+        "tags": [
+          "publishers"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "The publisher is removed."
+          },
+          "401": {
+            "description": "Authentication failed"
+          },
+          "403": {
+            "description": "Not authorized or Forbidden"
+          },
+          "404": {
+            "description": "The publisher does not exist"
+          },
+          "default": {
+            "description": "unexpected error"
+          }
+        }
+      }
+    },
+    "/publishers/query": {
+      "post": {
+        "summary": "Query for publishers",
+        "tags": [
+          "publishers"
+        ],
+        "parameters": [
+          {
+            "name": "publishers",
+            "in": "query",
+            "description": "Query certain publishers",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Query returned "
+          },
+          "401": {
+            "description": "Authentication failed"
+          },
+          "403": {
+            "description": "Not authorized or Forbidden"
+          },
+          "404": {
+            "description": "The publisher does not exist"
+          }
+        },
+        "default": {
+          "description": "unexpected error"
+        }
+      }
+    },
+    "/publishers/{id}/publications": {
+      "post": {
+        "summary": "Create a new publication",
+        "tags": [
+          "publications"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "newPublication",
+            "description": "ID of publishers",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "New Publication created"
+          },
+          "401": {
+            "description": "Authentication failed"
+          },
+          "403": {
+            "description": "Not authorized or Forbidden"
+          },
+          "404": {
+            "description": "The publisher does not exist"
+          },
+          "default": {
+            "description": "unexpected error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Publisher": {},
+      "Publication": {},
+      "Error": {}
+    }
+  }
 }

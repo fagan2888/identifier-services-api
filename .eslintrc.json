@@ -33,11 +33,12 @@
 		"no-trailing-spaces": "off",
 		"no-undef": ["error"],
 		"prefer-template": "error",
-		"no-unused-vars": "error",
+		"no-unused-vars": "warn",
 		"no-console": ["warn"],
 		"capitalized-comments": "off",
 		"no-inner-declarations": "off",
 		"padding-line-between-statements": "off",
-		"mocha/no-exclusive-tests": "error"
+		"mocha/no-exclusive-tests": "error",
+		"one-var": "off"
 	}
 }

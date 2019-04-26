@@ -27,7 +27,8 @@
  */
 
 import {expect} from 'chai';
-import Mongoose from 'mongoose';
+import HttpStatus from 'http-status';
+import Mongoose, {mongo} from 'mongoose';
 import publishersFactory from './publishers';
 import fixtureFactory, {READERS} from '@natlibfi/fixura';
 import mongoFixturesFactory from '@natlibfi/fixura-mongo';
@@ -50,4 +51,55 @@ describe('interfaces/publishers', () => {
 		await Mongoose.disconnect();
 		await mongoFixtures.close();
 	});
+
+	describe('#read', () => {
+		let dbContents, user, publishers, expectedResults;
+
+		async function defineVariables(index) {
+			dbContents = getFixture(['read', index, 'dbContents.json']);
+			user = getFixture(['read', index, 'user.json']);
+			publishers = publishersFactory({url: 'https://'});
+			expectedResults = getFixture(['read', index, 'expectedResults.json']);
+
+			await mongoFixtures.populate(dbContents);
+		}
+		it('Should succed', async (index = '0') => {
+			defineVariables(index);
+
+			const result = await publishers.read({id: 'foo', user});
+			expect(formatPublisherMetadata(result)).to.eql(expectedResults);
+		});
+
+		it('Should fail if the publisher does not exit', async (index = '1') => {
+			defineVariables(index);
+			try {
+				await publishers.read({id: 'foo', user});
+				throw new Error('Should not succeed');
+			} catch (err) {
+				// expect(err).to.be.instanceOf(ApiError);
+				expect(err.status).to.equal(HttpStatus.NOT_FOUND);
+			}
+		});
+	});
+
+	function formatPublisherMetadata(doc) {
+		format(doc);
+		return doc;
+
+		function format(o) {
+			Object.keys(o).forEach(key => {
+				if (
+					['_id', 'creationTime', 'modificationTime', 'creationTime'].includes(
+						key
+					)
+				) {
+					delete o[key];
+				} else if (Array.isArray(o[key])) {
+					o[key].filter(v => typeof v === 'object').forEach(format);
+				} else if (typeof o[key] === 'object') {
+					format(o[key]);
+				}
+			});
+		}
+	}
 });

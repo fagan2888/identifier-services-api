@@ -3,9 +3,11 @@
 		"browser": true,
 		"commonjs": true,
 		"es6": true,
-		"node": true
+		"node": true,
+		"mocha": true
 	},
 	"extends": ["xo", "plugin:import/errors"],
+	"plugins": ["mocha"],
 	"parserOptions": {
 		"ecmaVersion": 2015,
 		"sourceType": "module",
@@ -28,13 +30,14 @@
 		"no-var": "error",
 		"comma-dangle": 0,
 		"no-multiple-empty-lines": ["error"],
-		"no-trailing-spaces":"off",
+		"no-trailing-spaces": "off",
 		"no-undef": ["error"],
 		"prefer-template": "error",
 		"no-unused-vars": "error",
 		"no-console": ["warn"],
 		"capitalized-comments": "off",
 		"no-inner-declarations": "off",
-		"padding-line-between-statements": "off"
+		"padding-line-between-statements": "off",
+		"mocha/no-exclusive-tests": "error"
 	}
 }

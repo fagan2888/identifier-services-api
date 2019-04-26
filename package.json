@@ -22,7 +22,7 @@
   "scripts": {
     "start": "node ./dist/index",
     "check-deps": "npm-check;exit 0",
-    "lint:base": "eslint --fix",
+    "lint:base": "eslint . --fix",
     "lint": "npm run lint:base -- src",
     "test:base": "cross-env NODE_ENV=test nyc mocha -t 20000 --exit --require @babel/register",
     "test": "npm run lint && npm run test:base -- src/**/*.spec.js && npm run coverage",
@@ -36,7 +36,9 @@
     "@natlibfi/melinda-commons": "^4.1.0",
     "@natlibfi/passport-atlassian-crowd": "^1.0.0",
     "cors": "^2.8.5",
+    "eslint-plugin-prettier": "^3.0.1",
     "express": "^4.16.4",
+    "mongoose": "^5.5.4",
     "passport-http": "^0.3.0"
   },
   "devDependencies": {

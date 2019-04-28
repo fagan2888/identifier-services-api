@@ -42,8 +42,6 @@ async function run() {
 	app.use('/users', createUsersRouter());
 	app.use('/publishers', createPublishersRouter());
 
-	app.use('/', express.static(path.join(__dirname, '/')));
-
 	app.listen(HTTP_PORT, () => {
 		console.log(HTTP_PORT, 'Started melinda-record-import-api');
 	});

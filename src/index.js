@@ -25,6 +25,7 @@
  * for the JavaScript code in this file.
  *
  */
+<<<<<<< HEAD
 // import {Utils} from '@natlibfi/melinda-commons';
 import express from 'express';
 import cors from 'cors';
@@ -53,6 +54,27 @@ async function run() {
 	app.listen(HTTP_PORT, () => {
 		// Logger.log('info', 'Started melinda-record-import-api');
 		console.log('server running');
+=======
+
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import Mongoose from 'mongoose';
+import {createUsersRouter, createPublishersRouter} from './routes';
+import {HTTP_PORT, MONGO_DEBUG} from './config';
+
+async function run() {
+	Mongoose.set('debug', MONGO_DEBUG);
+	const app = express();
+
+	app.use(cors());
+
+	app.use('/users', createUsersRouter());
+	app.use('/publishers', createPublishersRouter());
+
+	app.listen(HTTP_PORT, () => {
+		console.log(HTTP_PORT, 'Started melinda-record-import-api');
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 	});
 
 	// registerSignalHandlers();

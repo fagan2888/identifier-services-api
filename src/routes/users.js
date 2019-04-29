@@ -29,19 +29,31 @@
 import {Router} from 'express';
 
 export default function() {
+<<<<<<< HEAD
 	const users = {};
+=======
+	const user = {};
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 
 	return new Router()
 		.post('/', create)
 		.get('/:id', read)
+<<<<<<< HEAD
 		.put('/:id', update)
 		.delete('/:id', remove)
+=======
+		.delete('/:id', remove)
+		.put('/:id', update)
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 		.post('/:id/password', changePwd)
 		.post('./query', query);
 
 	async function create(req, res, next) {
 		try {
+<<<<<<< HEAD
 			res.json({name: 'sanjog'});
+=======
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 		} catch (err) {
 			next(err);
 		}
@@ -49,23 +61,36 @@ export default function() {
 
 	async function read(req, res, next) {
 		try {
+<<<<<<< HEAD
 			console.log(req.params);
+=======
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 		} catch (err) {
 			next(err);
 		}
 	}
 
+<<<<<<< HEAD
 	async function update(req, res, next) {
 		try {
 			console.log(req.body);
+=======
+	async function remove(req, res, next) {
+		try {
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 		} catch (err) {
 			next(err);
 		}
 	}
 
+<<<<<<< HEAD
 	async function remove(req, res, next) {
 		try {
 			console.log(req.body);
+=======
+	async function update(req, res, next) {
+		try {
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 		} catch (err) {
 			next(err);
 		}
@@ -73,7 +98,10 @@ export default function() {
 
 	async function changePwd(req, res, next) {
 		try {
+<<<<<<< HEAD
 			console.log(req.body);
+=======
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 		} catch (err) {
 			next(err);
 		}
@@ -81,7 +109,10 @@ export default function() {
 
 	async function query(req, res, next) {
 		try {
+<<<<<<< HEAD
 			console.log(req.body);
+=======
+>>>>>>> 1912bb2448d828fb21dfc9ef71086f639dd59c01
 		} catch (err) {
 			next(err);
 		}

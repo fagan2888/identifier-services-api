@@ -1,38 +1,44 @@
 {
-    "env": {
-        "browser": true,
-        "commonjs": true,
-        "es6": true,
-        "node": true
-    },
-    "extends": ["xo", "plugin:import/errors"],
-    "parserOptions": {
-        "ecmaVersion": 2015,
-        "sourceType": "module",
-        "ecmaFeatures": {
-            "jsx": true,
-            "experimentalObjectRestSpread": true
-        }
-    },
-    "rules": {
-        "indent": [
-            "error",
-            "tab",
-            {
-                "SwitchCase": 1
-            }
-        ],
-        "space-before-function-paren": 0,
-        "quotes": ["error", "single"],
-        "semi": ["error", "always"],
-        "no-var": "error",
-        "comma-dangle": 0,
-        "no-multiple-empty-lines": ["error"],
-        "no-trailing-spaces": ["error"],
-        "no-undef": ["error"],
-        "prefer-template": "error",
-        "no-unused-vars": "warn",
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true,
+		"node": true,
+		"mocha": true
+	},
+	"extends": ["xo", "plugin:import/errors"],
+	"plugins": ["mocha"],
+	"parserOptions": {
+		"ecmaVersion": 2015,
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true,
+			"experimentalObjectRestSpread": true
+		}
+	},
+	"rules": {
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"space-before-function-paren": 0,
+		"quotes": ["error", "single"],
+		"semi": ["error", "always"],
+		"no-var": "error",
+		"comma-dangle": 0,
+		"no-multiple-empty-lines": ["error"],
+		"no-trailing-spaces": "off",
+		"no-undef": ["error"],
+		"prefer-template": "error",
+		"no-unused-vars": "warn",
 		"no-console": ["warn"],
-		"capitalized-comments":"off"
-    }
+		"capitalized-comments": "off",
+		"no-inner-declarations": "off",
+		"padding-line-between-statements": "off",
+		"mocha/no-exclusive-tests": "error",
+		"one-var": "off"
+	}
 }

@@ -68,7 +68,10 @@ export default function() {
 
 	async function read(req, res, next) {
 		try {
-			const result = await publishers.read({id: req.params.id});
+			const result = await publishers.read({
+				id: req.params.id,
+				publisher: req.publisher
+			});
 			res.json(result);
 		} catch (err) {
 			next(err);

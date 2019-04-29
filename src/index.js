@@ -25,7 +25,7 @@
  * for the JavaScript code in this file.
  *
  */
-// import {Utils} from '@natlibfi/melinda-commons';
+import {Utils} from '@natlibfi/melinda-commons';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -33,11 +33,11 @@ import {createUsersRouter, createPublishersRouter} from './routes';
 import Mongoose from 'mongoose';
 import {MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
 
-// const {createLogger, handleInterrupt} = Utils;
+const {createLogger, handleInterrupt} = Utils;
 
 async function run() {
 	// Mongoose.set('debug', MONGO_DEBUG);
-	// const Logger = createLogger();
+	const Logger = createLogger();
 
 	const app = express();
 
@@ -50,7 +50,7 @@ async function run() {
 	app.use('/users', createUsersRouter());
 	app.use('/publishers', createPublishersRouter());
 
-	app.listen(HTTP_PORT, () => {
+	const server = app.listen(HTTP_PORT, () => {
 		// Logger.log('info', 'Started melinda-record-import-api');
 		console.log('server running');
 	});
@@ -66,9 +66,9 @@ async function run() {
 	// 		.on('SIGUSR2', handle);
 
 	// 	function handle() {
-	// 		// server.close();
-	// 		Mongoose.disconnect();
-	// 		// handleInterrupt(arg);
+	// 		server.close();
+	// 		// Mongoose.disconnect();
+	// 		handleInterrupt(arg);
 	// 	}
 	// }
 }

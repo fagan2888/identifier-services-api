@@ -43,7 +43,7 @@ export default function() {
 	async function query(req, res, next) {
 		try {
 			const queryParams = getQueryParams();
-			const result = await publishers.query({user: req.user, ...queryParams});
+			const result = await publishers.query({...queryParams, user: req.user});
 			res.json(result);
 		} catch (err) {
 			next(err);

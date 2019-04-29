@@ -57,8 +57,10 @@ describe('interfaces/publishers', () => {
 
 		async function defineVariables(index) {
 			dbContents = getFixture(['read', index, 'dbContents.json']);
-			user = getFixture(['read', index, 'user.json']);
+			console.log(dbContents);
+			// user = getFixture(['read', index, 'user.json']);
 			publishers = publishersFactory({url: 'https://'});
+			console.log(publishers);
 			expectedResults = getFixture(['read', index, 'expectedResults.json']);
 
 			await mongoFixtures.populate(dbContents);
@@ -67,7 +69,8 @@ describe('interfaces/publishers', () => {
 		it('Should succed', async (index = '0') => {
 			defineVariables(index);
 
-			const result = await publishers.read({id: 'foo', user});
+			const result = await publishers.read({id: 'foo'});
+			console.log(result);
 			expect(formatPublisherMetadata(result)).to.eql(expectedResults);
 		});
 

@@ -462,7 +462,7 @@
 							"yearInactivated": {"type": "number"}
 						}
 					},
-					"streetAdderss": {
+					"streetAddress": {
 						"type": "object",
 						"properties": {
 							"address": {"type": "string", "required": true},

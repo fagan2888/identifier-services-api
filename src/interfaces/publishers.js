@@ -26,8 +26,11 @@
  *
  */
 import {Mongoose} from 'mongoose';
+import publishers from '../routes/publishers';
+import {PublisherModel} from './models';
 
 export default function({url}) {
+	Mongoose.models('Publisher', PublisherModel);
 	return {create, read, update, remove, query, newPublication};
 
 	async function query({profile, contentType, state, creationTime, modificationTime, user}) {
@@ -74,8 +77,10 @@ export default function({url}) {
 		console.log('query');
 	}
 
-	async function read({id, user}) {
-		console.log(id, user);
+	async function read({id}) {
+		console.log(id);
+		const publishers = await Mongoose.models.Publisher.findOne({id}).exec();
+		return publishers.filter(item => console.log(item));
 	}
 
 	async function create({inputStream, publisher, contentType, user}) {

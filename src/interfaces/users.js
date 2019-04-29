@@ -26,64 +26,30 @@
  *
  */
 
-import {Router} from 'express';
-
 export default function() {
-	const users = {};
+	return {create, read, update, remove, changePwd, query};
 
-	return new Router()
-		.post('/', create)
-		.get('/:id', read)
-		.put('/:id', update)
-		.delete('/:id', remove)
-		.post('/:id/password', changePwd)
-		.post('./query', query);
-
-	async function create(req, res, next) {
-		try {
-			res.json({name: 'sanjog'});
-		} catch (err) {
-			next(err);
-		}
+	async function create(val) {
+		console.log(val);
 	}
 
-	async function read(req, res, next) {
-		try {
-			console.log(req.params);
-		} catch (err) {
-			next(err);
-		}
+	async function read(val) {
+		console.log(val);
 	}
 
-	async function update(req, res, next) {
-		try {
-			console.log(req.body);
-		} catch (err) {
-			next(err);
-		}
+	async function update(val) {
+		console.log(val);
 	}
 
-	async function remove(req, res, next) {
-		try {
-			console.log(req.body);
-		} catch (err) {
-			next(err);
-		}
+	async function remove(val) {
+		console.log(val);
 	}
 
-	async function changePwd(req, res, next) {
-		try {
-			console.log(req.body);
-		} catch (err) {
-			next(err);
-		}
+	async function changePwd(val) {
+		console.log(val);
 	}
 
-	async function query(req, res, next) {
-		try {
-			console.log(req.body);
-		} catch (err) {
-			next(err);
-		}
+	async function query(val) {
+		console.log(val);
 	}
 }

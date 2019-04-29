@@ -28,7 +28,7 @@
 
 import {expect} from 'chai';
 import HttpStatus from 'http-status';
-import Mongoose, {mongo} from 'mongoose';
+import Mongoose from 'mongoose';
 import publishersFactory from './publishers';
 import fixtureFactory, {READERS} from '@natlibfi/fixura';
 import mongoFixturesFactory from '@natlibfi/fixura-mongo';
@@ -41,7 +41,7 @@ describe('interfaces/publishers', () => {
 	});
 
 	beforeEach(async () => {
-		mongoFixtures = await mongoFixturesFactory({gridFS: {bucketName: 'blobs'}});
+		mongoFixtures = await mongoFixturesFactory({gridFS: {bucketName: 'publishers'}});
 		await Mongoose.connect(await mongoFixtures.getConnectionString(), {
 			useNewUrlParser: true
 		});
@@ -63,6 +63,7 @@ describe('interfaces/publishers', () => {
 
 			await mongoFixtures.populate(dbContents);
 		}
+		
 		it('Should succed', async (index = '0') => {
 			defineVariables(index);
 

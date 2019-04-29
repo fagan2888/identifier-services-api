@@ -401,10 +401,63 @@
 		}
 	},
 	"components": {
+		"securitySchemes": {
+			"httpBasic": {
+				"type": "http",
+				"scheme": "basic"
+			}
+		},
 		"schemas": {
-			"Publisher": {},
-			"Publication": {},
-			"Error": {}
+			"User": {
+				"type": "object",
+				"properties": {
+					"id": {"type": "string", "required": true},
+					"preference": {
+						"type": "object",
+						"properties": {
+							"defaultLanguage": {"type": "string", "required": true}
+						}
+					}
+				}
+			},
+			"Publisher": {
+				"type": "object",
+				"properties": {
+					"id": {"type": "string", "required": true},
+					"lastUpdated": {
+						"type": "object",
+						"properties": {
+							"timestamp": {"type": "string", "required": true},
+							"user": {"type": "string", "required": true}
+						}
+					},
+					"name": {"type": "string", "required": true},
+					"language": {"type": "string", "required": true},
+					"metadataDelivery": {
+						"type": "string",
+						"enum": ["manual", "batch", "external"]
+					},
+					"activity": {
+						"type": "object",
+						"properties": {
+							"active": {"type": "boolean", "default": true, "required": true},
+							"yearInactivated": {"type": "number"}
+						}
+					},
+					"streetAdderss": {
+						"type": "object",
+						"properties": {
+							"address": {"type": "string", "required": true},
+							"city": {"type": "string", "required": true},
+							"zip": {"type": "string", "required": true}
+						}
+					},
+					"email": {"type":"string", "format":"email", "required":true},
+					"website": {"type": "string", "required": true}
+				},
+				"Publication": {},
+				"Error": {}
+			}
 		}
 	}
 }

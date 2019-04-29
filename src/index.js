@@ -36,7 +36,7 @@ import {MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
 // const {createLogger, handleInterrupt} = Utils;
 
 async function run() {
-	// Mongoose.set('debug', MONGO_DEBUG);
+	Mongoose.set('debug', MONGO_DEBUG);
 	// const Logger = createLogger();
 
 	const app = express();

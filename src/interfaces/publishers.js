@@ -26,14 +26,20 @@
  *
  */
 import {Mongoose} from 'mongoose';
-import publishers from '../routes/publishers';
 import {PublisherModel} from './models';
 
 export default function({url}) {
-	Mongoose.models('Publisher', PublisherModel);
+	// Mongoose.model('Publisher', PublisherModel);
 	return {create, read, update, remove, query, newPublication};
 
-	async function query({profile, contentType, state, creationTime, modificationTime, user}) {
+	async function query({
+		profile,
+		contentType,
+		state,
+		creationTime,
+		modificationTime,
+		user
+	}) {
 		// const publishers = await Mongoose.models.PublisherMetadata.find();
 		// const permittedPublishers = await filterPermitted();
 		// return filterPermitted.filter(applyFilters).map(publisher => ({
@@ -78,9 +84,25 @@ export default function({url}) {
 	}
 
 	async function read({id}) {
-		console.log(id);
-		const publishers = await Mongoose.models.Publisher.findOne({id}).exec();
-		return publishers.filter(item => console.log(item));
+		return {
+			id: 'foo',
+			lastUpdated: {
+				timestamp: 'foo',
+				user: 'foo'
+			},
+			name: 'foo',
+			language: 'foo',
+			activity: {
+				active: true
+			},
+			streetAddress: {
+				address: 'foo',
+				city: 'foo',
+				zip: 'foo'
+			},
+			email: 'foo@bar.com',
+			website: 'foo'
+		};
 	}
 
 	async function create({inputStream, publisher, contentType, user}) {

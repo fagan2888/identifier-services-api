@@ -26,39 +26,4 @@
  *
  */
 
-import Mongoose from 'mongoose';
-import {UserModel} from './models';
-import {v4 as uuid} from 'uuid';
-
-export default function() {
-	Mongoose.model('User', UserModel);
-	return {create, read, update, remove, changePwd, query};
-
-	async function create({preference}) {
-		const id = uuid();
-		const newUser = {
-			id, preference
-		};
-		console.log(newUser);
-	}
-
-	async function read(val) {
-		console.log(val);
-	}
-
-	async function update(val) {
-		console.log(val);
-	}
-
-	async function remove(val) {
-		console.log(val);
-	}
-
-	async function changePwd(val) {
-		console.log(val);
-	}
-
-	async function query(val) {
-		console.log(val);
-	}
-}
+ 

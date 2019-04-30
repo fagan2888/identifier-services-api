@@ -1,0 +1,8 @@
+{
+    "users": [{
+        "id": "foo",
+        "preference": {
+            "defaultLanguage": "foo"
+        }
+    }]
+}

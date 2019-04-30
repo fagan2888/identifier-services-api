@@ -27,12 +27,22 @@
  */
 
 import {Router} from 'express';
+import {usersFactory} from '../interfaces';
+import {API_URL} from '../config';
+import bodyParser from 'body-parser';
+import validateContentType from '@natlibfi/express-validate-content-type';
 
 export default function() {
-	const users = {};
+	const users = usersFactory({url: API_URL});
 
 	return new Router()
-		.post('/', create)
+		.post(
+			'/',
+			// validateContentType({type: 'application/json'}),
+			bodyParser.urlencoded({extended: false}),
+			bodyParser.json({type: 'application/json'}),
+			create
+		)
 		.get('/:id', read)
 		.put('/:id', update)
 		.delete('/:id', remove)
@@ -41,7 +51,10 @@ export default function() {
 
 	async function create(req, res, next) {
 		try {
-			res.json({name: 'sanjog'});
+			const user = await users.create({
+				preference: req.body.preference
+			});
+			res.json(user);
 		} catch (err) {
 			next(err);
 		}

@@ -298,8 +298,8 @@
 				"tags": ["publishers"],
 				"parameters": [
 					{
-						"name": "id",
-						"in": "read",
+						"name": "publisherId",
+						"in": "path",
 						"description": "ID of publisher to fetch",
 						"require": true,
 						"schema": {
@@ -313,7 +313,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Publishers"
+									"$ref": "#/components/schemas/Publisher"
 								}
 							}
 						}
@@ -335,21 +335,47 @@
 			"put": {
 				"summary": "Update a publisher",
 				"tags": ["publishers"],
+				"parameters": [
+					{
+						"name": "publisherId",
+						"in": "path",
+						"description": "ID of publisher to fetch",
+						"require": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
 				"requestBody": {
+					"required": true,
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Publishers"
+								"$ref": "#/components/schemas/Publisher"
 							}
 						}
 					}
 				},
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Publisher"
+								}
+							}
+						}
 					},
 					"201": {
-						"description": "The publisher was updated"
+						"description": "The publisher was updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type":"string"
+								}
+							}
+						}
 					},
 					"204": {
 						"description": "No new content to be updated"
@@ -404,14 +430,6 @@
 			"post": {
 				"summary": "Query for publishers",
 				"tags": ["publishers"],
-				"parameters": [
-					{
-						"name": "publishers",
-						"in": "query",
-						"description": "Query certain publishers",
-						"required": true
-					}
-				],
 				"responses": {
 					"200": {
 						"description": "OK"
@@ -440,8 +458,8 @@
 				"tags": ["publications"],
 				"parameters": [
 					{
-						"name": "id",
-						"in": "newPublication",
+						"name": "publicationId",
+						"in": "path",
 						"description": "ID of publishers",
 						"required": true,
 						"schema": {
@@ -524,7 +542,7 @@
 							"zip": {"type": "string", "required": true}
 						}
 					},
-					"email": {"type":"string", "format":"email", "required":true},
+					"email": {"type": "string", "format": "email", "required": true},
 					"website": {"type": "string", "required": true}
 				},
 				"Publication": {},

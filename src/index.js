@@ -32,7 +32,6 @@ import path from 'path';
 import {createUsersRouter, createPublishersRouter} from './routes';
 import Mongoose from 'mongoose';
 import {MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
-
 const {createLogger, handleInterrupt} = Utils;
 
 async function run() {
@@ -44,9 +43,6 @@ async function run() {
 	// await Mongoose.connect(MONGO_URI, {useNewUrlParser: true});
 
 	app.use(cors());
-	app.get('/', (req, res) => {
-		console.log('works');
-	});
 	app.use('/users', createUsersRouter());
 	app.use('/publishers', createPublishersRouter());
 

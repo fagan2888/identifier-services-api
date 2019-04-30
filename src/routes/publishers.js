@@ -27,13 +27,23 @@
  */
 
 import {Router} from 'express';
+import bodyParser from 'body-parser';
+import validateContentType from '@natlibfi/express-validate-content-type';
 import {publishersFactory} from '../interfaces';
 import {API_URL} from '../config';
 
 export default function() {
 	const publishers = publishersFactory({url: API_URL});
 	return new Router()
-		.post('/', create)
+		.post(
+			'/',
+			validateContentType({
+				type: ['application/json', 'application/x-www-form-urlencoded']
+			}),
+			bodyParser.urlencoded({extended: false}),
+			bodyParser.json({type: 'application/json'}),
+			create
+		)
 		.get('/:id', read)
 		.put('/:id', update)
 		.delete('/:id', remove)
@@ -43,7 +53,7 @@ export default function() {
 	async function query(req, res, next) {
 		try {
 			const queryParams = getQueryParams();
-			const result = await publishers.query({user: req.user, ...queryParams});
+			const result = await publishers.query({...queryParams, user: req.user});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -68,7 +78,10 @@ export default function() {
 
 	async function read(req, res, next) {
 		try {
-			const result = await publishers.read({id: req.params.id, user: req.user});
+			const result = await publishers.read({
+				id: req.params.id,
+				publisher: req.publisher
+			});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -97,7 +110,7 @@ export default function() {
 
 	async function create(req, res, next) {
 		try {
-			console.log(req.body);
+			console.log(req);
 		} catch (err) {
 			next(err);
 		}

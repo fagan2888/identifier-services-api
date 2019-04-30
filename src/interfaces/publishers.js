@@ -25,61 +25,21 @@
  * for the JavaScript code in this file.
  *
  */
-import {Mongoose} from 'mongoose';
+import Mongoose from 'mongoose';
+import {PublisherModel} from './models';
 
 export default function({url}) {
+	Mongoose.model('Publisher', PublisherModel);
 	return {create, read, update, remove, query, newPublication};
 
-	async function query({profile, contentType, state, creationTime, modificationTime, user}) {
-		// const publishers = await Mongoose.models.PublisherMetadata.find();
-		// const permittedPublishers = await filterPermitted();
-		// return filterPermitted.filter(applyFilters).map(publisher => ({
-		// 	id: publisher.id,
-		// 	url: `${url}/publishers/${publishers.id}`
-		// }));
-		// async function filterPermitted() {
-		// 	const filtered = await Promise.all(
-		// 		publishers.map(async obj => {
-		// 			const publisher = await getPublisher(obj.profile);
-		// 			// if (hasPermission(profile, user)) {
-		// 			return publisher;
-		// 			// }
-		// 		})
-		// 	);
-		// 	return filtered.filter(v => v);
-		// }
-		// function applyFilters(publisher) {
-		// 	if (state && !state.includes(publisher.state)) {
-		// 		return false;
-		// 	}
-		// 	if (profile && !profile.includes(publisher.profile)) {
-		// 		return false;
-		// 	}
-		// 	if (contentType && !contentType.includes(publisher.contentType)) {
-		// 		return false;
-		// 	}
-		// 	if (creationTime && !timeInRange(publisher.creationTime, creationTime)) {
-		// 		return false;
-		// 	}
-		// 	if (
-		// 		modificationTime &&
-		// 		!timeInRange(publisher.modificationTime, modificationTime)
-		// 	) {
-		// 		return false;
-		// 	}
-		// 	return true;
-		// 	function timeInRange(contextStr, [startStr, endStr]){
-		// 	}
-		// }
-		console.log('query');
+	async function query() {}
+
+	async function read({id, publisher}) {
+		return publisher;
 	}
 
-	async function read({id, user}) {
-		console.log(id, user);
-	}
-
-	async function create({inputStream, publisher, contentType, user}) {
-		console.log(inputStream, publisher, contentType, user);
+	async function create({id}) {
+		console.log(id);
 	}
 
 	async function update({id, payload, user}) {
@@ -98,7 +58,7 @@ export default function({url}) {
 	// 	const profile = await Mongoose.models.Publisher.findOne({id});
 
 	// 	if (publisher) {
-	// 		return publisher;
+	// 		 (publisher)
 	// 	}
 	// }
 }

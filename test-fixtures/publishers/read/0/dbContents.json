@@ -1,0 +1,21 @@
+{
+    "publishers":[{
+        "id":"foo",
+        "lastUpdated":{
+            "timestamp":"foo",
+            "user": "foo"
+        },
+        "name": "foo",
+        "language":"foo",
+        "activity":{
+            "active": true
+        },
+        "streetAddress":{
+            "address": "foo",
+            "city": "foo",
+            "zip": "foo"
+        },
+        "email":"foo@bar.com",
+        "website": "foo"
+    }]
+}

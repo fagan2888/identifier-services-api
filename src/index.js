@@ -31,42 +31,51 @@ import cors from 'cors';
 import path from 'path';
 import {createUsersRouter, createPublishersRouter} from './routes';
 import Mongoose from 'mongoose';
-import {MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
+import {ENABLE_PROXY, MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
+
 const {createLogger, handleInterrupt} = Utils;
 
-async function run() {
-	// Mongoose.set('debug', MONGO_DEBUG);
-	const Logger = createLogger();
-
-	const app = express();
-
-	// await Mongoose.connect(MONGO_URI, {useNewUrlParser: true});
-
-	app.use(cors());
-	app.use('/users', createUsersRouter());
-	app.use('/publishers', createPublishersRouter());
-
-	const server = app.listen(HTTP_PORT, () => {
-		// Logger.log('info', 'Started melinda-record-import-api');
-		console.log('server running');
-	});
-
-	// registerSignalHandlers();
-
-	// function registerSignalHandlers() {
-	// 	process
-	// 		.on('SIGINT', handle)
-	// 		.on('uncaughtException', handle)
-	// 		.on('unhandledRejection', handle)
-	// 		// Nodemon
-	// 		.on('SIGUSR2', handle);
-
-	// 	function handle() {
-	// 		server.close();
-	// 		// Mongoose.disconnect();
-	// 		handleInterrupt(arg);
-	// 	}
-	// }
-}
-
 run();
+
+async function run() {
+	try {
+		Mongoose.set('debug', MONGO_DEBUG);
+		// const Logger = createLogger();
+
+		const app = express();
+
+		await Mongoose.connect(MONGO_URI, {
+			useNewUrlParser: true,
+			useCreateIndex: true
+		});
+		app.enable('trust proxy', ENABLE_PROXY);
+
+		app.use(cors());
+		app.use('/users', createUsersRouter());
+		app.use('/publishers', createPublishersRouter());
+
+		const server = app.listen(HTTP_PORT, () => {
+			// Logger.log('info', 'Started melinda-record-import-api');
+			console.log(`server running in port ${HTTP_PORT}`);
+		});
+
+		registerSignalHandlers();
+
+		function registerSignalHandlers() {
+			process
+				.on('SIGINT', handle)
+				.on('uncaughtException', handle)
+				.on('unhandledRejection', handle)
+				// Nodemon
+				.on('SIGUSR2', handle);
+
+			function handle(arg) {
+				server.close();
+				Mongoose.disconnect();
+				handleInterrupt(arg);
+			}
+		}
+	} catch (err) {
+		console.log(err);
+	}
+}

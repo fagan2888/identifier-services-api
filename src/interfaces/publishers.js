@@ -38,8 +38,8 @@ export default function({url}) {
 		return publisher;
 	}
 
-	async function create({inputStream, publisher, contentType, user}) {
-		console.log(inputStream, publisher, contentType, user);
+	async function create({id}) {
+		console.log(id);
 	}
 
 	async function update({id, payload, user}) {

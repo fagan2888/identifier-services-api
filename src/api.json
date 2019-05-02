@@ -1732,23 +1732,507 @@
 					}
 				}
 			},
-			"Publications": {
+			"Publication_ISSN": {
 				"type": "object",
 				"properties": {
-					"id": {"type": "string", "required": true, "unique": true},
-					"lastUpdated": {
+					"metadata": {
 						"type": "object",
+						"description": "meta data of publication ISSN",
 						"properties": {
-							"timestamp": {"type": "string", "required": true},
-							"user": {"type": "string", "required": true}
+							"id": {
+								"type": "string",
+								"required": true,
+								"unique": true,
+								"description": "Identifier of the ISSN publication"
+							},
+							"lastUpdated": {
+								"type": "object",
+								"properties": {
+									"timestamp": {
+										"type": "string",
+										"required": true,
+										"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+									},
+									"user": {
+										"type": "string",
+										"required": true,
+										"description": "The id of the user who did the update."
+									}
+								}
+							},
+							"title": {
+								"type": "string",
+								"required": true,
+								"description": "Publication title"
+							},
+							"publicationId": {
+								"type": "string",
+								"required": false,
+								"description": "Identifier of the created publication"
+							},
+							"melindald": {
+								"type": "string",
+								"required": false,
+								"decription": "Identifier of the corresponding metadata record in Melinda"
+							},
+							"subtitle": {
+								"type": "string",
+								"required": false,
+								"description": "Publication subtitle"
+							},
+							"year": {
+								"type": "number",
+								"required": true,
+								"description": "Year the publication first started"
+							},
+							"number": {
+								"type": "number",
+								"required": false,
+								"description": "The first number of the publication"
+							},
+							"language": {
+								"type": "string",
+								"required": true,
+								"description": "Publication language(Three-letter language code)"
+							},
+							"frequency": {
+								"type": "string",
+								"required": true,
+								"description": "Publication frequency"
+							},
+							"type": {
+								"type": "string",
+								"required": true,
+								"description": "Publication type"
+							},
+							"additionalDetails": {
+								"type": "string",
+								"required": false,
+								"description": "Additional details of the publication"
+							}
 						}
 					},
-					"name": {"type": "string", "required": true},
-					"language": {"type": "string", "required": true},
-					"email": {"type": "string", "format": "email", "required": false},
-					"website": {"type": "string", "required": false},
-					"publicationEstimate": {"type": "number", "required": false},
-					"notes": {"type": "string", "required": false}
+					"electronicDetails": {
+						"type": "object",
+						"description": "An optional property describing details of the electronic publication",
+						"properties": {
+							"url": {
+								"type": "string",
+								"required": false,
+								"description": " Publicly accessible URL of the publication"
+							}
+						}
+					},
+					"printDetails": {
+						"type": "object",
+						"description": "An optional property describing details of the printed publication",
+						"properties": {
+							"manufacturer": {
+								"type": "string",
+								"required": true,
+								"description": "Name of the manufacturer"
+							},
+							"city": {
+								"type": "string",
+								"required": false,
+								"description": "Manufacturer city"
+							}
+						}
+					},
+					"seriesDetails": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"mainSeries": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"subSeries": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"otherMedium": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"previousPublication": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							},
+							"year": {
+								"type": "number",
+								"required": false,
+								"description": "The last year of publication"
+							},
+							"number": {
+								"type": "number",
+								"required": false,
+								"description": "The last issue number"
+							}
+						}
+					}
+				}
+			},
+			"PublicationRequest_ISSN": {
+				"type": "object",
+				"properties": {
+					"metadata": {
+						"type": "object",
+						"description": "meta data of publication request ISSN",
+						"properties": {
+							"id": {
+								"type": "string",
+								"required": true,
+								"unique": true,
+								"description": "Identifier of the ISSN publication request"
+							},
+							"lastUpdated": {
+								"type": "object",
+								"properties": {
+									"timestamp": {
+										"type": "string",
+										"required": true,
+										"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+									},
+									"user": {
+										"type": "string",
+										"required": true,
+										"description": "The id of the user who did the update."
+									}
+								}
+							},
+							"title": {
+								"type": "string",
+								"required": true,
+								"description": "Publication title"
+							},
+							"subtitle": {
+								"type": "string",
+								"required": false,
+								"description": "Publication subtitle"
+							},
+							"year": {
+								"type": "number",
+								"required": true,
+								"description": "Year the publication first started"
+							},
+							"number": {
+								"type": "number",
+								"required": false,
+								"description": "The first number of the publication"
+							},
+							"language": {
+								"type": "string",
+								"required": true,
+								"description": "Publication language(Three-letter language code)"
+							},
+							"frequency": {
+								"type": "string",
+								"required": true,
+								"description": "Publication frequency"
+							},
+							"type": {
+								"type": "string",
+								"required": true,
+								"description": "Publication type"
+							},
+							"additionalDetails": {
+								"type": "string",
+								"required": false,
+								"description": "Additional details of the publication"
+							}
+						}
+					},
+					"electronicDetails": {
+						"type": "object",
+						"description": "An optional property describing details of the electronic publication",
+						"properties": {
+							"url": {
+								"type": "string",
+								"required": false,
+								"description": " Publicly accessible URL of the publication"
+							}
+						}
+					},
+					"printDetails": {
+						"type": "object",
+						"description": "An optional property describing details of the printed publication",
+						"properties": {
+							"manufacturer": {
+								"type": "string",
+								"required": true,
+								"description": "Name of the manufacturer"
+							},
+							"city": {
+								"type": "string",
+								"required": false,
+								"description": "Manufacturer city"
+							}
+						}
+					},
+					"seriesDetails": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"mainSeries": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"subSeries": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"otherMedium": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
+						}
+					},
+					"previousPublication": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							},
+							"year": {
+								"type": "number",
+								"required": false,
+								"description": "The last year of publication"
+							},
+							"number": {
+								"type": "number",
+								"required": false,
+								"description": "The last issue number"
+							}
+						}
+					}
+				}
+			},
+			"IdentifierRangesISBN": {
+				"type": "object",
+				"properties": {
+					"prefix": {
+						"type": "string",
+						"required": true,
+						"default": 978,
+						"description": " Range prefix"
+					},
+					"language": {
+						"type": "string",
+						"required": true,
+						"default": "951",
+						"description": "Range language code"
+					},
+					"rangeStart": {
+						"type": "number",
+						"required": true,
+						"example": 20,
+						"description": "ISBN range start"
+					},
+					"rangeEnd": {
+						"type": "number",
+						"required": true,
+						"example": 54,
+						"description": "ISBN range end"
+					},
+					"publisher": {
+						"type": "string",
+						"required": false,
+						"description": "The id of the publisher who owns this range"
+					},
+					"active": {
+						"type": "boolean",
+						"required": true,
+						"default": true,
+						"description": "Whether the range is active or not. Defaults to true."
+					},
+					"reservedCount": {
+						"type": "number",
+						"required": true,
+						"default": 0,
+						"description": "Number of identifiers already reserved in this range."
+					}
+				}
+			},
+			"IdentifierRangesISMN": {
+				"type": "object",
+				"properties": {
+					"prefix": {
+						"type": "string",
+						"required": true,
+						"default": "979-0",
+						"description": " Range prefix"
+					},
+					"rangeStart": {
+						"type": "number",
+						"required": true,
+						"example": 55001,
+						"description": "ISMN range start"
+					},
+					"rangeEnd": {
+						"type": "number",
+						"required": true,
+						"example": 55020,
+						"description": "ISMN range end"
+					},
+					"publisher": {
+						"type": "string",
+						"required": false,
+						"description": "The id of the publisher who owns/use this range"
+					},
+					"active": {
+						"type": "boolean",
+						"required": true,
+						"default": true,
+						"description": "Whether the range is active or not. Defaults to true."
+					},
+					"reservedCount": {
+						"type": "number",
+						"required": true,
+						"default": 0,
+						"description": "Number of identifiers already reserved in this range."
+					}
+				}
+			},
+			"IdentifierRangesISSN": {
+				"type": "object",
+				"properties": {
+					"rangeStart": {
+						"type": "string",
+						"required": true,
+						"example": "1797-0008",
+						"description": "ISSN range start"
+					},
+					"rangeEnd": {
+						"type": "string",
+						"required": true,
+						"example": "1797-9994",
+						"description": "ISSN range end"
+					},
+					"active": {
+						"type": "boolean",
+						"required": true,
+						"default": true,
+						"description": "Whether the range is active or not. Defaults to true."
+					},
+					"reservedCount": {
+						"type": "number",
+						"required": true,
+						"default": 0,
+						"description": "Number of identifiers already reserved in this range."
+					}
 				}
 			}
 		}

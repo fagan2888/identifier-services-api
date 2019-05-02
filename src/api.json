@@ -1732,23 +1732,304 @@
 					}
 				}
 			},
-			"Publications": {
+			"Publication_ISBN_ISMN": {
 				"type": "object",
 				"properties": {
-					"id": {"type": "string", "required": true, "unique": true},
-					"lastUpdated": {
-						"type": "object",
+					"metadata": {
 						"properties": {
-							"timestamp": {"type": "string", "required": true},
-							"user": {"type": "string", "required": true}
+							"id": {"type": "string", "required": true, "unique": true},
+							"lastUpdated": {
+								"type": "object",
+								"properties": {
+									"timestamp": {
+										"type": "string",
+										"required": true,
+										"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+									},
+									"user": {
+										"type": "string",
+										"required": true,
+										"description": "The id of the user who did the update."
+									}
+								}
+							},
+							"title": {
+								"type": "string",
+								"required": true,
+								"description": "Publication title"
+							},
+							"publicationId": {
+								"type": "string",
+								"description": "Identifier of the created publication."
+							},
+							"melindaId": {
+								"type": "string",
+								"description": "Identifier of the corresponding metadata record in Melinda."
+							},
+							"type": {
+								"type": "string",
+								"required": true,
+								"description": "Publication type. Can be one of: book, dissertation, music, other"
+							},
+							"subtitle": {
+								"type": "string",
+								"description": "Publication subtitle"
+							},
+							"language": {
+								"type": "string",
+								"required": true,
+								"description": "Publication language (Three-letter language code)."
+							},
+							"publicationTime": {
+								"type": "string",
+								"required": true,
+								"description": "Publication time in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+							},
+							"additionalDetails": {
+								"type": "string",
+								"description": "Additional details of the publication."
+							},
+							"authors": {
+								"type": "array",
+								"items": {
+									"type":"object",
+									"properties": {
+										"givenName": {
+											"type": "string",
+											"required": true,
+											"description": "Given name of the author"
+										},
+										"familyName": {
+											"type": "string",
+											"required": true,
+											"description": "Family name of the author"
+										},
+										"role": {
+											"type": "string",
+											"required": true,
+											"description": "Role of the author. Can be one of: author, illustrator, translator, editor"
+										}
+									}
+								},
+								"minItems": 1,
+								"description":"array of authors"
+							},
+							"series": {
+								"type": "object",
+								"properties": {
+									"identifier": {
+										"type": "string",
+										"required": true,
+										"description": "Identifier of the publication (e.g. ISBN or ISSN). Mutually exclusive with name."
+									},
+									"name": {
+										"type": "string",
+										"required": true,
+										"description": "Name of the publication. Mutually exclusive with identifier."
+									},
+									"volume": {
+										"type": "number",
+										"description": "Number of the volume."
+									}
+								}
+							},
+							"electronicdetails": {
+								"type":"object",
+								"description": "An optional property describing details of the electronic publication.",
+								"properties": {
+									"format": {
+										"type": "string",
+										"required": true,
+										"description": "Publication format"
+									}
+								}
+							},
+							"printDetails": {
+								"type": "object",
+								"description": "An optional property describing details of the printed publication.",
+								"properties": {
+									"manufacturer": {
+										"type": "string",
+										"required": true,
+										"description": "Name of the manufacturer."
+									},
+									"city": {
+										"type": "string",
+										"description": "Manufacturer city."
+									},
+									"run": {
+										"type": "number",
+										"description": "The number of copies printed."
+									},
+									"edition": {
+										"type": "number",
+										"description": "The number of publication edition."
+									},
+									"format": {
+										"type": "string",
+										"required": true,
+										"description": "Publication format."
+									}
+								}
+							},
+							"mapDetails": {
+								"type": "object",
+								"description": "An optional property describing details of map publications.",
+								"properties": {
+									"scale": {
+										"type": "string",
+										"description": "Map scale"
+									}
+								}
+							}
 						}
-					},
-					"name": {"type": "string", "required": true},
-					"language": {"type": "string", "required": true},
-					"email": {"type": "string", "format": "email", "required": false},
-					"website": {"type": "string", "required": false},
-					"publicationEstimate": {"type": "number", "required": false},
-					"notes": {"type": "string", "required": false}
+					}
+				}
+			},
+			"Publication_creation_request_ISBN_ISMN": {
+				"type": "object",
+				"properties": {
+					"metadata": {
+						"properties": {
+							"id": {"type": "string", "required": true, "unique": true},
+							"lastUpdated": {
+								"type": "object",
+								"properties": {
+									"timestamp": {
+										"type": "string",
+										"required": true,
+										"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+									},
+									"user": {
+										"type": "string",
+										"required": true,
+										"description": "The id of the user who did the update."
+									}
+								}
+							},
+							"title": {
+								"type": "string",
+								"required": true,
+								"description": "Publication title"
+							},
+							"type": {
+								"type": "string",
+								"required": true,
+								"description": "Publication type. Can be one of: book, dissertation, music, other"
+							},
+							"subtitle": {
+								"type": "string",
+								"description": "Publication subtitle"
+							},
+							"language": {
+								"type": "string",
+								"required": true,
+								"description": "Publication language (Three-letter language code)."
+							},
+							"publicationTime": {
+								"type": "string",
+								"required": true,
+								"description": "Publication time in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+							},
+							"additionalDetails": {
+								"type": "string",
+								"description": "Additional details of the publication."
+							},
+							"authors": {
+								"type": "array",
+								"items": {
+									"type":"object",
+									"properties": {
+										"givenName": {
+											"type": "string",
+											"required": true,
+											"description": "Given name of the author"
+										},
+										"familyName": {
+											"type": "string",
+											"required": true,
+											"description": "Family name of the author"
+										},
+										"role": {
+											"type": "string",
+											"required": true,
+											"description": "Role of the author. Can be one of: author, illustrator, translator, editor"
+										}
+									}
+								},
+								"minItems": 1,
+								"description":"array of authors"
+							},
+							"series": {
+								"type": "object",
+								"properties": {
+									"identifier": {
+										"type": "string",
+										"required": true,
+										"description": "Identifier of the publication (e.g. ISBN or ISSN). Mutually exclusive with name."
+									},
+									"name": {
+										"type": "string",
+										"required": true,
+										"description": "Name of the publication. Mutually exclusive with identifier."
+									},
+									"volume": {
+										"type": "number",
+										"description": "Number of the volume."
+									}
+								}
+							},
+							"electronicdetails": {
+								"type":"object",
+								"description": "An optional property describing details of the electronic publication.",
+								"properties": {
+									"format": {
+										"type": "string",
+										"required": true,
+										"description": "Publication format"
+									}
+								}
+							},
+							"printDetails": {
+								"type": "object",
+								"description": "An optional property describing details of the printed publication.",
+								"properties": {
+									"manufacturer": {
+										"type": "string",
+										"required": true,
+										"description": "Name of the manufacturer."
+									},
+									"city": {
+										"type": "string",
+										"description": "Manufacturer city."
+									},
+									"run": {
+										"type": "number",
+										"description": "The number of copies printed."
+									},
+									"edition": {
+										"type": "number",
+										"description": "The number of publication edition."
+									},
+									"format": {
+										"type": "string",
+										"required": true,
+										"description": "Publication format."
+									}
+								}
+							},
+							"mapDetails": {
+								"type": "object",
+								"description": "An optional property describing details of map publications.",
+								"properties": {
+									"scale": {
+										"type": "string",
+										"description": "Map scale"
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}

@@ -75,7 +75,7 @@
 					{
 						"name": "userId",
 						"in": "path",
-						"description": "ID of user which is to be retrieve",
+						"description": "ID of user to be retrieve user information",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -111,7 +111,7 @@
 					{
 						"name": "userId",
 						"in": "path",
-						"description": "ID of user which need to be updated",
+						"description": "ID of user needed to update",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -159,7 +159,7 @@
 					{
 						"name": "userId",
 						"in": "path",
-						"description": "ID of user which is to be deleted",
+						"description": "ID of user needed to delete",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -190,7 +190,7 @@
 					{
 						"name": "userId",
 						"in": "path",
-						"description": "ID of user whose password need to change",
+						"description": "ID of user needed to change password",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -239,7 +239,7 @@
 						"description": "Not authorized or Forbidden"
 					},
 					"404": {
-						"description": "The publisher does not exist"
+						"description": "The user does not exist"
 					}
 				}
 			}
@@ -300,7 +300,7 @@
 					{
 						"name": "publisherId",
 						"in": "path",
-						"description": "ID of publisher to fetch",
+						"description": "ID of publisher to fetch publisher information",
 						"require": true,
 						"schema": {
 							"type": "string"
@@ -339,7 +339,7 @@
 					{
 						"name": "publisherId",
 						"in": "path",
-						"description": "ID of publisher to fetch",
+						"description": "ID of publisher to fetch and update publisher information",
 						"require": true,
 						"schema": {
 							"type": "string"
@@ -394,31 +394,6 @@
 					},
 					"422": {
 						"description": "Invalid syntax"
-					},
-					"default": {
-						"description": "unexpected error"
-					}
-				}
-			},
-			"delete": {
-				"summary": "Delete a publisher",
-				"description": "The publisher is removed",
-				"tags": ["publishers"],
-				"responses": {
-					"200": {
-						"description": "OK"
-					},
-					"204": {
-						"description": "The publisher is removed."
-					},
-					"401": {
-						"description": "Authentication failed"
-					},
-					"403": {
-						"description": "Not authorized or Forbidden"
-					},
-					"404": {
-						"description": "The publisher does not exist"
 					},
 					"default": {
 						"description": "unexpected error"
@@ -479,7 +454,7 @@
 						}
 					},
 					"400": {
-						"description": "Publisher does not exist or Bad Request"
+						"description": "Bad Request"
 					},
 					"401": {
 						"description": "Authentication failed or Unauthorized"
@@ -507,7 +482,7 @@
 					{
 						"name": "publisherRequestId",
 						"in": "path",
-						"description": "ID of publisher's request to fetch",
+						"description": "ID of publisher request to fetch its information",
 						"require": true,
 						"schema": {
 							"type": "string"
@@ -540,15 +515,15 @@
 				}
 			},
 			"delete": {
-				"summary": "Delete a publisher's creation request",
-				"description": "The publisher's creation request is removed",
+				"summary": "Delete a publisher creation request",
+				"description": "The publisher creation request is removed",
 				"tags": ["publishers"],
 				"responses": {
 					"200": {
 						"description": "OK"
 					},
 					"204": {
-						"description": "The publisher's creation request is removed"
+						"description": "The publisher creation request is removed"
 					},
 					"401": {
 						"description": "Authentication failed"
@@ -557,7 +532,7 @@
 						"description": "Not authorized or Forbidden"
 					},
 					"404": {
-						"description": "The publisher's creation request does not exist"
+						"description": "No record found"
 					},
 					"default": {
 						"description": "unexpected error"
@@ -565,13 +540,13 @@
 				}
 			},
 			"put": {
-				"summary": "Update a publisher's creation request",
+				"summary": "Update a publisher creation request",
 				"tags": ["publishers"],
 				"parameters": [
 					{
 						"name": "publisherRequestId",
 						"in": "path",
-						"description": "ID of publisher's creation request to fetch",
+						"description": "ID of publisher creation request to fetch its information",
 						"require": true,
 						"schema": {
 							"type": "string"
@@ -600,7 +575,7 @@
 						}
 					},
 					"201": {
-						"description": "The publisher's creation request is updated",
+						"description": "The publisher creation request is updated",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -622,7 +597,7 @@
 						"description": "Not authorized or Forbidden"
 					},
 					"404": {
-						"description": "The publisher's creation request does not exist"
+						"description": "The publisher creation request does not exist"
 					},
 					"422": {
 						"description": "Invalid syntax"
@@ -630,6 +605,32 @@
 					"default": {
 						"description": "unexpected error"
 					}
+				}
+			}
+		},
+		"/publishers/request/query": {
+			"post": {
+				"summary": "Query for publishers request",
+				"tags": ["publishers"],
+				"responses": {
+					"200": {
+						"description": "OK"
+					},
+					"201": {
+						"description": "Query returned "
+					},
+					"401": {
+						"description": "Authentication failed"
+					},
+					"403": {
+						"description": "Not authorized or Forbidden"
+					},
+					"404": {
+						"description": "The publisher does not exist"
+					}
+				},
+				"default": {
+					"description": "unexpected error"
 				}
 			}
 		},
@@ -641,7 +642,7 @@
 					{
 						"name": "publicationId",
 						"in": "path",
-						"description": "ID of publishers",
+						"description": "ID of a new publication",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -678,7 +679,7 @@
 					{
 						"name": "publicationsId",
 						"in": "path",
-						"description": "ID of publications to fetch",
+						"description": "ID of publications to fetch metadata informations",
 						"require": true,
 						"schema": {
 							"type": "string"
@@ -712,12 +713,12 @@
 			},
 			"put": {
 				"summary": "Update a publication metadata",
-				"tags": ["publishers"],
+				"tags": ["publications"],
 				"parameters": [
 					{
 						"name": "publicationId",
 						"in": "path",
-						"description": "ID of publication metadata to fetch",
+						"description": "ID of publication to fetch metadata informations",
 						"require": true,
 						"schema": {
 							"type": "string"
@@ -746,7 +747,7 @@
 						}
 					},
 					"201": {
-						"description": "The publisher's creation request is updated",
+						"description": "The publication metadata is updated",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -768,7 +769,7 @@
 						"description": "Not authorized or Forbidden"
 					},
 					"404": {
-						"description": "The publisher's creation request does not exist"
+						"description": "No record found"
 					},
 					"422": {
 						"description": "Invalid syntax"
@@ -778,8 +779,206 @@
 					}
 				}
 			}
+		},
+		"/publishers/{id}/publications/requests": {
+			"post": {
+				"summary": "Create a new publication request",
+				"tags": ["publications"],
+				"parameters": [
+					{
+						"name": "publicationRequestId",
+						"in": "path",
+						"description": "ID of publication request",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					},
+					"201": {
+						"description": "New Publication request created"
+					},
+					"401": {
+						"description": "Authentication failed"
+					},
+					"403": {
+						"description": "Not authorized or Forbidden"
+					},
+					"404": {
+						"description": "The publisher does not exist"
+					},
+					"default": {
+						"description": "unexpected error"
+					}
+				}
+			}
+		},
+		"/publishers/{id}/publications/requests/{id}": {
+			"get": {
+				"summary": "Retrive a publication creation request",
+				"tags": ["publications"],
+				"parameters": [
+					{
+						"name": "publicationsRequestId",
+						"in": "path",
+						"description": "ID of publications creation request to fetch",
+						"require": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Publisher"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Authentication failed"
+					},
+					"403": {
+						"description": "Not authorized or Forbidden"
+					},
+					"404": {
+						"description": "No record found"
+					},
+					"default": {
+						"description": "unexpected error"
+					}
+				}
+			},
+			"delete": {
+				"summary": "Delete a publisher request",
+				"description": "The publisher creation request is removed",
+				"tags": ["publications"],
+				"responses": {
+					"200": {
+						"description": "OK"
+					},
+					"204": {
+						"description": "The publisher creation request is removed"
+					},
+					"401": {
+						"description": "Authentication failed"
+					},
+					"403": {
+						"description": "Not authorized or Forbidden"
+					},
+					"404": {
+						"description": "No record found"
+					},
+					"default": {
+						"description": "unexpected error"
+					}
+				}
+			},
+			"put": {
+				"summary": "Update a publications creation request",
+				"tags": ["publications"],
+				"parameters": [
+					{
+						"name": "publicationRequestId",
+						"in": "path",
+						"description": "ID of publication creation request to fetch",
+						"require": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Publisher"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Publisher"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "The publication's creation request is updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No new content to be updated"
+					},
+					"400": {
+						"description": "Malformed content or Bad request"
+					},
+					"401": {
+						"description": "Authentication failed"
+					},
+					"403": {
+						"description": "Not authorized or Forbidden"
+					},
+					"404": {
+						"description": "No record found"
+					},
+					"422": {
+						"description": "Invalid syntax"
+					},
+					"default": {
+						"description": "unexpected error"
+					}
+				}
+			}
+		},
+		"/publishers/{id}/publications/query": {
+			"post": {
+				"summary": "Query for publications",
+				"tags": ["publications"],
+				"responses": {
+					"200": {
+						"description": "OK"
+					},
+					"201": {
+						"description": "Query returned "
+					},
+					"401": {
+						"description": "Authentication failed"
+					},
+					"403": {
+						"description": "Not authorized or Forbidden"
+					},
+					"404": {
+						"description": "The publisher does not exist"
+					},
+					"default": {
+						"description": "unexpected error"
+					}
+				}
+			}
 		}
 	},
+
 	"components": {
 		"securitySchemes": {
 			"httpBasic": {
@@ -788,41 +987,200 @@
 			}
 		},
 		"schemas": {
-			"User": {
+			"userMetadata": {
 				"type": "object",
 				"properties": {
-					"id": {"type": "string", "required": true},
+					"id": {
+						"type": "string",
+						"required": true,
+						"unique": true,
+						"description": "Identifier of the user metadata"
+					},
 					"preference": {
 						"type": "object",
 						"properties": {
-							"defaultLanguage": {"type": "string", "required": true}
+							"defaultLanguage": {
+								"type": "string",
+								"required": true,
+								"description": "Three-letter language code. Defaults to the language defined in the publisher metadata (In case of the user having permissions to multiple publishers, the default is taken from the first publisher in the list or permissions)."
+							}
+						}
+					},
+					"lastUpdated": {
+						"type": "object",
+						"properties": {
+							"timestamp": {
+								"type": "string",
+								"required": true,
+								"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+							},
+							"user": {
+								"type": "string",
+								"required": true,
+								"description": "The id of the user who did the update."
+							}
 						}
 					}
 				}
 			},
-			"Publisher": {
+			"usersRequest": {
 				"type": "object",
 				"properties": {
-					"id": {"type": "string", "required": true},
+					"id": {
+						"type": "string",
+						"required": true,
+						"unique": true,
+						"description": "Identifier if the user creationRequest"
+					},
+					"userId": {
+						"type": "string",
+						"required": false,
+						"description": "Identifier of the created user"
+					},
+					"publishers": {
+						"type": "string",
+						"required": true,
+						"description": "An array of identifiers of the publishers the user should have permission to."
+					},
+					"givenName": {
+						"type": "string",
+						"required": true,
+						"description": "The user's given name"
+					},
+					"familyName": {
+						"type": "string",
+						"required": true,
+						"description": "The user's family name"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"required": true,
+						"description": "The user's email address"
+					},
+					"notes": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"required": true,
+							"description": "notes"
+						},
+						"required": true,
+						"description": "A list of notes"
+					},
 					"lastUpdated": {
 						"type": "object",
 						"properties": {
-							"timestamp": {"type": "string", "required": true},
-							"user": {"type": "string", "required": true}
+							"timestamp": {
+								"type": "string",
+								"required": true,
+								"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+							},
+							"user": {
+								"type": "string",
+								"required": true,
+								"description": "The id of the user who did the update."
+							}
+						}
+					}
+				}
+			},
+			"PublisherMetadata": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"required": true,
+						"unique": true,
+						"description": "Identifier of the created publisher"
+					},
+					"lastUpdated": {
+						"type": "object",
+						"properties": {
+							"timestamp": {
+								"type": "string",
+								"required": true,
+								"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sssZ"
+							},
+							"user": {
+								"type": "string",
+								"required": true,
+								"description": "The id of the user who did the update."
+							}
 						}
 					},
-					"name": {"type": "string", "required": true},
-					"language": {"type": "string", "required": true},
+					"name": {
+						"type": "string",
+						"required": true,
+						"description": "Publisher's Name"
+					},
+					"language": {
+						"type": "string",
+						"required": true,
+						"description": "Three-letter language code indicating the default language for the publisher"
+					},
 					"metadataDelivery": {
 						"type": "string",
 						"required": true,
-						"enum": ["manual", "batch", "external"]
+						"enum": ["manual", "external"],
+						"default": "manual",
+						"description": "The publisher's metadata delivery type. Either manual or external."
+					},
+					"primaryContact": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"required": true,
+							"description": "Email addresses of user identifier"
+						},
+						"required": true,
+						"description": "Primary contact points. An array of strings which can be email addresses or user identifiers."
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"required": false,
+						"description": "Public email address of the publisher"
+					},
+					"website": {
+						"type": "string",
+						"required": false,
+						"description": "URL of the publisher's public website"
+					},
+					"aliases": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"required": false,
+							"description": "alternate name"
+						},
+						"required": false,
+						"description": "A list of alternative publisher's names"
+					},
+					"notes": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"required": true,
+							"description": "notes"
+						},
+						"required": true,
+						"description": "A list of notes"
 					},
 					"activity": {
 						"type": "object",
 						"properties": {
-							"active": {"type": "boolean", "default": true, "required": true},
-							"yearInactivated": {"type": "number", "required": false}
+							"active": {
+								"type": "boolean",
+								"default": true,
+								"required": true,
+								"description": "Whether the publisher is active or not."
+							},
+							"yearInactivated": {
+								"type": "number",
+								"required": false,
+								"description": "The year the publisher became inactive. Can only be present when active is false."
+							}
 						}
 					},
 					"streetAddress": {
@@ -832,14 +1190,43 @@
 							"city": {"type": "string", "required": true},
 							"zip": {"type": "string", "required": true}
 						}
+					}
+				}
+			},
+			"PublisherRequest": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"unique": true,
+						"required": true,
+						"description": "Identifier of the created publisher creation request"
 					},
+					"name":{
+						"type":"string",
+						"required":true,
+						"description":"Publisher's name"
+					}
+				}
+			},
+			"Publications": {
+				"type": "object",
+				"properties": {
+					"id": {"type": "string", "required": true, "unique": true},
+					"lastUpdated": {
+						"type": "object",
+						"properties": {
+							"timestamp": {"type": "string", "required": true},
+							"user": {"type": "string", "required": true}
+						}
+					},
+					"name": {"type": "string", "required": true},
+					"language": {"type": "string", "required": true},
 					"email": {"type": "string", "format": "email", "required": false},
 					"website": {"type": "string", "required": false},
-					"aliases": {"type": "string", "required": false},
+					"publicationEstimate": {"type": "number", "required": false},
 					"notes": {"type": "string", "required": false}
-				},
-				"Publication": {},
-				"Error": {}
+				}
 			}
 		}
 	}

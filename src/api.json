@@ -1655,6 +1655,80 @@
 						"type": "string",
 						"required": true,
 						"description": "Publisher's name"
+					},
+					"publisherId": {
+						"type": "string",
+						"required": true,
+						"description": "Identifier of the created publisher"
+					},
+					"language": {
+						"type": "string",
+						"required": true,
+						"description": "Three-letter language code indicating the default language for the publisher"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"required": false,
+						"description": "Public email address of the publisher"
+					},
+					"website": {
+						"type": "string",
+						"required": false,
+						"description": "URL of the publisher's public website"
+					},
+					"publicationEstimate": {
+						"type": "number",
+						"required": false,
+						"description": "An estimate of publication per year"
+					},
+					"notes": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"required": true,
+							"description": "notes"
+						},
+						"required": true,
+						"description": "A list of notes"
+					},
+					"streetAddress": {
+						"type": "object",
+						"properties": {
+							"address": {"type": "string", "required": true},
+							"city": {"type": "string", "required": true},
+							"zip": {"type": "string", "required": true}
+						}
+					},
+					"primaryContact": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"givenName": {
+									"type": "string",
+									"required": true,
+									"description": "The user's given name."
+								},
+								"familyName": {
+									"type": "string",
+									"required": true,
+									"description": "The user's family name"
+								},
+								"email": {
+									"type": "string",
+									"format": "email",
+									"required": true,
+									"description": "The user's email address"
+								}
+							}
+						},
+						"description": "An array of object"
+					},
+					"publication": {
+						"type": "object",
+						"required": false,
+						"description": "An optional property which has has the structure of either ISBN-ISMN or ISSN publication request."
 					}
 				}
 			},

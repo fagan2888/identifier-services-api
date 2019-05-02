@@ -27,13 +27,21 @@
  */
 
 import {Router} from 'express';
-import {usersFactory} from '../interfaces';
-import {API_URL} from '../config';
 import bodyParser from 'body-parser';
 import validateContentType from '@natlibfi/express-validate-content-type';
+import expressGraphQL from 'express-graphql';
+
+import {usersFactory} from '../interfaces';
+import {API_URL} from '../config';
+import schema from '../graphql';
 
 export default function() {
 	const users = usersFactory({url: API_URL});
+
+	// const mongo = {
+	// 	Users: db.db,
+	// 	Publishers: db.collections
+	// };
 
 	return new Router()
 		.post(
@@ -51,7 +59,11 @@ export default function() {
 		.put('/:id', update)
 		.delete('/:id', remove)
 		.post('/:id/password', changePwd)
-		.post('./query', query);
+		.post(
+			'/query',
+			expressGraphQL({schema: schema, graphiql: true}),
+			query
+		);
 
 	async function create(req, res, next) {
 		try {

@@ -56,7 +56,6 @@ export default function() {
 		.get('/:id', read)
 		.put('/:id', update)
 		.delete('/:id', remove)
-		.post('/:id/password', changePwd)
 		.post('/query', query);
 
 	async function create(req, res, next) {

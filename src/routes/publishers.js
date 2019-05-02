@@ -94,14 +94,6 @@ export default function() {
 		}
 	}
 
-	async function changePwd(req, res, next) {
-		try {
-			res.json(req.body);
-		} catch (err) {
-			next(err);
-		}
-	}
-
 	async function query(req, res, next) {
 		try {
 			res.json(req);

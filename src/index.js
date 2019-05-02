@@ -28,7 +28,7 @@
 import {Utils} from '@natlibfi/melinda-commons';
 import express from 'express';
 import cors from 'cors';
-import {createUsersRouter, createPublishersRouter} from './routes';
+import {createUsersRouter, createPublishersRouter, createPublicationsRouter, createMessageTemplate} from './routes';
 import Mongoose from 'mongoose';
 import {ENABLE_PROXY, MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
 import bodyParser from 'body-parser';
@@ -53,8 +53,11 @@ async function run() {
 		app.enable('trust proxy', ENABLE_PROXY);
 
 		app.use(cors());
+		app.use('/templates', createMessageTemplate());
 		app.use('/users', createUsersRouter());
 		app.use('/publishers', createPublishersRouter());
+		app.use('publications', createPublicationsRouter());
+		
 		app.use(
 			'/graphql',
 			cors(),

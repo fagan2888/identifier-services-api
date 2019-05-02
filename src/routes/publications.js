@@ -27,27 +27,11 @@
  */
 
 import {Router} from 'express';
-import bodyParser from 'body-parser';
-import validateContentType from '@natlibfi/express-validate-content-type';
-
-import {usersFactory} from '../interfaces';
-import {API_URL} from '../config';
 
 export default function() {
-	const users = usersFactory({url: API_URL});
-
+	
 	return new Router()
-		.post(
-			'/',
-			validateContentType({
-				type: ['application/json', 'application/x-www-form-urlencoded']
-			}),
-			bodyParser.urlencoded({extended: false}),
-			bodyParser.json({
-				type: ['application/json', 'application/x-www-form-urlencoded']
-			}),
-			create
-		)
+		.post('/', create)
 		.get('/:id', read)
 		.put('/:id', update)
 		.delete('/:id', remove)
@@ -55,15 +39,11 @@ export default function() {
 		.post('/requests', createRequest)
 		.get('/requests/:id', readRequest)
 		.delete('/requests/:id', removeRequest)
-		.put('/requests/:id', updateRequest)
-		.post('/requests/query', queryRequest);
+		.put('/requests/:id', updateRequest);
 
 	async function create(req, res, next) {
 		try {
-			const user = await users.create({
-				preference: req.body.preference
-			});
-			res.json(user);
+			res.json(req);
 		} catch (err) {
 			next(err);
 		}
@@ -126,14 +106,6 @@ export default function() {
 	}
 
 	async function updateRequest(req, res, next) {
-		try {
-			res.json(req);
-		} catch (err) {
-			next(err);
-		}
-	}
-
-	async function queryRequest(req, res, next) {
 		try {
 			res.json(req);
 		} catch (err) {

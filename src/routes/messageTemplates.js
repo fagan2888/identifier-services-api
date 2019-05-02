@@ -26,7 +26,53 @@
  *
  */
 
-export {default as createUsersRouter} from './users';
-export {default as createPublishersRouter} from './publishers';
-export {default as createPublicationsRouter} from './publications';
-export {default as createMessageTemplate} from './messageTemplates';
+import {Router} from 'express';
+
+export default function() {
+	return new Router()
+		.post('/', create)
+		.get('/:id', read)
+		.put('/:id', update)
+		.delete('/:id', remove)
+		.post('/query', query);
+
+	async function create(req, res, next) {
+		try {
+			res.json(req);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function read(req, res, next) {
+		try {
+			res.json(req.params);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function update(req, res, next) {
+		try {
+			res.json(req.body);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function remove(req, res, next) {
+		try {
+			res.json(req.body);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function query(req, res, next) {
+		try {
+			res.json(req.body);
+		} catch (err) {
+			next(err);
+		}
+	}
+}

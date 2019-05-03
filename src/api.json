@@ -1441,7 +1441,7 @@
 				"type": "object",
 				"properties": {
 					"id": {
-						"type":"string",
+						"type": "string",
 						"required": true,
 						"unique": true
 					},
@@ -1456,7 +1456,7 @@
 							"defaultLanguage": {
 								"type": "string",
 								"required": true,
-								"description": "TThree-letter language code. Defaults to the language defined in the publisher metadata (In case of the user having permissions to multiple publishers, the default is taken from the first publisher in the list or permissions). For administrators defaults to fin."
+								"description": "Three-letter language code. Defaults to the language defined in the publisher metadata (In case of the user having permissions to multiple publishers, the default is taken from the first publisher in the list or permissions). For administrators defaults to fin."
 							}
 						}
 					},
@@ -1521,6 +1521,11 @@
 						},
 						"required": true,
 						"description": "A list of notes encoded as Base64."
+					},
+					"state": {
+						"type": "string",
+						"required": true,
+						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 					},
 					"lastUpdated": {
 						"type": "object",
@@ -1704,6 +1709,11 @@
 						},
 						"required": true,
 						"description": "A list of notes encoded as Base64."
+					},
+					"state": {
+						"type": "string",
+						"required": true,
+						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 					},
 					"streetAddress": {
 						"type": "object",
@@ -1980,6 +1990,60 @@
 								"type": "number",
 								"description": "Number of the volume."
 							}
+						},
+						"electronicdetails": {
+							"type": "object",
+							"description": "An optional property describing details of the electronic publication.",
+							"properties": {
+								"format": {
+									"type": "string",
+									"required": true,
+									"description": "Publication format"
+								}
+							}
+						},
+						"printDetails": {
+							"type": "object",
+							"description": "An optional property describing details of the printed publication.",
+							"properties": {
+								"manufacturer": {
+									"type": "string",
+									"required": true,
+									"description": "Name of the manufacturer."
+								},
+								"city": {
+									"type": "string",
+									"description": "Manufacturer city."
+								},
+								"run": {
+									"type": "number",
+									"description": "The number of copies printed."
+								},
+								"edition": {
+									"type": "number",
+									"description": "The number of publication edition."
+								},
+								"format": {
+									"type": "string",
+									"required": true,
+									"description": "Publication format."
+								}
+							}
+						},
+						"mapDetails": {
+							"type": "object",
+							"description": "An optional property describing details of map publications.",
+							"properties": {
+								"scale": {
+									"type": "string",
+									"description": "Map scale"
+								}
+							}
+						},
+						"state": {
+							"type": "string",
+							"required": true,
+							"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 						}
 					},
 					"electronicdetails": {
@@ -2291,123 +2355,129 @@
 						"type": "string",
 						"required": false,
 						"description": "Additional details of the publication"
-					}
-				},
-				"electronicDetails": {
-					"type": "object",
-					"description": "An optional property describing details of the electronic publication",
-					"properties": {
-						"url": {
-							"type": "string",
-							"required": false,
-							"description": " Publicly accessible URL of the publication"
+					},
+					"electronicDetails": {
+						"type": "object",
+						"description": "An optional property describing details of the electronic publication",
+						"properties": {
+							"url": {
+								"type": "string",
+								"required": false,
+								"description": " Publicly accessible URL of the publication"
+							}
 						}
-					}
-				},
-				"printDetails": {
-					"type": "object",
-					"description": "An optional property describing details of the printed publication",
-					"properties": {
-						"manufacturer": {
-							"type": "string",
-							"required": true,
-							"description": "Name of the manufacturer"
-						},
-						"city": {
-							"type": "string",
-							"required": false,
-							"description": "Manufacturer city"
+					},
+					"printDetails": {
+						"type": "object",
+						"description": "An optional property describing details of the printed publication",
+						"properties": {
+							"manufacturer": {
+								"type": "string",
+								"required": true,
+								"description": "Name of the manufacturer"
+							},
+							"city": {
+								"type": "string",
+								"required": false,
+								"description": "Manufacturer city"
+							}
 						}
-					}
-				},
-				"seriesDetails": {
-					"type": "object",
-					"description": "An optional property",
-					"properties": {
-						"identifier": {
-							"type": "string",
-							"required": true,
-							"description": "ISSN of the publication. Mutually exclusive with name"
-						},
-						"name": {
-							"type": "string",
-							"required": false,
-							"description": "Name of the publication. Mutually exclusive with identifier"
+					},
+					"seriesDetails": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
 						}
-					}
-				},
-				"mainSeries": {
-					"type": "object",
-					"description": "An optional property",
-					"properties": {
-						"identifier": {
-							"type": "string",
-							"required": true,
-							"description": "ISSN of the publication. Mutually exclusive with name"
-						},
-						"name": {
-							"type": "string",
-							"required": false,
-							"description": "Name of the publication. Mutually exclusive with identifier"
+					},
+					"mainSeries": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
 						}
-					}
-				},
-				"subSeries": {
-					"type": "object",
-					"description": "An optional property",
-					"properties": {
-						"identifier": {
-							"type": "string",
-							"required": true,
-							"description": "ISSN of the publication. Mutually exclusive with name"
-						},
-						"name": {
-							"type": "string",
-							"required": false,
-							"description": "Name of the publication. Mutually exclusive with identifier"
+					},
+					"subSeries": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
 						}
-					}
-				},
-				"otherMedium": {
-					"type": "object",
-					"description": "An optional property",
-					"properties": {
-						"identifier": {
-							"type": "string",
-							"required": true,
-							"description": "ISSN of the publication. Mutually exclusive with name"
-						},
-						"name": {
-							"type": "string",
-							"required": false,
-							"description": "Name of the publication. Mutually exclusive with identifier"
+					},
+					"otherMedium": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							}
 						}
-					}
-				},
-				"previousPublication": {
-					"type": "object",
-					"description": "An optional property",
-					"properties": {
-						"identifier": {
-							"type": "string",
-							"required": true,
-							"description": "ISSN of the publication. Mutually exclusive with name"
-						},
-						"name": {
-							"type": "string",
-							"required": false,
-							"description": "Name of the publication. Mutually exclusive with identifier"
-						},
-						"year": {
-							"type": "number",
-							"required": false,
-							"description": "The last year of publication"
-						},
-						"number": {
-							"type": "number",
-							"required": false,
-							"description": "The last issue number"
+					},
+					"previousPublication": {
+						"type": "object",
+						"description": "An optional property",
+						"properties": {
+							"identifier": {
+								"type": "string",
+								"required": true,
+								"description": "ISSN of the publication. Mutually exclusive with name"
+							},
+							"name": {
+								"type": "string",
+								"required": false,
+								"description": "Name of the publication. Mutually exclusive with identifier"
+							},
+
+							"year": {
+								"type": "number",
+								"required": false,
+								"description": "The last year of publication"
+							},
+							"number": {
+								"type": "number",
+								"required": false,
+								"description": "The last issue number"
+							}
 						}
+					},
+					"state": {
+						"type": "string",
+						"required": true,
+						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 					}
 				}
 			},

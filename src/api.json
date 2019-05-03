@@ -2435,6 +2435,27 @@
 			"IdentifierRangesISBN": {
 				"type": "object",
 				"properties": {
+					"id": {
+						"type": "string",
+						"required": true,
+						"unique": true,
+						"description": "Identifier of the ISBN identifier ranges"
+					},
+					"lastUpdated": {
+						"type": "object",
+						"properties": {
+							"timestamp": {
+								"type": "string",
+								"required": true,
+								"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sss"
+							},
+							"user": {
+								"type": "string",
+								"required": true,
+								"description": "The id of the user who did the update."
+							}
+						}
+					},
 					"prefix": {
 						"type": "string",
 						"required": true,
@@ -2481,6 +2502,27 @@
 			"IdentifierRangesISMN": {
 				"type": "object",
 				"properties": {
+					"id": {
+						"type": "string",
+						"required": true,
+						"unique": true,
+						"description": "Identifier of the ISMN identifier ranges"
+					},
+					"lastUpdated": {
+						"type": "object",
+						"properties": {
+							"timestamp": {
+								"type": "string",
+								"required": true,
+								"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sss"
+							},
+							"user": {
+								"type": "string",
+								"required": true,
+								"description": "The id of the user who did the update."
+							}
+						}
+					},
 					"prefix": {
 						"type": "string",
 						"required": true,
@@ -2521,6 +2563,27 @@
 			"IdentifierRangesISSN": {
 				"type": "object",
 				"properties": {
+					"id": {
+						"type": "string",
+						"required": true,
+						"unique": true,
+						"description": "Identifier of the ISSN identifier ranges"
+					},
+					"lastUpdated": {
+						"type": "object",
+						"properties": {
+							"timestamp": {
+								"type": "string",
+								"required": true,
+								"description": "Last update timestamp in ISO 8601 Date time string format YYYY-MM-DDTHH:mm:ss.sss"
+							},
+							"user": {
+								"type": "string",
+								"required": true,
+								"description": "The id of the user who did the update."
+							}
+						}
+					},
 					"rangeStart": {
 						"type": "string",
 						"required": true,

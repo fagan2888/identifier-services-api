@@ -1517,6 +1517,11 @@
 						"required": true,
 						"description": "A list of notes"
 					},
+					"state": {
+						"type": "string",
+						"required": true,
+						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
+					},
 					"lastUpdated": {
 						"type": "object",
 						"properties": {
@@ -1691,6 +1696,11 @@
 						},
 						"required": true,
 						"description": "A list of notes"
+					},
+					"state": {
+						"type": "string",
+						"required": true,
+						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 					},
 					"streetAddress": {
 						"type": "object",
@@ -2027,6 +2037,11 @@
 										"description": "Map scale"
 									}
 								}
+							},
+							"state": {
+								"type": "string",
+								"required": true,
+								"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 							}
 						}
 					}
@@ -2416,6 +2431,11 @@
 									"description": "The last issue number"
 								}
 							}
+						},
+						"state": {
+							"type": "string",
+							"required": true,
+							"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 						}
 					}
 				}

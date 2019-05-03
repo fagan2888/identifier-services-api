@@ -1525,7 +1525,7 @@
 					"state": {
 						"type": "string",
 						"required": true,
-						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
+						"description": "Request state. Can be one of new, inProgress, processed."
 					},
 					"lastUpdated": {
 						"type": "object",
@@ -1713,7 +1713,7 @@
 					"state": {
 						"type": "string",
 						"required": true,
-						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
+						"description": "Request state. Can be one of new, inProgress, processed."
 					},
 					"streetAddress": {
 						"type": "object",
@@ -1990,60 +1990,6 @@
 								"type": "number",
 								"description": "Number of the volume."
 							}
-						},
-						"electronicdetails": {
-							"type": "object",
-							"description": "An optional property describing details of the electronic publication.",
-							"properties": {
-								"format": {
-									"type": "string",
-									"required": true,
-									"description": "Publication format"
-								}
-							}
-						},
-						"printDetails": {
-							"type": "object",
-							"description": "An optional property describing details of the printed publication.",
-							"properties": {
-								"manufacturer": {
-									"type": "string",
-									"required": true,
-									"description": "Name of the manufacturer."
-								},
-								"city": {
-									"type": "string",
-									"description": "Manufacturer city."
-								},
-								"run": {
-									"type": "number",
-									"description": "The number of copies printed."
-								},
-								"edition": {
-									"type": "number",
-									"description": "The number of publication edition."
-								},
-								"format": {
-									"type": "string",
-									"required": true,
-									"description": "Publication format."
-								}
-							}
-						},
-						"mapDetails": {
-							"type": "object",
-							"description": "An optional property describing details of map publications.",
-							"properties": {
-								"scale": {
-									"type": "string",
-									"description": "Map scale"
-								}
-							}
-						},
-						"state": {
-							"type": "string",
-							"required": true,
-							"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
 						}
 					},
 					"electronicdetails": {
@@ -2094,6 +2040,11 @@
 								"description": "Map scale"
 							}
 						}
+					},
+					"state": {
+						"type": "string",
+						"required": true,
+						"description": "Request state. Can be one of new, inProgress, processed."
 					}
 				}
 			},
@@ -2477,7 +2428,7 @@
 					"state": {
 						"type": "string",
 						"required": true,
-						"description": "Request State. Can be one of NEW, IN_PROGRESS, PROCESSED "
+						"description": "Request state. Can be one of new, inProgress, processed."
 					}
 				}
 			},

@@ -28,7 +28,7 @@
 
 export default `
  type Query{
-     userMetadata(id: String, defaultLanguage: String, user: String, timestamp: String):User
+     userMetadata(id: String, userId: String, defaultLanguage: String, user: String, timestamp: String):User
      usersRequest(id: String, userId: String, publishers: String, givenName: String, familyName: String,
         email: String, state: String): UsersRequest
      Users: [User]
@@ -46,6 +46,7 @@ export default `
  
  type User{
     id: String!
+    userId: String
     preferences(defaultLanguage:String): Preferences!
     lastUpdated(timeStamp: String, user: String): LastUpdated!
  }

@@ -31,6 +31,7 @@ import {mergeTypes} from 'merge-graphql-schemas';
 import User from './User';
 import Publisher from './Publisher';
 import Publication from './Publication';
+import IdentifierRanges from './IdentifierRanges';
 
-const typeDefs = [User, Publisher, Publication];
+const typeDefs = [User, Publisher, Publication, IdentifierRanges];
 export default mergeTypes(typeDefs, {all: true});

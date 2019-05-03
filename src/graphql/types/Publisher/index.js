@@ -28,18 +28,34 @@
 
 export default `
     type Query{
-        publisher:Publisher
+        publisherMetadata(id:String, active:Boolean, name:String, language:String, metadataDelivery:String,
+            email:String, website:String, primaryContact: String, aliases: String, notes: String, active: Boolean,
+            yearInactivated: Int, address:String, city:String, zip:String ):Publisher
+        
+        publisherRequest(id: String, name:String, publisherId: String, language: String, email: String, website: String,
+            publicationEstimate: Int, note: String, state: String, address: String, city: String, zip: String, 
+            givenName: String, familyName: String, emailContact: String ): PublisherRequest
+
         Publishers:[Publisher]
+
     }
 
     type LastUpdated{
-        timeStamp:String!
+        timeStamp: String!
         user: String!
     }
 
-    type Activity{
-        active: Boolean!
+    type Active{
+        active: Boolean
+    }
+
+    type YearInactivated{
         yearInactivated: Int
+    }
+
+    enum Activity{
+        Active
+        YearInactivated
     }
 
     type StreetAddress{
@@ -48,20 +64,72 @@ export default `
         zip: String!
     }
 
-    type MetaData{
+    type PublisherAltName {
+        name:String!
+    }
+
+    type Note{
+        note: String!
+    }
+
+    type UserId{
+        userId: String
+    }
+
+    type Email {
+        email: String
+    }
+
+    enum PrimaryContact{
+        UserId
+        Email
+    }
+
+    type PrimaryContactRequest{
+        givenName: String!
+        familyName: String!
+        email: String!
+    }
+
+    type ISBN_ISMN{
+        name: String
+    }
+    type ISSN {
+        name: String
+    }
+
+    enum Publication{
+        ISBN_ISMN
+        ISSN
+    }
+
+    type Publisher{
         id: String!
         name: String!
         language: String!
+        metadataDelivery: String!
+        primaryContact(name:String, email: String): PrimaryContact
         email: String
         website: String
-        aliases: String
-        notes: String
-    }
+        aliases(publisherAltName: String!): [PublisherAltName]
+        notes: [Note]
+        lastUpdated(timeStamp: String, user: String): LastUpdated
+        activity(active: Boolean, yearInactivated: Int): Activity!
+        streetAddress(address: String, city:String, zip: String): StreetAddress
+    }  
     
-    type Publisher{
-        metadata: MetaData
-        lastUpdated: LastUpdated!
-        activity: Activity!
-        streetAddress: StreetAddress
-    }   
+    type PublisherRequest{
+        id: String!
+        name: String!
+        publisherId: String!
+        language: String!
+        email: String
+        website: String
+        publicationEstimate: Int!
+        notes: [Note]
+        state: String!
+        streetAddress(address: String, city: String, zip: String): StreetAddress
+        primaryContact: [PrimaryContactRequest]
+        publication: Publication
+    }
  `;

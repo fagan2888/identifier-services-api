@@ -28,12 +28,41 @@
 
 export default `
  type Query{
-     user(id: String, preference: String):User
+     userMetadata(id: String, defaultLanguage: String, user: String, timestamp: String):User
+     usersRequest(id: String, userId: String, publishers: String, givenName: String, familyName: String,
+        email: String, state: String): UsersRequest
      Users: [User]
+     usersRequests: [UsersRequest]
  }
 
+ type LastUpdated{
+     timestamp: String!
+     user: String!
+ }
+ 
+ type Preferences{
+     defaultLanguage: String!
+ }
+ 
  type User{
     id: String!
-    preference: String
+    preferences(defaultLanguage:String): Preferences!
+    lastUpdated(timeStamp: String, user: String): LastUpdated!
+ }
+
+ type Note{
+     note: String!
+ }
+
+ type UsersRequest{
+     id: String!
+     userId: String!
+     publishers: String!
+     givenName: String!
+     familyName: String!
+     email: String!
+     notes:[Note]
+     state: String!
+     lastUpdated: LastUpdated
  }
  `;

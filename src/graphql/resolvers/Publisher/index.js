@@ -30,7 +30,7 @@ import {PublisherModel as Publisher} from '../../../interfaces/models';
 
 export default {
 	Query: {
-		publisher: async (root, args) => {
+		publisherMetadata: async (root, args) => {
 			await Publisher.findOne(args).exec();
 		},
 

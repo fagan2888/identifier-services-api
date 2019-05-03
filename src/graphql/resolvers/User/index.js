@@ -28,7 +28,7 @@
 
 export default {
 	Query: {
-		user: async (root, args, {mongo: {Users}}) => {
+		userMetadata: async (root, args, {mongo: {Users}}) => {
 			await Users.findOne(args).exec();
 		},
 

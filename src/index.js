@@ -28,12 +28,18 @@
 import {Utils} from '@natlibfi/melinda-commons';
 import express from 'express';
 import cors from 'cors';
-import {createUsersRouter, createPublishersRouter, createPublicationsRouter, createMessageTemplate} from './routes';
+import {
+	createUsersRouter,
+	createPublishersRouter,
+	createPublicationsRouter,
+	createMessageTemplate
+} from './routes';
 import Mongoose from 'mongoose';
 import {ENABLE_PROXY, MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
 import bodyParser from 'body-parser';
 import expressGraphQL from 'express-graphql';
 import schema from './graphql';
+import {MongoClient} from 'mongodb';
 
 const {createLogger, handleInterrupt} = Utils;
 
@@ -41,32 +47,35 @@ run();
 
 async function run() {
 	try {
-		Mongoose.set('debug', MONGO_DEBUG);
 		// const Logger = createLogger();
-
 		const app = express();
-
-		await Mongoose.connect(MONGO_URI, {
-			useNewUrlParser: true,
-			useCreateIndex: true
-		});
 		app.enable('trust proxy', ENABLE_PROXY);
 
 		app.use(cors());
+		const client = new MongoClient(MONGO_URI, {useNewUrlParser: true});
+		client.connect(err => {
+			const dbName = 'IdentifierServices';
+			const mongo = {
+				Users: client.db(dbName).collection('userMetadata'),
+				UsersRequest: client.db(dbName).collection('usersRequest')
+			};
+			console.log(err);
+			app.use(
+				'/graphql',
+				cors(),
+				bodyParser.json(),
+				expressGraphQL({
+					schema: schema,
+					context: {mongo},
+					graphiql: true
+				})
+			);
+		});
+
 		app.use('/templates', createMessageTemplate());
 		app.use('/users', createUsersRouter());
 		app.use('/publishers', createPublishersRouter());
 		app.use('publications', createPublicationsRouter());
-		
-		app.use(
-			'/graphql',
-			cors(),
-			bodyParser.json(),
-			expressGraphQL({
-				schema: schema,
-				graphiql: true
-			})
-		);
 
 		const server = app.listen(HTTP_PORT, () => {
 			// Logger.log('info', 'Started melinda-record-import-api');

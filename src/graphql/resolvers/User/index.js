@@ -29,15 +29,39 @@
 export default {
 	Query: {
 		userMetadata: async (root, args, {mongo: {Users}}) => {
-			await Users.findOne(args).exec();
+			try {
+				return await Users.findOne(args).then(res => res);
+			} catch (err) {
+				return err;
+			}
 		},
 
-		Users: () => {
-			return async (root, {mongo: {Users}}) => {
-				await Users.find({})
-					.populate()
-					.exec();
-			};
+		Users: async (root, data, {mongo: {Users}}) => {
+			try {
+				return await Users.find({})
+					.toArray()
+					.then(res => res);
+			} catch (err) {
+				return err;
+			}
+		},
+
+		usersRequest: async (root, args, {mongo: {UsersRequest}}) => {
+			try {
+				return await UsersRequest.findOne(args).then(res => res);
+			} catch (err) {
+				return err;
+			}
+		},
+
+		usersRequests: async (root, data, {mongo: {UsersRequest}}) => {
+			try {
+				return await UsersRequest.find({})
+					.toArray()
+					.then(res => res);
+			} catch (err) {
+				return err;
+			}
 		}
 	}
 };

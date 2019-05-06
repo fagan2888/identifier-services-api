@@ -72,7 +72,6 @@ export default {
 
 	Mutation: {
 		createUser: async ({db, req}) => {
-			console.log(req.body);
 			try {
 				const newUser = {
 					id: req.body.id,
@@ -85,12 +84,11 @@ export default {
 						user: req.body.lastUpdated.user
 					}
 				};
-				await db.collection('userMetadata').insertOne(newUser);
-				return await db
+				const createdResponse = await db
 					.collection('userMetadata')
-					.find()
-					.toArray()
-					.then(res => res);
+					.insertOne(newUser)
+					.then(res => res.ops);
+				return createdResponse[0];
 			} catch (err) {
 				return err;
 			}
@@ -98,9 +96,11 @@ export default {
 
 		deleteUser: async ({db, params}) => {
 			try {
-				return await db
+				const deletedUser = await db
 					.collection('userMetadata')
-					.findOneAndDelete({id: params.id});
+					.findOneAndDelete({id: params.id})
+					.then(res => res.value);
+				return deletedUser;
 			} catch (err) {
 				return err;
 			}

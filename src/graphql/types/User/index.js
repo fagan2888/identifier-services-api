@@ -48,7 +48,7 @@ export default `
     id: String!
     userId: String
     preferences(defaultLanguage:String): Preferences!
-    lastUpdated(timeStamp: String, user: String): LastUpdated
+    lastUpdated(timestamp: String, user: String): LastUpdated
  }
 
  type Note{

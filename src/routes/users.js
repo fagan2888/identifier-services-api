@@ -78,6 +78,13 @@ export default function(db) {
 						) {
 							id
 							userId
+							preferences {
+								defaultLanguage
+							}
+							lastUpdated {
+								timestamp
+								user
+							}
 						}
 					}
 				`,

@@ -26,21 +26,56 @@
  *
  */
 
-import Mongoose from 'mongoose';
-import {UserModel} from './models';
 import {v4 as uuid} from 'uuid';
+import {MongoClient} from 'mongodb';
+import {MONGO_URI} from '../config';
+import {graphql} from 'graphql';
+import schema from '../graphql';
 
 export default function() {
-	Mongoose.model('User', UserModel);
+	const client = new MongoClient(MONGO_URI, {useNewUrlParser: true});
+
+	let db;
+	client.connect(err => {
+		const dbName = 'IdentifierServices';
+		db = client.db(dbName);
+		console.log(err);
+	});
+
 	return {create, read, update, remove, changePwd, query};
 
-	async function create({preference}) {
-		const id = uuid();
-		const newUser = {
-			id,
-			preference
-		};
-		return newUser;
+	async function create({req}) {
+		return graphql(
+			schema,
+			`
+				mutation(
+					$id: String
+					$userId: String
+					$defaultLanguage: String
+					$timestamp: String
+					$user: String
+				) {
+					createUser(
+						id: $id
+						userId: $userId
+						defaultLanguage: $defaultLanguage
+						timestamp: $timestamp
+						user: $user
+					) {
+						id
+						userId
+						preferences {
+							defaultLanguage
+						}
+						lastUpdated {
+							timestamp
+							user
+						}
+					}
+				}
+			`,
+			{db, req}
+		);
 	}
 
 	async function read(val) {
@@ -48,18 +83,62 @@ export default function() {
 	}
 
 	async function update(val) {
-		return val;
+		return graphql(
+			schema,
+			`
+				mutation(
+					$id: String
+					$userId: String
+					$defaultLanguage: String
+					$timestamp: String
+					$user: String
+				) {
+					updateUser(
+						id: $id
+						userId: $userId
+						defaultLanguage: $defaultLanguage
+						timestamp: $timestamp
+						user: $user
+					) {
+						id
+						userId
+						preferences {
+							defaultLanguage
+						}
+						lastUpdated {
+							timestamp
+							user
+						}
+					}
+				}
+			`,
+			{db, val}
+		);
 	}
 
-	async function remove(val) {
-		return val;
+	async function remove(params) {
+		return graphql(
+			schema,
+			`
+				mutation($id: String, $userId: String) {
+					deleteUser(id: $id, userId: $userId) {
+						id
+					}
+				}
+			`,
+			{db, params}
+		);
 	}
 
 	async function changePwd(val) {
 		return val;
 	}
 
-	async function query(val) {
-		return val;
+	async function query() {
+		return graphql(
+			schema,
+			'{Users{id, preferences{defaultLanguage}, userId}}',
+			db
+		);
 	}
 }

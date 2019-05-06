@@ -27,30 +27,15 @@
  */
 
 import {Router} from 'express';
-import bodyParser from 'body-parser';
-import validateContentType from '@natlibfi/express-validate-content-type';
-import {graphql} from 'graphql';
 
 import {usersFactory} from '../interfaces';
 import {API_URL} from '../config';
-import schema from '../graphql';
-import resolver from '../graphql/resolvers';
 
-export default function(db) {
+export default function() {
 	const users = usersFactory({url: API_URL});
 
 	return new Router()
-		.post(
-			'/',
-			// validateContentType({
-			// 	type: ['application/json', 'application/x-www-form-urlencoded']
-			// }),
-			bodyParser.urlencoded({extended: false}),
-			bodyParser.json({
-				type: ['application/json', 'application/x-www-form-urlencoded']
-			}),
-			create
-		)
+		.post('/', create)
 		.get('/:id', read)
 		.put('/:id', update)
 		.delete('/:id', remove)
@@ -59,37 +44,8 @@ export default function(db) {
 
 	async function create(req, res, next) {
 		try {
-			graphql(
-				schema,
-				`
-					mutation(
-						$id: String
-						$userId: String
-						$defaultLanguage: String
-						$timestamp: String
-						$user: String
-					) {
-						createUser(
-							id: $id
-							userId: $userId
-							defaultLanguage: $defaultLanguage
-							timestamp: $timestamp
-							user: $user
-						) {
-							id
-							userId
-							preferences {
-								defaultLanguage
-							}
-							lastUpdated {
-								timestamp
-								user
-							}
-						}
-					}
-				`,
-				{db, req}
-			).then(response => res.json(response));
+			const result = await users.create({req});
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}
@@ -105,7 +61,8 @@ export default function(db) {
 
 	async function update(req, res, next) {
 		try {
-			res.json(req.body);
+			const result = await users.update();
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}
@@ -114,17 +71,8 @@ export default function(db) {
 	async function remove(req, res, next) {
 		const params = req.params;
 		try {
-			graphql(
-				schema,
-				`
-					mutation($id: String, $userId: String) {
-						deleteUser(id: $id, userId: $userId) {
-							id
-						}
-					}
-				`,
-				{db, params}
-			).then(response => res.json(response));
+			const result = await users.remove(params);
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}
@@ -140,11 +88,8 @@ export default function(db) {
 
 	async function query(req, res, next) {
 		try {
-			graphql(
-				schema,
-				'{Users{id, preferences{defaultLanguage}, userId}}',
-				db
-			).then(response => res.json(response));
+			const result = await users.query();
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}

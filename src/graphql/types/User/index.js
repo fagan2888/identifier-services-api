@@ -70,5 +70,6 @@ export default `
  type Mutation{
     createUser(id:String, userId:String, defaultLanguage: String, user: String, timestamp: String):User
     deleteUser(id:String, userId:String):User
+    updateUser(id:String, userId:String, defaultLanguage:String, user:String, timestamp:String):User
  }
  `;

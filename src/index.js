@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  *
  * @licstart  The following is the entire license notice for the JavaScript code in this file.
@@ -39,7 +40,8 @@ import {ENABLE_PROXY, MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
 import bodyParser from 'body-parser';
 import expressGraphQL from 'express-graphql';
 import schema from './graphql';
-import {MongoClient} from 'mongodb';
+import validateContentType from '@natlibfi/express-validate-content-type';
+
 
 const {createLogger, handleInterrupt} = Utils;
 
@@ -52,21 +54,20 @@ async function run() {
 		app.enable('trust proxy', ENABLE_PROXY);
 
 		app.use(cors());
-		const client = new MongoClient(MONGO_URI, {useNewUrlParser: true});
-		client.connect(err => {
-			const dbName = 'IdentifierServices';
-			const db = client.db(dbName);
-			// const mongo = {
-			// 	Users: client.db(dbName).collection('userMetadata'),
-			// 	UsersRequest: client.db(dbName).collection('usersRequest')
-			// };
-			console.log(err);
+		app.use(
+			validateContentType({
+				type: ['application/json', 'application/x-www-form-urlencoded']
+			}),
+			bodyParser.urlencoded({extended: false}),
+			bodyParser.json({
+				type: ['application/json', 'application/x-www-form-urlencoded']
+			})
+		);
 
-			app.use('/templates', createMessageTemplate());
-			app.use('/users', createUsersRouter(db));
-			app.use('/publishers', createPublishersRouter());
-			app.use('publications', createPublicationsRouter());
-		});
+		app.use('/templates', createMessageTemplate());
+		app.use('/users', createUsersRouter());
+		app.use('/publishers', createPublishersRouter());
+		app.use('publications', createPublicationsRouter());
 
 		const server = app.listen(HTTP_PORT, () => {
 			// Logger.log('info', 'Started melinda-record-import-api');

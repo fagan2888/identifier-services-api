@@ -80,7 +80,7 @@ export default {
 						defaultLanguage: req.body.preferences.defaultLanguage
 					},
 					lastUpdated: {
-						timestamp: req.body.lastUpdated.timestamp,
+						timestamp: Date.now(),
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -101,6 +101,33 @@ export default {
 					.findOneAndDelete({id: params.id})
 					.then(res => res.value);
 				return deletedUser;
+			} catch (err) {
+				return err;
+			}
+		},
+
+		updateUser: async ({db, req}) => {
+			try {
+				const updateUser = {
+					id: req.params.id,
+					userId: req.body.userId,
+					preferences: {
+						defaultLanguage: req.body.preferences.defaultLanguage
+					},
+					lastUpdated: {
+						timestamp: Date.now(),
+						user: req.body.lastUpdated.user
+					}
+				};
+				const replacedUser = await db
+					.collection('userMetadata')
+					.findOneAndUpdate(
+						{id: req.params.id},
+						{$set: updateUser},
+						{upsert: true}
+					)
+					.then(res => res.value);
+				return replacedUser;
 			} catch (err) {
 				return err;
 			}

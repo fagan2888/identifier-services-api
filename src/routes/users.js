@@ -29,20 +29,23 @@
 import {Router} from 'express';
 import bodyParser from 'body-parser';
 import validateContentType from '@natlibfi/express-validate-content-type';
+import {graphql} from 'graphql';
 
 import {usersFactory} from '../interfaces';
 import {API_URL} from '../config';
+import schema from '../graphql';
+import resolver from '../graphql/resolvers';
 
-export default function() {
+export default function(db) {
 	const users = usersFactory({url: API_URL});
 
 	return new Router()
 		.post(
 			'/',
-			validateContentType({
-				type: ['application/json', 'application/x-www-form-urlencoded']
-			}),
-			// bodyParser.urlencoded({extended: false}),
+			// validateContentType({
+			// 	type: ['application/json', 'application/x-www-form-urlencoded']
+			// }),
+			bodyParser.urlencoded({extended: false}),
 			bodyParser.json({
 				type: ['application/json', 'application/x-www-form-urlencoded']
 			}),
@@ -56,10 +59,30 @@ export default function() {
 
 	async function create(req, res, next) {
 		try {
-			const user = await users.create({
-				preference: req.body.preference ? req.body.preference : 'FIN'
-			});
-			return res.json(user);
+			graphql(
+				schema,
+				`
+					mutation(
+						$id: String
+						$userId: String
+						$defaultLanguage: String
+						$timestamp: String
+						$user: String
+					) {
+						createUser(
+							id: $id
+							userId: $userId
+							defaultLanguage: $defaultLanguage
+							timestamp: $timestamp
+							user: $user
+						) {
+							id
+							userId
+						}
+					}
+				`,
+				{db, req}
+			).then(response => res.json(response));
 		} catch (err) {
 			next(err);
 		}
@@ -82,8 +105,19 @@ export default function() {
 	}
 
 	async function remove(req, res, next) {
+		const params = req.params;
 		try {
-			res.json(req.body);
+			graphql(
+				schema,
+				`
+					mutation($id: String, $userId: String) {
+						deleteUser(id: $id, userId: $userId) {
+							id
+						}
+					}
+				`,
+				{db, params}
+			).then(response => res.json(response));
 		} catch (err) {
 			next(err);
 		}
@@ -99,7 +133,11 @@ export default function() {
 
 	async function query(req, res, next) {
 		try {
-			res.json(req.body);
+			graphql(
+				schema,
+				'{Users{id, preferences{defaultLanguage}, userId}}',
+				db
+			).then(response => res.json(response));
 		} catch (err) {
 			next(err);
 		}

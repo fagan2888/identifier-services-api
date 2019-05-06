@@ -48,7 +48,7 @@ export default `
     id: String!
     userId: String
     preferences(defaultLanguage:String): Preferences!
-    lastUpdated(timeStamp: String, user: String): LastUpdated!
+    lastUpdated(timeStamp: String, user: String): LastUpdated
  }
 
  type Note{
@@ -65,5 +65,10 @@ export default `
      notes:[Note]
      state: String!
      lastUpdated: LastUpdated
+ }
+
+ type Mutation{
+    createUser(id:String, userId:String, defaultLanguage: String, user: String, timestamp: String):User
+    deleteUser(id:String, userId:String):User
  }
  `;

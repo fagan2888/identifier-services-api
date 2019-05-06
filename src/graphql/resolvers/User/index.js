@@ -1,3 +1,6 @@
+import {read} from 'fs';
+import User from '../../types/User';
+
 /**
  *
  * @licstart  The following is the entire license notice for the JavaScript code in this file.
@@ -36,9 +39,11 @@ export default {
 			}
 		},
 
-		Users: async (root, data, {mongo: {Users}}) => {
+		Users: async db => {
 			try {
-				return await Users.find({})
+				return await db
+					.collection('userMetadata')
+					.find()
 					.toArray()
 					.then(res => res);
 			} catch (err) {
@@ -59,6 +64,43 @@ export default {
 				return await UsersRequest.find({})
 					.toArray()
 					.then(res => res);
+			} catch (err) {
+				return err;
+			}
+		}
+	},
+
+	Mutation: {
+		createUser: async ({db, req}) => {
+			console.log(req.body);
+			try {
+				const newUser = {
+					id: req.body.id,
+					userId: req.body.userId,
+					preferences: {
+						defaultLanguage: req.body.preferences.defaultLanguage
+					},
+					lastUpdated: {
+						timestamp: req.body.lastUpdated.timestamp,
+						user: req.body.lastUpdated.user
+					}
+				};
+				await db.collection('userMetadata').insertOne(newUser);
+				return await db
+					.collection('userMetadata')
+					.find()
+					.toArray()
+					.then(res => res);
+			} catch (err) {
+				return err;
+			}
+		},
+
+		deleteUser: async ({db, params}) => {
+			try {
+				return await db
+					.collection('userMetadata')
+					.findOneAndDelete({id: params.id});
 			} catch (err) {
 				return err;
 			}

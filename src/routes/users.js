@@ -40,7 +40,12 @@ export default function() {
 		.put('/:id', update)
 		.delete('/:id', remove)
 		.post('/:id/password', changePwd)
-		.post('/query', query);
+		.post('/query', query)
+		.post('/request', createRequest)
+		.get('/request/:id', readRequest)
+		.delete('/request/:id', removeRequest)
+		.put('/request/:id', updateRequest)
+		.post('/request/query', queryRequest);
 
 	async function create(req, res, next) {
 		try {
@@ -52,8 +57,10 @@ export default function() {
 	}
 
 	async function read(req, res, next) {
+		const params = req.params;
 		try {
-			res.json(req.params);
+			const result = await users.read(params);
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}
@@ -61,7 +68,7 @@ export default function() {
 
 	async function update(req, res, next) {
 		try {
-			const result = await users.update();
+			const result = await users.update(req);
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -89,6 +96,53 @@ export default function() {
 	async function query(req, res, next) {
 		try {
 			const result = await users.query();
+			res.json(result);
+		} catch (err) {
+			next(err);
+		}
+	}
+	async function createRequest(req, res, next) {
+		try {
+			const result = await users.createUsersRequest({req});
+			res.json(result);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function readRequest(req, res, next) {
+		const params = req.params;
+		try {
+			const result = await users.read(params);
+			res.json(result);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function updateRequest(req, res, next) {
+		console.log(req)
+		try {
+			const result = await users.update(req);
+			res.json(result);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function removeRequest(req, res, next) {
+		const params = req.params;
+		try {
+			const result = await users.remove(params);
+			res.json(result);
+		} catch (err) {
+			next(err);
+		}
+	}
+
+	async function queryRequest(req, res, next) {
+		try {
+			const result = await users.queryRequest();
 			res.json(result);
 		} catch (err) {
 			next(err);

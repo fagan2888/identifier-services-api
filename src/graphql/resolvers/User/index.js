@@ -31,9 +31,12 @@ import User from '../../types/User';
 
 export default {
 	Query: {
-		userMetadata: async (root, args, {mongo: {Users}}) => {
+		userMetadata: async ({db, params}) => {
 			try {
-				return await Users.findOne(args).then(res => res);
+				return await db
+					.collection('userMetadata')
+					.findOne(params)
+					.then(res => res);
 			} catch (err) {
 				return err;
 			}
@@ -51,17 +54,22 @@ export default {
 			}
 		},
 
-		usersRequest: async (root, args, {mongo: {UsersRequest}}) => {
+		usersRequest: async ({db, params}) => {
 			try {
-				return await UsersRequest.findOne(args).then(res => res);
+				return await db
+					.collection('usersRequest')
+					.findOne(params)
+					.then(res => res);
 			} catch (err) {
 				return err;
 			}
 		},
 
-		usersRequests: async (root, data, {mongo: {UsersRequest}}) => {
+		usersRequests: async db => {
 			try {
-				return await UsersRequest.find({})
+				return await db
+					.collection('usersRequest')
+					.find()
 					.toArray()
 					.then(res => res);
 			} catch (err) {
@@ -119,15 +127,40 @@ export default {
 						user: req.body.lastUpdated.user
 					}
 				};
-				const replacedUser = await db
+				await db
 					.collection('userMetadata')
 					.findOneAndUpdate(
 						{id: req.params.id},
 						{$set: updateUser},
 						{upsert: true}
-					)
-					.then(res => res.value);
-				return replacedUser;
+					);
+				return updateUser;
+			} catch (err) {
+				return err;
+			}
+		},
+
+		createUsersRequest: async ({db, req}) => {
+			try {
+				const newUserRequest = {
+					id: req.body.id,
+					userId: req.body.userId,
+					state: req.body.state,
+					publishers: [req.body.publisher],
+					givenName: req.body.givenName,
+					familyName: req.body.familyName,
+					email: req.body.email,
+					notes: [req.body.note],
+					lastUpdated: {
+						timestamp: Date.now(),
+						user: req.body.lastUpdated.user
+					}
+				};
+				const createdResponse = await db
+					.collection('usersRequest')
+					.insertOne(newUserRequest)
+					.then(res => res.ops);
+				return createdResponse;
 			} catch (err) {
 				return err;
 			}

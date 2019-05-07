@@ -55,9 +55,9 @@ async function run() {
 
 		app.use(cors());
 		app.use(
-			validateContentType({
-				type: ['application/json', 'application/x-www-form-urlencoded']
-			}),
+			// validateContentType({
+			// 	type: ['application/json', 'application/x-www-form-urlencoded']
+			// }),
 			bodyParser.urlencoded({extended: false}),
 			bodyParser.json({
 				type: ['application/json', 'application/x-www-form-urlencoded']

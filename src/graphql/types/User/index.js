@@ -58,7 +58,7 @@ export default `
  type UsersRequest{
      id: String!
      userId: String!
-     publishers: String!
+     publishers: [String!]
      givenName: String!
      familyName: String!
      email: String!
@@ -69,6 +69,8 @@ export default `
 
  type Mutation{
     createUser(id:String, userId:String, defaultLanguage: String, user: String, timestamp: String):User
+    createUsersRequest(id:String, userId:String, state:String, publisher:String, givenName:String, familyName:String,
+         email:String, note:String, timestamp:String, user:String ):UsersRequest
     deleteUser(id:String, userId:String):User
     updateUser(id:String, userId:String, defaultLanguage:String, user:String, timestamp:String):User
  }

@@ -27,9 +27,11 @@
  */
 
 import {Router} from 'express';
+import {publicationsFactory} from '../interfaces';
+import {API_URL} from '../config';
 
-export default function() {
-	
+export default function(db) {
+	const publications = publicationsFactory({url: API_URL});
 	return new Router()
 		.post('/', create)
 		.get('/:id', read)
@@ -43,7 +45,8 @@ export default function() {
 
 	async function create(req, res, next) {
 		try {
-			res.json(req);
+			const result = await publications.createISBN_ISMN({db, req});
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}
@@ -75,7 +78,8 @@ export default function() {
 
 	async function query(req, res, next) {
 		try {
-			res.json(req);
+			const result = await publications.queryISBN_ISMN(db);
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}

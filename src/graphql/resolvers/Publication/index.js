@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /**
  *
  * @licstart  The following is the entire license notice for the JavaScript code in this file.
@@ -26,11 +27,51 @@
  *
  */
 
-import {mergeResolvers} from 'merge-graphql-schemas';
-import User from './User';
-import Publisher from './Publisher';
-import Publication from './Publication';
+export default {
+	Query: {
+		publication_ISBN_ISMN: async ({db, params}) => {
+			try {
+				return await db
+					.collection('Publication_ISBN_ISMN')
+					.findOne(params)
+					.then(res => res);
+			} catch (err) {
+				return err;
+			}
+		},
 
-const resolver = [User, Publisher, Publication];
+		Publications_ISBN_ISMN: async db => {
+			try {
+				return await db
+					.collection('Publication_ISBN_ISMN')
+					.find()
+					.toArray()
+					.then(res => res);
+			} catch (err) {
+				return err;
+			}
+		}
+	},
 
-export default mergeResolvers(resolver, {all: true});
+	Mutation: {
+		createPublication: async ({db, req}) => {
+			console.log(db);
+			try {
+				const newPublication = {
+					...req.body,
+					lastUpdated: {
+						timestamp: `${Date.now()}`,
+						user: req.body.lastUpdated.user
+					}
+				};
+				const createdPublication = await db
+					.collection('Publication_ISBN_ISMN')
+					.insertOne(newPublication)
+					.then(res => console.log(res.ops) || res.ops);
+				return createdPublication[0];
+			} catch (err) {
+				return err;
+			}
+		}
+	}
+};

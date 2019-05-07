@@ -38,10 +38,9 @@ import {
 import Mongoose from 'mongoose';
 import {ENABLE_PROXY, MONGO_URI, HTTP_PORT, MONGO_DEBUG} from './config';
 import bodyParser from 'body-parser';
-import expressGraphQL from 'express-graphql';
-import schema from './graphql';
-import validateContentType from '@natlibfi/express-validate-content-type';
+import {MongoClient} from 'mongodb';
 
+import validateContentType from '@natlibfi/express-validate-content-type';
 
 const {createLogger, handleInterrupt} = Utils;
 
@@ -64,10 +63,19 @@ async function run() {
 			})
 		);
 
-		app.use('/templates', createMessageTemplate());
-		app.use('/users', createUsersRouter());
-		app.use('/publishers', createPublishersRouter());
-		app.use('publications', createPublicationsRouter());
+		const client = new MongoClient(MONGO_URI, {useNewUrlParser: true});
+
+		let db;
+		client.connect(err => {
+			const dbName = 'IdentifierServices';
+			db = client.db(dbName);
+			console.log(err);
+			app.use('/templates', createMessageTemplate());
+			app.use('/users', createUsersRouter());
+			app.use('/publishers', createPublishersRouter());
+			app.use('/publications', createPublicationsRouter(db));
+		});
+
 
 		const server = app.listen(HTTP_PORT, () => {
 			// Logger.log('info', 'Started melinda-record-import-api');

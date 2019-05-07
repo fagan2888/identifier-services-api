@@ -28,31 +28,29 @@
 
 export default `
  type Query{
-    publication_ISBN_ISMN(id: String, title: String, publicationId: String, melindaId: String, type: String, 
-        subtitle: String, language: String, publicationTime: String, additionalDetails: String, authorGivenName: String,
-        authorFamilyName: String, authorRole: String, seriesId: String, seriesName: String, seriesVolume: String, electronicFormat: String,
-        manufacturer: String, city: String, run: Int, edition: Int, printFormat: String, mapScale: String, timeStamp: String, user: String ): ISBN_ISMN
+    publication_ISBN_ISMN: ISBN_ISMN
      
-    publication_ISSN(id: String, title: String, publicationId: String, melindaId: String, type: String, 
-        subtitle: String, language: String, additionalDetails: String, year: Int, number: Int, frequency: String, timeStamp: String, user: String ): ISSN
+    publication_ISSN: ISSN
         
-    publicationRequest_ISBN_ISMN(id: String, title: String, type: String,subtitle: String, language: String, 
-        publicationTime: String, additionalDetails: String, authorGivenName: String, authorFamilyName: String, 
-        authorRole: String, seriesId: String, seriesName: String, seriesVolume: String, electronicFormat: String,
-        manufacturer: String, city: String, run: Int, edition: Int, printFormat: String, mapScale: String, state: String ): ISBN_ISMN_Request
+    publicationRequest_ISBN_ISMN: ISBN_ISMN_Request
         
-    publicationRequest_ISSN(id: String, title: String, type: String, subtitle: String, language: String, additionalDetails: String, 
-        year: Int, number: Int, frequency: String, timeStamp: String, user: String ): ISSN_Request
+    publicationRequest_ISSN: ISSN_Request
 
-    publications_ISBN_ISMN: [ISBN_ISMN]   
+    Publications_ISBN_ISMN: [ISBN_ISMN]   
 
-    publications_ISSN: [ISSN]
+    Publications_ISSN: [ISSN]
     
-    publicationRequests_ISBN_ISMN: [ISBN_ISMN_Request]
+    PublicationRequests_ISBN_ISMN: [ISBN_ISMN_Request]
     
-    publicationRequests_ISSN: [ISSN_Request]
+    PublicationRequests_ISSN: [ISSN_Request]
 
+}
 
+type Mutation{
+    createPublication(id: String, title: String, publicationId: String, melindaId: String, type: String, 
+        subtitle: String, language: String, publicationTime: String, additionalDetails: String, authors:[authorInput], 
+        series: seriesInput, electronicDetails: electronicDetailsInput, printDetails: printDetailsInput, 
+        mapDetails: mapDetailsInput, lastUpdated: lastUpdatedInput ): ISBN_ISMN
 }
 
 type LastUpdated{
@@ -81,10 +79,43 @@ type PrintDetails{
     city: String
     run: Int
     edition: Int
-    format: String!
+    format: String
 }
 
 type MapDetails{
+    scale: String
+}
+
+input lastUpdatedInput{
+    timestamp: String!
+    user: String!
+}
+
+input authorInput{
+    givenName: String!
+    familyName: String!
+    role: String!
+}
+
+input seriesInput{
+    identifier: String!
+    name: String!
+    volume: Int
+}
+
+input electronicDetailsInput{
+    format: String
+}
+
+input printDetailsInput{
+    manufacturer: String!
+    city: String
+    run: Int
+    edition: Int
+    format: String
+}
+
+input mapDetailsInput{
     scale: String
 }
 
@@ -98,12 +129,12 @@ type ISBN_ISMN{
     language: String!
     publicationTime: String!
     additionalDetails: String
-    authors(authorGivenName: String, authorFamilyName: String, authorRole: String): [Author]
-    series(identifier: String, name: String, voulme: Int): Series
-    electronicDetails(format: String): ElectronicDetails
-    printDetails(manufacturer: String, city: String, run: Int, edition: Int, format: String): PrintDetails
-    mapDetails(scale: String): MapDetails
-    lastUpdated(timeStamp: String, user: String): LastUpdated
+    authors: [Author]
+    series: Series
+    electronicDetails: ElectronicDetails
+    printDetails: PrintDetails
+    mapDetails: MapDetails
+    lastUpdated: LastUpdated
 }
 
 type ISSN{
@@ -118,7 +149,7 @@ type ISSN{
     number: Int
     frequency: String!
     additionalDetails: String    
-    lastUpdated(timeStamp: String, user: String): LastUpdated
+    lastUpdated: LastUpdated
 }
 
 type ISBN_ISMN_Request{
@@ -129,12 +160,12 @@ type ISBN_ISMN_Request{
     language: String!
     publicationTime: String!
     additionalDetails: String
-    authors(authorGivenName: String, authorFamilyName: String, authorRole: String): [Author]
-    series(identifier: String, name: String, voulme: Int): Series
-    electronicDetails(format: String): ElectronicDetails
-    printDetails(manufacturer: String, city: String, run: Int, edition: Int, format: String): PrintDetails
-    mapDetails(scale: String): MapDetails
-    lastUpdated(timeStamp: String, user: String): LastUpdated
+    authors: [Author]
+    series: Series
+    electronicDetails: ElectronicDetails
+    printDetails: PrintDetails
+    mapDetails: MapDetails
+    lastUpdated: LastUpdated
     state: String!
 }
 
@@ -148,7 +179,7 @@ type ISSN_Request{
     number: Int
     frequency: String!
     additionalDetails: String    
-    lastUpdated(timeStamp: String, user: String): LastUpdated
+    lastUpdated: LastUpdated
 }
- 
+
  `;

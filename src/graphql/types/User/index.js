@@ -30,7 +30,7 @@ export default `
  type Query{
      userMetadata(id: String, userId: String, defaultLanguage: String, user: String, timestamp: String):User
      usersRequest(id: String, userId: String, publishers: String, givenName: String, familyName: String,
-        email: String, state: String): UsersRequest
+        email: String, state: String, notes:String, timestamp:String, user:String): UsersRequest
      Users: [User]
      usersRequests: [UsersRequest]
  }
@@ -51,10 +51,6 @@ export default `
     lastUpdated(timestamp: String, user: String): LastUpdated
  }
 
- type Note{
-     note: String!
- }
-
  type UsersRequest{
      id: String!
      userId: String!
@@ -62,16 +58,24 @@ export default `
      givenName: String!
      familyName: String!
      email: String!
-     notes:[Note]
+     notes:[String]
      state: String!
      lastUpdated: LastUpdated
  }
 
  type Mutation{
     createUser(id:String, userId:String, defaultLanguage: String, user: String, timestamp: String):User
-    createUsersRequest(id:String, userId:String, state:String, publisher:String, givenName:String, familyName:String,
-         email:String, note:String, timestamp:String, user:String ):UsersRequest
+
+    createRequest(id:String, userId:String, state:String, publishers:String, givenName:String, familyName:String,
+        email:String, notes:String, timestamp:String, user:String ):UsersRequest
+
     deleteUser(id:String, userId:String):User
+
+    deleteRequest(id:String, userId:String):UsersRequest
+
     updateUser(id:String, userId:String, defaultLanguage:String, user:String, timestamp:String):User
+
+    updateRequest(id:String, userId:String, state:String, publishers:String, givenName:String, familyName:String,
+        email:String, notes:String, timestamp:String, user:String ):UsersRequest
  }
  `;

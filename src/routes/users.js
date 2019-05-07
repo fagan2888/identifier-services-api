@@ -103,7 +103,7 @@ export default function() {
 	}
 	async function createRequest(req, res, next) {
 		try {
-			const result = await users.createUsersRequest({req});
+			const result = await users.createRequest({req});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -113,7 +113,7 @@ export default function() {
 	async function readRequest(req, res, next) {
 		const params = req.params;
 		try {
-			const result = await users.read(params);
+			const result = await users.readRequest(params);
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -121,9 +121,8 @@ export default function() {
 	}
 
 	async function updateRequest(req, res, next) {
-		console.log(req)
 		try {
-			const result = await users.update(req);
+			const result = await users.updateRequest(req);
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -133,7 +132,7 @@ export default function() {
 	async function removeRequest(req, res, next) {
 		const params = req.params;
 		try {
-			const result = await users.remove(params);
+			const result = await users.removeRequest(params);
 			res.json(result);
 		} catch (err) {
 			next(err);

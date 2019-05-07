@@ -172,7 +172,7 @@ export default function() {
 		);
 	}
 
-	// ===== User Creation Request Starts From Here ====
+	// =====***************************** User Creation Request Starts From Here********************** ====
 
 	async function createRequest({req}) {
 		return graphql(
@@ -182,34 +182,34 @@ export default function() {
 					$id: String
 					$userId: String
 					$state: String
-					$publisher: String
+					$publishers: String
 					$givenName: String
 					$familyName: String
 					$email: String
-					$note: String
+					$notes: String
 					$timestamp: String
 					$user: String
 				) {
-					createUsersRequest(
+					createRequest(
 						id: $id
 						userId: $userId
 						state: $state
-						publisher: $publisher
+						publishers: $publishers
 						givenName: $givenName
 						familyName: $familyName
 						email: $email
-						note: $note
+						notes: $notes
 						timestamp: $timestamp
 						user: $user
 					) {
 						id
 						userId
 						state
-						[publisher]
+						publishers
 						givenName
 						familyName
 						email
-						note
+						notes
 						lastUpdated {
 							timestamp
 							user
@@ -226,12 +226,15 @@ export default function() {
 			schema,
 			`
 				{
-					userMetadata {
+					usersRequest{
 						id
 						userId
-						preferences {
-							defaultLanguage
-						}
+						state
+						publishers
+						givenName
+						familyName
+						email
+						notes
 						lastUpdated {
 							timestamp
 							user
@@ -243,29 +246,42 @@ export default function() {
 		);
 	}
 
-	async function updateRequest(val) {
+	async function updateRequest(req) {
 		return graphql(
 			schema,
 			`
 				mutation(
 					$id: String
 					$userId: String
-					$defaultLanguage: String
+					$state: String
+					$publishers: String
+					$givenName: String
+					$familyName: String
+					$email: String
+					$notes: String
 					$timestamp: String
 					$user: String
 				) {
-					updateUser(
+					updateRequest(
 						id: $id
 						userId: $userId
-						defaultLanguage: $defaultLanguage
+						state: $state
+						publishers: $publishers
+						givenName: $givenName
+						familyName: $familyName
+						email: $email
+						notes: $notes
 						timestamp: $timestamp
-						user: $user	
+						user: $user
 					) {
 						id
 						userId
-						preferences {
-							defaultLanguage
-						}
+						state
+						publishers
+						givenName
+						familyName
+						email
+						notes
 						lastUpdated {
 							timestamp
 							user
@@ -273,7 +289,7 @@ export default function() {
 					}
 				}
 			`,
-			{db, val}
+			{db, req}
 		);
 	}
 
@@ -282,7 +298,7 @@ export default function() {
 			schema,
 			`
 				mutation($id: String, $userId: String) {
-					deleteUser(id: $id, userId: $userId) {
+					deleteRequest(id: $id, userId: $userId) {
 						id
 					}
 				}

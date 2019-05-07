@@ -82,13 +82,9 @@ export default {
 		createUser: async ({db, req}) => {
 			try {
 				const newUser = {
-					id: req.body.id,
-					userId: req.body.userId,
-					preferences: {
-						defaultLanguage: req.body.preferences.defaultLanguage
-					},
+					...req.body,
 					lastUpdated: {
-						timestamp: Date.now(),
+						timestamp: `${Date.now()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -117,13 +113,9 @@ export default {
 		updateUser: async ({db, req}) => {
 			try {
 				const updateUser = {
-					id: req.params.id,
-					userId: req.body.userId,
-					preferences: {
-						defaultLanguage: req.body.preferences.defaultLanguage
-					},
+					...req.body,
 					lastUpdated: {
-						timestamp: Date.now(),
+						timestamp: `${Date.now()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -140,19 +132,12 @@ export default {
 			}
 		},
 
-		createUsersRequest: async ({db, req}) => {
+		createRequest: async ({db, req}) => {
 			try {
 				const newUserRequest = {
-					id: req.body.id,
-					userId: req.body.userId,
-					state: req.body.state,
-					publishers: [req.body.publisher],
-					givenName: req.body.givenName,
-					familyName: req.body.familyName,
-					email: req.body.email,
-					notes: [req.body.note],
+					...req.body,
 					lastUpdated: {
-						timestamp: Date.now(),
+						timestamp: `${Date.now()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -160,7 +145,41 @@ export default {
 					.collection('usersRequest')
 					.insertOne(newUserRequest)
 					.then(res => res.ops);
-				return createdResponse;
+				return createdResponse[0];
+			} catch (err) {
+				return err;
+			}
+		},
+
+		deleteRequest: async ({db, params}) => {
+			try {
+				const deletedRequest = await db
+					.collection('usersRequest')
+					.findOneAndDelete({id: params.id})
+					.then(res => res.value);
+				return deletedRequest;
+			} catch (err) {
+				return err;
+			}
+		},
+
+		updateRequest: async ({db, req}) => {
+			try {
+				const updateRequest = {
+					...req.body,
+					lastUpdated: {
+						timestamp: `${Date.now()}`,
+						user: req.body.lastUpdated.user
+					}
+				};
+				await db
+					.collection('usersRequest')
+					.findOneAndUpdate(
+						{id: req.params.id},
+						{$set: updateRequest},
+						{upsert: true}
+					);
+				return updateRequest;
 			} catch (err) {
 				return err;
 			}

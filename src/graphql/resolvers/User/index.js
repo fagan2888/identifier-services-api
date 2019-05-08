@@ -26,6 +26,8 @@
  *
  */
 
+const date = new Date(); 
+
 export default {
 	Query: {
 		userMetadata: async ({db, params}) => {
@@ -81,7 +83,7 @@ export default {
 				const newUser = {
 					...req.body,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -113,7 +115,7 @@ export default {
 					...req.body,
 					id: req.params.id,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -135,7 +137,7 @@ export default {
 				const newUserRequest = {
 					...req.body,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -166,7 +168,7 @@ export default {
 				const updateRequest = {
 					...req.body,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};

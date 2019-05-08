@@ -30,7 +30,7 @@ import {mergeResolvers} from 'merge-graphql-schemas';
 import User from './User';
 import Publisher from './Publisher';
 import Publication from './Publication';
-import MessageTemplate from './MessageTemplate'
+import MessageTemplate from './MessageTemplate';
 
 const resolver = [User, Publisher, Publication, MessageTemplate];
 

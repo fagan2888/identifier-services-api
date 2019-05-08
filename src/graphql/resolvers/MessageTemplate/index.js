@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 /**
  *
  * @licstart  The following is the entire license notice for the JavaScript code in this file.
@@ -26,6 +25,7 @@
  * for the JavaScript code in this file.
  *
  */
+const date = new Date();
 
 export default {
 	Query: {
@@ -59,7 +59,7 @@ export default {
 				const newTemplate = {
 					...req.body,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -78,7 +78,7 @@ export default {
 					...req.body,
 					id: req.params.id,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};

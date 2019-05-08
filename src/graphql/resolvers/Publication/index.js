@@ -27,6 +27,8 @@
  *
  */
 
+const date = new Date();
+
 export default {
 	Query: {
 		publication_ISBN_ISMN: async ({db, params}) => {
@@ -70,7 +72,7 @@ export default {
 				const newPublication = {
 					...req.body,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
@@ -102,7 +104,7 @@ export default {
 					...req.body,
 					id: req.params.id,
 					lastUpdated: {
-						timestamp: `${Date.now()}`,
+						timestamp: `${date.toISOString()}`,
 						user: req.body.lastUpdated.user
 					}
 				};

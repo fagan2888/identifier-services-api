@@ -63,16 +63,15 @@ export default function() {
 				mutation(
 					$id: String
 					$userId: String
-					$defaultLanguage: String
-					$timestamp: String
-					$user: String
+					$preferences: PreferencesInput
+					$lastUpdated: LastUpdatedInput
 				) {
 					createUser(
 						id: $id
 						userId: $userId
-						defaultLanguage: $defaultLanguage
-						timestamp: $timestamp
-						user: $user
+						preferences: $preferences
+						lastUpdated: $lastUpdated
+						
 					) {
 						id
 						userId
@@ -119,16 +118,15 @@ export default function() {
 				mutation(
 					$id: String
 					$userId: String
-					$defaultLanguage: String
-					$timestamp: String
-					$user: String
+					$preferences: PreferencesInput
+					$lastUpdated: LastUpdatedInput
 				) {
 					updateUser(
 						id: $id
 						userId: $userId
-						defaultLanguage: $defaultLanguage
-						timestamp: $timestamp
-						user: $user
+						preferences: $preferences
+						lastUpdated: $lastUpdated
+						
 					) {
 						id
 						userId
@@ -182,13 +180,12 @@ export default function() {
 					$id: String
 					$userId: String
 					$state: String
-					$publishers: String
+					$publishers: [String]
 					$givenName: String
 					$familyName: String
 					$email: String
-					$notes: String
-					$timestamp: String
-					$user: String
+					$notes: [String]
+					$lastUpdated: LastUpdatedInput
 				) {
 					createRequest(
 						id: $id
@@ -199,8 +196,7 @@ export default function() {
 						familyName: $familyName
 						email: $email
 						notes: $notes
-						timestamp: $timestamp
-						user: $user
+						lastUpdated: $lastUpdated
 					) {
 						id
 						userId
@@ -259,8 +255,7 @@ export default function() {
 					$familyName: String
 					$email: String
 					$notes: String
-					$timestamp: String
-					$user: String
+					$lastUpdated: LastUpdatedInput
 				) {
 					updateRequest(
 						id: $id
@@ -271,8 +266,7 @@ export default function() {
 						familyName: $familyName
 						email: $email
 						notes: $notes
-						timestamp: $timestamp
-						user: $user
+						lastUpdated: $lastUpdated
 					) {
 						id
 						userId

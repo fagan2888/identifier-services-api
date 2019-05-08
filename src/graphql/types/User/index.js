@@ -43,6 +43,15 @@ export default `
  type Preferences{
      defaultLanguage: String!
  }
+
+ input LastUpdatedInput{
+     timestamp: String!
+     user: String!
+ }
+ 
+ input PreferencesInput{
+     defaultLanguage: String!
+ }
  
  type User{
     id: String!
@@ -63,19 +72,20 @@ export default `
      lastUpdated: LastUpdated
  }
 
- type Mutation{
-    createUser(id:String, userId:String, defaultLanguage: String, user: String, timestamp: String):User
 
-    createRequest(id:String, userId:String, state:String, publishers:String, givenName:String, familyName:String,
-        email:String, notes:String, timestamp:String, user:String ):UsersRequest
+ type Mutation{
+    createUser(id:String, userId:String, preferences:PreferencesInput, lastUpdated:LastUpdatedInput):User
+
+    createRequest(id:String, userId:String, state:String, publishers:[String], givenName:String, familyName:String,
+        email:String, notes:[String], lastUpdated: LastUpdatedInput ):UsersRequest
 
     deleteUser(id:String, userId:String):User
 
     deleteRequest(id:String, userId:String):UsersRequest
 
-    updateUser(id:String, userId:String, defaultLanguage:String, user:String, timestamp:String):User
+    updateUser(id:String, userId:String, preferences:PreferencesInput, lastUpdated:LastUpdatedInput):User
 
     updateRequest(id:String, userId:String, state:String, publishers:String, givenName:String, familyName:String,
-        email:String, notes:String, timestamp:String, user:String ):UsersRequest
+        email:String, notes:String, lastUpdated: LastUpdatedInput ):UsersRequest
  }
  `;

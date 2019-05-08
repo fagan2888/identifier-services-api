@@ -111,6 +111,7 @@ export default {
 			try {
 				const updateUser = {
 					...req.body,
+					id: req.params.id,
 					lastUpdated: {
 						timestamp: `${Date.now()}`,
 						user: req.body.lastUpdated.user

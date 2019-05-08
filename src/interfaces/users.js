@@ -27,21 +27,10 @@
  */
 
 import {v4 as uuid} from 'uuid';
-import {MongoClient} from 'mongodb';
-import {MONGO_URI} from '../config';
 import {graphql} from 'graphql';
 import schema from '../graphql';
 
 export default function() {
-	const client = new MongoClient(MONGO_URI, {useNewUrlParser: true});
-
-	let db;
-	client.connect(err => {
-		const dbName = 'IdentifierServices';
-		db = client.db(dbName);
-		console.log(err);
-	});
-
 	return {
 		create,
 		read,
@@ -56,7 +45,7 @@ export default function() {
 		queryRequest
 	};
 
-	async function create({req}) {
+	async function create({db, req}) {
 		return graphql(
 			schema,
 			`
@@ -89,7 +78,7 @@ export default function() {
 		);
 	}
 
-	async function read(val) {
+	async function read({db, val}) {
 		return graphql(
 			schema,
 			`
@@ -111,7 +100,7 @@ export default function() {
 		);
 	}
 
-	async function update(req) {
+	async function update({db, req}) {
 		return graphql(
 			schema,
 			`
@@ -144,7 +133,7 @@ export default function() {
 		);
 	}
 
-	async function remove(params) {
+	async function remove({db, params}) {
 		return graphql(
 			schema,
 			`
@@ -158,11 +147,11 @@ export default function() {
 		);
 	}
 
-	async function changePwd(val) {
-		return val;
+	async function changePwd(db) {
+		return db;
 	}
 
-	async function query() {
+	async function query(db) {
 		return graphql(
 			schema,
 			'{Users{id, preferences{defaultLanguage}, userId}}',
@@ -172,7 +161,7 @@ export default function() {
 
 	// =====***************************** User Creation Request Starts From Here********************** ====
 
-	async function createRequest({req}) {
+	async function createRequest({db, req}) {
 		return graphql(
 			schema,
 			`
@@ -217,7 +206,7 @@ export default function() {
 		);
 	}
 
-	async function readRequest(val) {
+	async function readRequest({db, val}) {
 		return graphql(
 			schema,
 			`
@@ -242,7 +231,7 @@ export default function() {
 		);
 	}
 
-	async function updateRequest(req) {
+	async function updateRequest({db, req}) {
 		return graphql(
 			schema,
 			`
@@ -287,7 +276,7 @@ export default function() {
 		);
 	}
 
-	async function removeRequest(params) {
+	async function removeRequest({db, params}) {
 		return graphql(
 			schema,
 			`
@@ -301,7 +290,7 @@ export default function() {
 		);
 	}
 
-	async function queryRequest() {
+	async function queryRequest(db) {
 		return graphql(
 			schema,
 			`

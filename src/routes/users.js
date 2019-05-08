@@ -31,7 +31,7 @@ import {Router} from 'express';
 import {usersFactory} from '../interfaces';
 import {API_URL} from '../config';
 
-export default function() {
+export default function(db) {
 	const users = usersFactory({url: API_URL});
 
 	return new Router()
@@ -49,7 +49,7 @@ export default function() {
 
 	async function create(req, res, next) {
 		try {
-			const result = await users.create({req});
+			const result = await users.create({db, req});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -59,7 +59,7 @@ export default function() {
 	async function read(req, res, next) {
 		const params = req.params;
 		try {
-			const result = await users.read(params);
+			const result = await users.read({db, params});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -68,7 +68,7 @@ export default function() {
 
 	async function update(req, res, next) {
 		try {
-			const result = await users.update(req);
+			const result = await users.update({db, req});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -78,7 +78,7 @@ export default function() {
 	async function remove(req, res, next) {
 		const params = req.params;
 		try {
-			const result = await users.remove(params);
+			const result = await users.remove({db, params});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -95,7 +95,7 @@ export default function() {
 
 	async function query(req, res, next) {
 		try {
-			const result = await users.query();
+			const result = await users.query(db);
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -103,7 +103,7 @@ export default function() {
 	}
 	async function createRequest(req, res, next) {
 		try {
-			const result = await users.createRequest({req});
+			const result = await users.createRequest({db, req});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -113,7 +113,7 @@ export default function() {
 	async function readRequest(req, res, next) {
 		const params = req.params;
 		try {
-			const result = await users.readRequest(params);
+			const result = await users.readRequest({db, params});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -122,7 +122,7 @@ export default function() {
 
 	async function updateRequest(req, res, next) {
 		try {
-			const result = await users.updateRequest(req);
+			const result = await users.updateRequest({db, req});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -132,7 +132,7 @@ export default function() {
 	async function removeRequest(req, res, next) {
 		const params = req.params;
 		try {
-			const result = await users.removeRequest(params);
+			const result = await users.removeRequest({db, params});
 			res.json(result);
 		} catch (err) {
 			next(err);
@@ -141,7 +141,7 @@ export default function() {
 
 	async function queryRequest(req, res, next) {
 		try {
-			const result = await users.queryRequest();
+			const result = await users.queryRequest(db);
 			res.json(result);
 		} catch (err) {
 			next(err);

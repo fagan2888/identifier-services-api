@@ -71,7 +71,7 @@ async function run() {
 			db = client.db(dbName);
 			console.log(err);
 			app.use('/templates', createMessageTemplate());
-			app.use('/users', createUsersRouter());
+			app.use('/users', createUsersRouter(db));
 			app.use('/publishers', createPublishersRouter());
 			app.use('/publications', createPublicationsRouter(db));
 		});

@@ -82,7 +82,7 @@ type ElectronicDetails{
 }
 
 type PrintDetails{
-    manufacturer: String!
+    manufacturer: String
     city: String
     run: Int
     edition: Int

@@ -31,7 +31,8 @@ import {graphql} from 'graphql';
 import schema from '../graphql';
 
 export default function() {
-	const queryReturn = `id
+	const queryReturn = `
+	id
 	title
 	language
 	publicationTime
@@ -55,7 +56,11 @@ export default function() {
 		readISBN_ISMN,
 		updateISBN_ISMN,
 		removeISBN_ISMN,
-		queryISBN_ISMN
+		queryISBN_ISMN,
+		createRequestISBN_ISMN,
+		readRequestISBN_ISMN
+		// updateRequestISBN_ISMN,
+		// removeRequestISBN_ISMN,
 	};
 
 	async function createISBN_ISMN({db, req}) {
@@ -189,6 +194,65 @@ export default function() {
 				}
 			`,
 			db
+		);
+	}
+
+	async function createRequestISBN_ISMN({db, req}) {
+		return graphql(
+			schema,
+			`
+				mutation(
+					$id: String
+					$title: String
+					$publicationId: String
+					$melindaId: String
+					$type: String
+					$subtitle: String
+					$language: String
+					$publicationTime: String
+					$additionalDetails: String
+					$authors: [authorInput]
+					$series: seriesInput
+					$electronicDetails: electronicDetailsInput
+					$printDetails: printDetailsInput
+					$mapDetails: mapDetailsInput
+					$lastUpdated: lastUpdatedInput
+				) {
+					createPublication(
+						id: $id
+						title: $title
+						publicationId: $publicationId
+						melindaId: $melindaId
+						type: $type
+						subtitle: $subtitle
+						language: $language
+						publicationTime: $publicationTime
+						additionalDetails: $additionalDetails
+						authors: $authors
+						series: $series
+						electronicDetails: $electronicDetails
+						printDetails: $printDetails
+						mapDetails: $mapDetails
+						lastUpdated: $lastUpdated
+					) {
+						${queryReturn}
+					}
+		`,
+			{db, req}
+		);
+	}
+
+	async function readRequestISBN_ISMN({db, params}) {
+		return graphql(
+			schema,
+			`
+				{
+					PublicationRequests_ISBN_ISMN {
+						${queryReturn}
+					}
+				}
+			`,
+			{db, params}
 		);
 	}
 }

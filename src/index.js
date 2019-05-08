@@ -69,8 +69,8 @@ async function run() {
 		client.connect(err => {
 			const dbName = 'IdentifierServices';
 			db = client.db(dbName);
-			console.log(err);
-			app.use('/templates', createMessageTemplate());
+			err && console.log(err);
+			app.use('/templates', createMessageTemplate(db));
 			app.use('/users', createUsersRouter(db));
 			app.use('/publishers', createPublishersRouter());
 			app.use('/publications', createPublicationsRouter(db));

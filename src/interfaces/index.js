@@ -29,3 +29,4 @@
 export {default as usersFactory} from './users';
 export {default as publishersFactory} from './publishers';
 export {default as publicationsFactory} from './publications';
+export {default as templatesFactory} from './messageTemplates';

@@ -26,12 +26,28 @@
  *
  */
 
-import {mergeResolvers} from 'merge-graphql-schemas';
-import User from './User';
-import Publisher from './Publisher';
-import Publication from './Publication';
-import MessageTemplate from './MessageTemplate'
+export default `
+type Query{
+    template: Template
+    Templates: [Template]
+}
 
-const resolver = [User, Publisher, Publication, MessageTemplate];
+type Template{
+    id: String!
+    name:String!
+    language: String!
+    subject: String!
+    body: String!
+    lastUpdated: LastUpdated!
+}
 
-export default mergeResolvers(resolver, {all: true});
+type Mutation{
+    createTemplate(id:String, name:String, language:String, subject:String, body:String, 
+        lastUpdated:LastUpdatedInput):Template
+    
+    updateTemplate(id:String, name:String, language:String, subject:String, body:String, 
+        lastUpdated:LastUpdatedInput):Template
+    
+    deleteTemplate(id:String):Template
+}
+`;

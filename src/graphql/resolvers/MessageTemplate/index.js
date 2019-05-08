@@ -29,10 +29,10 @@
 
 export default {
 	Query: {
-		publication_ISBN_ISMN: async ({db, params}) => {
+		template: async ({db, params}) => {
 			try {
 				return await db
-					.collection('Publication_ISBN_ISMN')
+					.collection('MessageTemplate')
 					.findOne(params)
 					.then(res => res);
 			} catch (err) {
@@ -40,65 +40,41 @@ export default {
 			}
 		},
 
-		Publications_ISBN_ISMN: async db => {
+		Templates: async ({db, req}) => {
 			try {
 				return await db
-					.collection('Publication_ISBN_ISMN')
+					.collection('MessageTemplate')
 					.find()
 					.toArray()
 					.then(res => res);
 			} catch (err) {
-				return err;
-			}
-		},
-
-		publicationRequest_ISBN_ISMN: async ({db, params}) => {
-			try {
-				return await db
-					.collection('PublicationRequest_ISBN_ISMN')
-					.findOne(params)
-					.then(res => res);
-			} catch (err) {
-				return err;
+				return CustomElementRegistry;
 			}
 		}
 	},
 
 	Mutation: {
-		createPublication: async ({db, req}) => {
+		createTemplate: async ({db, req}) => {
 			try {
-				const newPublication = {
+				const newTemplate = {
 					...req.body,
 					lastUpdated: {
 						timestamp: `${Date.now()}`,
 						user: req.body.lastUpdated.user
 					}
 				};
-				const createdPublication = await db
-					.collection('Publication_ISBN_ISMN')
-					.insertOne(newPublication)
+				const createdTemplate = await db
+					.collection('MessageTemplate')
+					.insertOne(newTemplate)
 					.then(res => res.ops);
-				return createdPublication[0];
+				return createdTemplate[0];
 			} catch (err) {
 				return err;
 			}
 		},
-
-		deletePublication: async ({db, params}) => {
+		updateTemplate: async ({db, req}) => {
 			try {
-				const deletedUser = await db
-					.collection('Publication_ISBN_ISMN')
-					.findOneAndDelete({id: params.id})
-					.then(res => res.value);
-				return deletedUser;
-			} catch (err) {
-				return err;
-			}
-		},
-
-		updatePublication: async ({db, req}) => {
-			try {
-				const updatePublication = {
+				const updateTemplate = {
 					...req.body,
 					id: req.params.id,
 					lastUpdated: {
@@ -107,13 +83,25 @@ export default {
 					}
 				};
 				await db
-					.collection('Publication_ISBN_ISMN')
+					.collection('MessageTemplate')
 					.findOneAndUpdate(
 						{id: req.params.id},
-						{$set: updatePublication},
+						{$set: updateTemplate},
 						{upsert: true}
 					);
-				return updatePublication;
+				return updateTemplate;
+			} catch (err) {
+				return err;
+			}
+		},
+
+		deleteTemplate: async ({db, params}) => {
+			try {
+				const deletedUser = await db
+					.collection('MessageTemplate')
+					.findOneAndDelete({id: params.id})
+					.then(res => res.value);
+				return deletedUser;
 			} catch (err) {
 				return err;
 			}

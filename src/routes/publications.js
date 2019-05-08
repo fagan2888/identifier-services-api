@@ -99,8 +99,10 @@ export default function(db) {
 	}
 
 	async function readRequest(req, res, next) {
+		const params = req.params;
 		try {
-			res.json(req);
+			const result = await publications.readRequestISBN_ISMN({db, params});
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}

@@ -55,7 +55,6 @@ export default {
 
 	Mutation: {
 		createPublication: async ({db, req}) => {
-			console.log(db);
 			try {
 				const newPublication = {
 					...req.body,
@@ -67,8 +66,43 @@ export default {
 				const createdPublication = await db
 					.collection('Publication_ISBN_ISMN')
 					.insertOne(newPublication)
-					.then(res => console.log(res.ops) || res.ops);
+					.then(res => res.ops);
 				return createdPublication[0];
+			} catch (err) {
+				return err;
+			}
+		},
+
+		deletePublication: async ({db, params}) => {
+			try {
+				const deletedUser = await db
+					.collection('Publication_ISBN_ISMN')
+					.findOneAndDelete({id: params.id})
+					.then(res => res.value);
+				return deletedUser;
+			} catch (err) {
+				return err;
+			}
+		},
+
+		updatePublication: async ({db, req}) => {
+			try {
+				const updatePublication = {
+					...req.body,
+					id: req.params.id,
+					lastUpdated: {
+						timestamp: `${Date.now()}`,
+						user: req.body.lastUpdated.user
+					}
+				};
+				await db
+					.collection('Publication_ISBN_ISMN')
+					.findOneAndUpdate(
+						{id: req.params.id},
+						{$set: updatePublication},
+						{upsert: true}
+					);
+				return updatePublication;
 			} catch (err) {
 				return err;
 			}

@@ -31,11 +31,30 @@ import {graphql} from 'graphql';
 import schema from '../graphql';
 
 export default function() {
+	const queryReturn = `id
+	title
+	language
+	publicationTime
+	type
+	language
+	authors{
+		givenName
+		familyName
+		role
+	}
+	printDetails{
+		manufacturer
+	}
+	lastUpdated{
+		timestamp
+		user
+	}`;
+
 	return {
 		createISBN_ISMN,
-		// readISBN_ISMN,
-		// updateISBN_ISMN,
-		// removeISBN_ISMN,
+		readISBN_ISMN,
+		updateISBN_ISMN,
+		removeISBN_ISMN,
 		queryISBN_ISMN
 	};
 
@@ -77,11 +96,85 @@ export default function() {
 						mapDetails: $mapDetails
 						lastUpdated: $lastUpdated
 					) {
-						id
+						${queryReturn}
 					}
 				}
 			`,
 			{db, req}
+		);
+	}
+
+	async function readISBN_ISMN({db, params}) {
+		return graphql(
+			schema,
+			`
+				{
+					publication_ISBN_ISMN {
+						${queryReturn}
+					}
+				}
+			`,
+			{db, params}
+		);
+	}
+
+	async function updateISBN_ISMN({db, req}) {
+		return graphql(
+			schema,
+			`
+				mutation(
+					$id: String
+					$title: String
+					$publicationId: String
+					$melindaId: String
+					$type: String
+					$subtitle: String
+					$language: String
+					$publicationTime: String
+					$additionalDetails: String
+					$authors: [authorInput]
+					$series: seriesInput
+					$electronicDetails: electronicDetailsInput
+					$printDetails: printDetailsInput
+					$mapDetails: mapDetailsInput
+					$lastUpdated: lastUpdatedInput
+				) {
+					createPublication(
+						id: $id
+						title: $title
+						publicationId: $publicationId
+						melindaId: $melindaId
+						type: $type
+						subtitle: $subtitle
+						language: $language
+						publicationTime: $publicationTime
+						additionalDetails: $additionalDetails
+						authors: $authors
+						series: $series
+						electronicDetails: $electronicDetails
+						printDetails: $printDetails
+						mapDetails: $mapDetails
+						lastUpdated: $lastUpdated
+					) {
+						${queryReturn}
+					}
+				}
+			`,
+			{db, req}
+		);
+	}
+
+	async function removeISBN_ISMN({db, params}) {
+		return graphql(
+			schema,
+			`
+				mutation($id: String) {
+					deletePublication(id: $id) {
+						id
+					}
+				}
+			`,
+			{db, params}
 		);
 	}
 
@@ -91,7 +184,7 @@ export default function() {
 			`
 				{
 					Publications_ISBN_ISMN {
-						id
+						${queryReturn}
 					}
 				}
 			`,

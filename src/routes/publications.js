@@ -53,8 +53,10 @@ export default function(db) {
 	}
 
 	async function read(req, res, next) {
+		const params = req.params;
 		try {
-			res.json(req);
+			const result = await publications.readISBN_ISMN({db, params});
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}
@@ -62,15 +64,18 @@ export default function(db) {
 
 	async function update(req, res, next) {
 		try {
-			res.json(req.body);
+			const result = await publications.updateISBN_ISMN({db, req});
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}
 	}
 
 	async function remove(req, res, next) {
+		const params = req.params;
 		try {
-			res.json(req.body);
+			const result = await publications.removeISBN_ISMN({db, params});
+			res.json(result);
 		} catch (err) {
 			next(err);
 		}

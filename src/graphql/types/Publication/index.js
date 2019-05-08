@@ -51,6 +51,13 @@ type Mutation{
         subtitle: String, language: String, publicationTime: String, additionalDetails: String, authors:[authorInput], 
         series: seriesInput, electronicDetails: electronicDetailsInput, printDetails: printDetailsInput, 
         mapDetails: mapDetailsInput, lastUpdated: lastUpdatedInput ): ISBN_ISMN
+    
+    deletePublication(id:String): ISBN_ISMN
+
+    updatePublication(id: String, title: String, publicationId: String, melindaId: String, type: String, 
+        subtitle: String, language: String, publicationTime: String, additionalDetails: String, authors:[authorInput], 
+        series: seriesInput, electronicDetails: electronicDetailsInput, printDetails: printDetailsInput, 
+        mapDetails: mapDetailsInput, lastUpdated: lastUpdatedInput ): ISBN_ISMN
 }
 
 type LastUpdated{

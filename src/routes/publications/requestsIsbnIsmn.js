@@ -32,10 +32,10 @@ import {publicationIsbnIsmnRequestsFactory} from '../../interfaces';
 import {API_URL} from '../../config';
 import HttpStatus from 'http-status';
 
-export default function (db, passportMiddleware) {
+export default function (db, combineUserInfo) {
 	const publications = publicationIsbnIsmnRequestsFactory({url: API_URL});
 	return new Router()
-		.use(passportMiddleware)
+		.use(combineUserInfo)
 		.post('/', bodyParse(), createRequest)
 		.get('/:id', readRequest)
 		.delete('/:id', removeRequest)

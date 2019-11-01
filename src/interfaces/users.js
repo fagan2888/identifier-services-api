@@ -29,7 +29,7 @@
 import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
-import {hasAdminPermission, hasSystemPermission, hasPublisherAdminPermission, createLinkAndSendEmail, local} from './utils';
+import {hasAdminPermission, hasSystemPermission, hasPublisherAdminPermission, createLinkAndSendEmail, local, crowd} from './utils';
 import interfaceFactory from './interfaceModules';
 import {PASSPORT_LOCAL, PRIVATE_KEY_URL} from '../config';
 
@@ -46,9 +46,15 @@ export default function () {
 	};
 
 	async function create(db, doc, user) {
-		if (hasAdminPermission(user)) {
-			const {localUser} = local();
-			await localUser.create({PASSPORT_LOCAL: PASSPORT_LOCAL, doc: doc});
+		if (hasSystemPermission(user)) {
+			if (PASSPORT_LOCAL) {
+				const {localUser} = local();
+				await localUser.create({PASSPORT_LOCAL: PASSPORT_LOCAL, doc: doc});
+			} else {
+				const {crowdUser} = crowd();
+				await crowdUser.create({doc: doc});
+			}
+
 			const newDoc = {...doc, id: doc.email};
 			const result = await userInterface.create(db, newDoc, user);
 			return result;
@@ -69,7 +75,7 @@ export default function () {
 	}
 
 	async function update(db, id, doc, user) {
-		if (hasAdminPermission(user)) {
+		if (hasSystemPermission(user)) {
 			const result = await userInterface.update(db, id, doc, user);
 			return result;
 		}
@@ -78,7 +84,7 @@ export default function () {
 	}
 
 	async function remove(db, id, user) {
-		if (hasAdminPermission(user)) {
+		if (hasSystemPermission(user)) {
 			const result = await userInterface.remove(db, id);
 			return result;
 		}
@@ -89,11 +95,16 @@ export default function () {
 	async function changePwd(doc, user) {
 		if (doc.newPassword) {
 			if (hasAdminPermission(user) || hasSystemPermission(user)) {
-				const {localUser} = local();
-				return localUser.update({PASSPORT_LOCAL: PASSPORT_LOCAL, user: doc});
-			}
+				if (PASSPORT_LOCAL) {
+					const {localUser} = local();
+					return localUser.update({PASSPORT_LOCAL: PASSPORT_LOCAL, user: doc});
+				}
 
-			throw new ApiError(HttpStatus.FORBIDDEN);
+				const {crowdUser} = crowd();
+				await crowdUser.update({doc});
+			} else {
+				throw new ApiError(HttpStatus.FORBIDDEN);
+			}
 		} else {
 			const result = await createLinkAndSendEmail({request: doc, PRIVATE_KEY_URL: PRIVATE_KEY_URL, PASSPORT_LOCAL: PASSPORT_LOCAL});
 			if (result !== undefined && result.status === 404) {
@@ -106,7 +117,7 @@ export default function () {
 
 	async function query(db, {queries, offset}, user) {
 		const result = await userInterface.query(db, {queries, offset});
-		if (hasAdminPermission(user)) {
+		if (hasAdminPermission(user) || hasSystemPermission(user)) {
 			return result;
 		}
 

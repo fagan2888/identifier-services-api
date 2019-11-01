@@ -30,11 +30,11 @@ import {Router} from 'express';
 import {templatesFactory} from '../interfaces';
 import {API_URL} from '../config';
 
-export default function (db, passportMiddlewares) {
+export default function (db, combineUserInfo) {
 	const templates = templatesFactory({url: API_URL});
 
 	return new Router()
-		.use(passportMiddlewares)
+		.use(combineUserInfo)
 		.post('/', create)
 		.get('/:id', read)
 		.put('/:id', update)

@@ -31,10 +31,10 @@ import {bodyParse} from '../../utils';
 import {publicationIssnRequestsFactory} from '../../interfaces';
 import {API_URL} from '../../config';
 
-export default function (db, passportMiddleware) {
+export default function (db, combineUserInfo) {
 	const publications = publicationIssnRequestsFactory({url: API_URL});
 	return new Router()
-		.use(passportMiddleware)
+		.use(combineUserInfo)
 		.post('/', bodyParse(), createRequest)
 		.get('/:id', readRequest)
 		.delete('/:id', removeRequest)

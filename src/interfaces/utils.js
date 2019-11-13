@@ -63,25 +63,97 @@ const localClient =	createApiClient({
 	userAgent: API_CLIENT_USER_AGENT
 });
 
-export function hasPermission(profile, user) {
-	const permitted = profile.auth.role.some(profileRole => {
+export function removeGroupPrefix(user) {
+	return user.groups.map(item => item.split('-').pop().replace('$', '', 'g'));
+}
+
+const permissions = {
+	users: {
+		create: ['system'],
+		read: ['system', 'admin', 'publisherAdmin'],
+		update: ['system'],
+		remove: ['system', 'admin'],
+		changePwd: ['system', 'admin'],
+		query: ['system', 'admin', 'publisherAdmin']
+	},
+	userRequests: {
+		createRequest: ['publisherAdmin'],
+		readRequest: ['system', 'admin', 'publisherAdmin'],
+		updateInitialRequest: ['system', 'admin', 'publisherAdmin'],
+		updateRequest: ['system', 'admin', 'publisherAdmin'],
+		removeRequest: ['system'],
+		queryRequest: ['system', 'admin', 'publisherAdmin']
+	},
+	publishers: {
+		create: ['admin'],
+		read: ['all'],
+		update: ['publisherAdmin'],
+		query: ['all']
+	},
+	publisherRequests: {
+		createRequest: ['system'],
+		readRequest: ['system', 'admin'],
+		updateRequest: ['system', 'admin'],
+		removeRequest: ['system'],
+		queryRequests: ['system', 'admin']
+	},
+	publicationIsbnIsmn: {
+		createIsbnIsmn: ['system'],
+		readIsbnIsmn: ['system', 'admin'],
+		updateIsbnIsmn: ['system', 'admin'],
+		queryIsbnIsmn: ['system', 'admin']
+	},
+	publicationIsbnIsmnRequests: {
+		createRequestIsbnIsmn: ['system'],
+		readRequestIsbnIsmn: ['system', 'admin'],
+		updateRequestIsbnIsmn: ['system', 'admin'],
+		removeRequestIsbnIsmn: ['system'],
+		queryRequestIsbnIsmn: ['system', 'admin']
+	},
+	publicationIssn: {
+		createISSN: ['admin'],
+		readISSN: ['admin', 'publisheradmin'],
+		updateISSN: ['system', 'admin'],
+		queryISSN: ['system', 'admin']
+	},
+	publicationIssnRequests: {
+		createRequestISSN: ['system'],
+		readRequestISSN: ['system', 'admin'],
+		updateRequestISSN: ['system', 'admin'],
+		removeRequestISSN: ['system'],
+		queryRequestISSN: ['system', 'admin']
+	},
+	messageTemplates: {
+		create: ['admin'],
+		read: ['admin'],
+		update: ['system', 'admin'],
+		remove: ['admin'],
+		query: ['system', 'admin']
+	},
+	ranges: {
+		createIsbn: ['admin'],
+		readIsbn: ['admin'],
+		updateIsbn: ['admin'],
+		queryIsbn: ['admin'],
+		createIsmn: ['admin'],
+		readIsmn: ['admin'],
+		updateIsmn: ['admin'],
+		queryIsmn: ['admin'],
+		createIssn: ['admin'],
+		readIssn: ['admin'],
+		updateIssn: ['admin'],
+		queryIssn: ['admin']
+	}
+};
+
+export function hasPermission(user, type, command) {
+	const commandPermissions = permissions[type][command];
+	const permitted = commandPermissions.includes('all') || commandPermissions.some(role => {
 		return user.groups.some(
-			userRole => userRole === profileRole
+			userRole => userRole === role
 		);
 	});
 	return permitted;
-}
-
-export function hasAdminPermission(user) {
-	return hasPermission({auth: {role: ['admin']}}, user);
-}
-
-export function hasSystemPermission(user) {
-	return hasPermission({auth: {role: ['system']}}, user);
-}
-
-export function hasPublisherAdminPermission(user) {
-	return hasPermission({auth: {role: ['publisher-admin', 'publisherAdmin']}}, user);
 }
 
 export function convertLanguage(language) {

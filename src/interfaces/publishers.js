@@ -27,7 +27,7 @@
  */
 
 import interfaceFactory from './interfaceModules';
-import {removeGroupPrefix, hasPermission} from './utils';
+import {hasPermission} from './utils';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 import HttpStatus from 'http-status';
 
@@ -42,7 +42,6 @@ export default function () {
 	};
 
 	async function create(db, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'publishers', 'create')) {
 			const result = await publisherInterface.create(db, doc, user);
 			return result;
@@ -85,7 +84,6 @@ export default function () {
 	}
 
 	async function update(db, id, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const result = await publisherInterface.update(db, id, doc, user);
 		return result;
 	}

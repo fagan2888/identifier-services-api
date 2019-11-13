@@ -30,7 +30,7 @@ import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
 import interfaceFactory from './interfaceModules';
-import {removeGroupPrefix, hasPermission} from './utils';
+import {hasPermission} from './utils';
 
 const publicationsIssnInterface = interfaceFactory('Publication_ISSN', 'PublicationIssnContent');
 
@@ -44,7 +44,6 @@ export default function () {
 	};
 
 	async function createISSN(db, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'publicationIssn', 'createISSN')) {
 			const result = await publicationsIssnInterface.create(db, doc, user);
 			return result;
@@ -54,7 +53,6 @@ export default function () {
 	}
 
 	async function readISSN(db, id, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const result = await publicationsIssnInterface.read(db, id);
 		if (hasPermission(user, 'publicationIssn', 'readISSN') && result.publisher === user.id) {
 			return result;
@@ -64,7 +62,6 @@ export default function () {
 	}
 
 	async function updateISSN(db, id, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'publicationIssn', 'updateISSN')) {
 			const result = await publicationsIssnInterface.update(db, id, doc, user);
 			return result;
@@ -79,7 +76,6 @@ export default function () {
 	// }
 
 	async function queryISSN(db, {queries, offset}, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const result = await publicationsIssnInterface.query(db, {queries, offset});
 
 		if (hasPermission(user, 'publicationIssn', 'queryISSN')) {

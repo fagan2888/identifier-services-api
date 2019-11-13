@@ -30,7 +30,7 @@ import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
 import interfaceFactory from './interfaceModules';
-import {removeGroupPrefix, hasPermission} from './utils';
+import {hasPermission} from './utils';
 
 const publicationsIsbnIsmnInterface = interfaceFactory('Publication_ISBN_ISMN', 'PublicationIsbnIsmnContent');
 
@@ -43,7 +43,6 @@ export default function () {
 	};
 
 	async function createIsbnIsmn(db, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'publicationIsbnIsmn', 'createIsbnIsmn')) {
 			doc.publisher = user.id;
 			doc.metadataReference =	{state: 'pending'};
@@ -56,7 +55,6 @@ export default function () {
 	}
 
 	async function readIsbnIsmn(db, id, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const result = await publicationsIsbnIsmnInterface.read(db, id);
 		if (hasPermission(user, 'publicationIsbnIsmn', 'readIsbnIsmn') && result.publisher === user.id) {
 			return result;
@@ -66,7 +64,6 @@ export default function () {
 	}
 
 	async function updateIsbnIsmn(db, id, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'publicationIsbnIsmn', 'updateIsbnIsmn')) {
 			const result = await publicationsIsbnIsmnInterface.update(db, id, doc, user);
 			return result;
@@ -85,7 +82,6 @@ export default function () {
 	// }
 
 	async function queryIsbnIsmn(db, {queries, offset}, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const result = await publicationsIsbnIsmnInterface.query(db, {queries, offset});
 		if (hasPermission(user, 'publicationIsbnIsmn', 'queryIsbnIsmn')) {
 			return result;

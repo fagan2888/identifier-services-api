@@ -29,7 +29,7 @@
 import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
-import {removeGroupPrefix, hasPermission, createLinkAndSendEmail, local, crowd} from './utils';
+import {hasPermission, createLinkAndSendEmail, local, crowd} from './utils';
 import interfaceFactory from './interfaceModules';
 import {CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL} from '../config';
 
@@ -46,7 +46,6 @@ export default function () {
 	};
 
 	async function create(db, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'users', 'create')) {
 			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
 				const {crowdUser} = crowd();
@@ -65,7 +64,6 @@ export default function () {
 	}
 
 	async function read(db, id, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const response = await userInterface.read(db, id);
 		let result;
 		if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
@@ -84,7 +82,6 @@ export default function () {
 	}
 
 	async function update(db, id, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'users', update)) {
 			const result = await userInterface.update(db, id, doc, user);
 			return result;
@@ -94,7 +91,6 @@ export default function () {
 	}
 
 	async function remove(db, id, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'users', 'remove')) {
 			const response = await userInterface.read(db, id);
 			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
@@ -113,7 +109,6 @@ export default function () {
 	}
 
 	async function changePwd(doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (doc.newPassword) {
 			if (hasPermission(user, 'users', 'changePwd')) {
 				if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
@@ -137,7 +132,6 @@ export default function () {
 	}
 
 	async function query(db, {queries, offset}, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		let response;
 		if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
 			const {crowdUser} = crowd();

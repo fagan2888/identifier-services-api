@@ -30,7 +30,7 @@ import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
 import interfaceFactory from './interfaceModules';
-import {removeGroupPrefix, hasPermission} from './utils';
+import {hasPermission} from './utils';
 
 const userInterface = interfaceFactory('usersRequest', 'UserRequest');
 const userInitialInterface = interfaceFactory('usersRequest', 'UserRequestContent');
@@ -46,7 +46,6 @@ export default function () {
 	};
 
 	async function createRequest(db, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'userRequests', 'createRequest')) {
 			const newDoc = {
 				...doc,
@@ -66,7 +65,6 @@ export default function () {
 	}
 
 	async function readRequest(db, id, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const protectedProperties = {_id: 0};
 		const result = await userInterface.read(db, id, protectedProperties);
 		if (hasPermission(user, 'userRequests', 'readRequest')) {
@@ -82,7 +80,6 @@ export default function () {
 	}
 
 	async function updateInitialRequest(db, id, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const newDoc = {...doc, backgroundProcessingState: doc.backgroundProcessingState ? doc.backgroundProcessingState : 'pending'};
 		const readResult = await readRequest(db, id, user);
 		if (hasPermission(user, 'userRequests', 'updateInitialRequest')) {
@@ -100,7 +97,6 @@ export default function () {
 	}
 
 	async function updateRequest(db, id, doc, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const newDoc = {...doc, backgroundProcessingState: doc.backgroundProcessingState ? doc.backgroundProcessingState : 'pending'};
 		const readResult = await readRequest(db, id, user);
 		if (hasPermission(user, 'userRequests', 'updateRequest')) {
@@ -118,7 +114,6 @@ export default function () {
 	}
 
 	async function removeRequest(db, id, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		if (hasPermission(user, 'userRequests', 'removeRequest')) {
 			const result = await userInterface.remove(db, id);
 			return result;
@@ -128,7 +123,6 @@ export default function () {
 	}
 
 	async function queryRequest(db, {queries, offset}, user) {
-		user = {...user, groups: removeGroupPrefix(user)};
 		const result = await userInterface.query(db, {queries, offset});
 		if (hasPermission(user, 'userRequests', 'queryRequest')) {
 			if (user.role === 'publisher-admin') {

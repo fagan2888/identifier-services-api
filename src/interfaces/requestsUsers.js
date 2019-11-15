@@ -46,6 +46,7 @@ export default function () {
 	};
 
 	async function createRequest(db, doc, user) {
+		console.log('createrequerst', user);
 		if (hasPermission(user, 'userRequests', 'createRequest')) {
 			const newDoc = {
 				...doc,

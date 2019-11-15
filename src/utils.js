@@ -29,6 +29,8 @@
 
 import validateContentType from '@natlibfi/express-validate-content-type';
 import bodyParser from 'body-parser';
+import fs from 'fs';
+import {GROUPS_AND_ROLES} from './config';
 
 export function bodyParse() {
 	validateContentType({
@@ -37,4 +39,20 @@ export function bodyParse() {
 	return bodyParser.json({
 		type: ['application/json']
 	});
+}
+
+export function mapRole(role) {
+	const readResponse = fs.readFileSync(formatUrl(GROUPS_AND_ROLES), 'utf-8');
+	const data = JSON.parse(readResponse);
+	return Object.keys(data).reduce((acc, key) => {
+		if (role === key) {
+			acc = data[key];
+		}
+
+		return acc;
+	}, '');
+}
+
+export function formatUrl(url) {
+	return url.replace(/^file:\/\//, '');
 }

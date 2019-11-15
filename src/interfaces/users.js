@@ -47,12 +47,16 @@ export default function () {
 
 	async function create(db, doc, user) {
 		if (hasPermission(user, 'users', 'create')) {
-			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-				const {crowdUser} = crowd();
-				await crowdUser.create({doc: doc});
-			} else {
-				const {localUser} = local();
-				await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
+			try {
+				if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
+					const {crowdUser} = crowd();
+					await crowdUser.create({doc: doc});
+				} else {
+					const {localUser} = local();
+					await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
+				}
+			} catch (err) {
+				throw new ApiError(err.status);
 			}
 
 			const newDoc = {...doc, id: doc.email};
@@ -74,7 +78,8 @@ export default function () {
 			result = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, email: response.email});
 		}
 
-		if (hasPermission(user, 'users', 'read') && response.id === user.id) {
+		if (hasPermission(user, 'users', 'read')) {
+			// Need to filter user information after combining and before returning to clientSide
 			return {...response, ...result};
 		}
 
@@ -132,30 +137,15 @@ export default function () {
 	}
 
 	async function query(db, {queries, offset}, user) {
-		let response;
-		if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-			const {crowdUser} = crowd();
-			response = await crowdUser.query();
-		} else {
-			const {localUser} = local();
-			response = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
-		}
-
-		const dbResponse = await userInterface.query(db, {queries, offset});
 		if (hasPermission(user, 'users', 'query')) {
 			if (user.role === 'publisher-admin') {
-				const results = dbResponse.results.filter(item => {
-					if (response.includes(item.userId) && item.publisher === user.id) {
-						return item;
-					}
-
-					return null;
-				});
-				return {...dbResponse, queryDocCount: results.length, results: results};
+				const queries = [{
+					query: {publisher: 'publisher-admin'}
+				}];
+				return userInterface.query(db, {queries, offset});
 			}
 
-			const results = dbResponse.results.filter(item => response.includes(item.userId) && item);
-			return {...dbResponse, queryDocCount: results.length, results: results};
+			return userInterface.query(db, {queries, offset});
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);

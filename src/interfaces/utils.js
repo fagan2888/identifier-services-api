@@ -33,6 +33,7 @@ import jose from 'jose';
 import CrowdClient from 'atlassian-crowd-client';
 import User from 'atlassian-crowd-client/lib/models/user';
 
+import {formatUrl, mapRole} from '../utils';
 import {
 	UI_URL,
 	SMTP_URL,
@@ -63,31 +64,27 @@ const localClient =	createApiClient({
 	userAgent: API_CLIENT_USER_AGENT
 });
 
-export function removeGroupPrefix(user) {
-	return user.groups.map(item => item.split('-').pop().replace('$', '', 'g'));
-}
-
 const permissions = {
 	users: {
-		create: ['system'],
-		read: ['system', 'admin', 'publisherAdmin'],
+		create: ['system', 'admin'],
+		read: ['system', 'admin', 'publisher-admin'],
 		update: ['system'],
 		remove: ['system', 'admin'],
 		changePwd: ['system', 'admin'],
-		query: ['system', 'admin', 'publisherAdmin']
+		query: ['system', 'admin', 'publisher-admin']
 	},
 	userRequests: {
-		createRequest: ['publisherAdmin'],
-		readRequest: ['system', 'admin', 'publisherAdmin'],
-		updateInitialRequest: ['system', 'admin', 'publisherAdmin'],
-		updateRequest: ['system', 'admin', 'publisherAdmin'],
+		createRequest: ['publisher-admin'],
+		readRequest: ['system', 'admin', 'publisher-admin'],
+		updateInitialRequest: ['system', 'admin', 'publisher-admin'],
+		updateRequest: ['system', 'admin', 'publisher-admin'],
 		removeRequest: ['system'],
-		queryRequest: ['system', 'admin', 'publisherAdmin']
+		queryRequest: ['system', 'admin', 'publisher-admin']
 	},
 	publishers: {
 		create: ['admin'],
 		read: ['all'],
-		update: ['publisherAdmin'],
+		update: ['publisher-admin'],
 		query: ['all']
 	},
 	publisherRequests: {
@@ -112,7 +109,7 @@ const permissions = {
 	},
 	publicationIssn: {
 		createISSN: ['admin'],
-		readISSN: ['admin', 'publisheradmin'],
+		readISSN: ['admin', 'publisher-admin'],
 		updateISSN: ['system', 'admin'],
 		queryISSN: ['system', 'admin']
 	},
@@ -121,7 +118,7 @@ const permissions = {
 		readRequestISSN: ['system', 'admin'],
 		updateRequestISSN: ['system', 'admin'],
 		removeRequestISSN: ['system'],
-		queryRequestISSN: ['system', 'admin']
+		queryRequestISSN: ['system', 'admin', 'publisher-admin', 'publisher']
 	},
 	messageTemplates: {
 		create: ['admin'],
@@ -149,9 +146,7 @@ const permissions = {
 export function hasPermission(user, type, command) {
 	const commandPermissions = permissions[type][command];
 	const permitted = commandPermissions.includes('all') || commandPermissions.some(role => {
-		return user.groups.some(
-			userRole => userRole === role
-		);
+		return user.role === role;
 	});
 	return permitted;
 }
@@ -205,7 +200,7 @@ export function local() {
 			displayName: `${doc.givenName}${doc.familyName}`,
 			emails: [{value: doc.email, type: 'work'}],
 			organization: [],
-			groups: [`${doc.role}`]
+			groups: [mapRole(doc.role)]
 		};
 
 		if (containsObject(newData, data)) {
@@ -279,7 +274,7 @@ export function crowd() {
 	async function create({doc}) {
 		const payload = new User(doc.givenName, doc.familyName, `${doc.givenName} ${doc.familyName}`, doc.email, doc.email, Math.random().toString(36).slice(2));
 		const response = await crowdClient.user.create(payload);
-		await crowdClient.user.groups.add(response.email, doc.role);
+		await crowdClient.user.groups.add(response.email, mapRole(doc.role));
 		return {...response, groups: await getUserGroup(response.username)};
 	}
 
@@ -371,6 +366,3 @@ export async function getTemplate(query, cache) {
 	return cache[key];
 }
 
-function formatUrl(url) {
-	return url.replace(/^file:\/\//, '');
-}

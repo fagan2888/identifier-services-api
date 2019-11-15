@@ -33,6 +33,7 @@ import {filterResult, hasPermission} from './utils';
 import interfaceFactory from './interfaceModules';
 
 const publicationsRequestsIssnInterface = interfaceFactory('PublicationRequest_ISSN', 'PublicationIssnRequestContent');
+const userInterface = interfaceFactory('userMetadata', 'UserContent');
 
 export default function () {
 	return {
@@ -89,15 +90,35 @@ export default function () {
 	}
 
 	async function queryRequestISSN(db, {queries, offset}, user) {
-		const result = await publicationsRequestsIssnInterface.query(db, {queries, offset});
+		let protectedProperties;
+		const result = await publicationsRequestsIssnInterface.query(db, {queries, offset}, protectedProperties);
 		if (hasPermission(user, 'publicationIssnRequests', 'queryRequestISSN')) {
+			if (user.role === 'publisher-admin') {
+				protectedProperties = {
+					state: 0,
+					publisher: 0,
+					lastUpdated: 0
+				};
+				const queries = [{
+					query: {publisher: user.id}
+				}];
+				const response = await userInterface.query(db, {queries, offset});
+
+				return response.results.reduce((acc, i) => {
+					result.results.map(k =>
+						k.publisher === i.email && acc.push(k)
+					);
+					return {results: acc};
+				}, []);
+			} 
+
 			return result;
 		}
 
-		if (user) {
-			const response = await db.collection('userMetadata').findOne({id: user.id});
-			return {results: result.results.filter(item => item.publisher === response.id && filterResult(item))};
-		}
+		// if (user) {
+		// 	const response = await db.collection('userMetadata').findOne({id: user.id});
+		// 	return {results: result.results.filter(item => item.publisher === response.id && filterResult(item))};
+		// }
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}

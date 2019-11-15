@@ -53,7 +53,6 @@ import {
 	CROWD_APP_PASSWORD,
 	PASSPORT_LOCAL_USERS
 } from './config';
-import {removeGroupPrefix} from './interfaces/utils';
 
 const {createLogger, createExpressLogger, handleInterrupt} = Utils;
 const {Crowd: {generatePassportMiddlewares}} = Authentication;
@@ -114,8 +113,7 @@ export default async function run() {
 
 	async function combineUserInfo(req, res, next) {
 		const response = await db.collection('userMetadata').findOne({id: req.user.id});
-		const newUser = {...req.user, ...response};
-		req.user = {...newUser, groups: removeGroupPrefix(newUser)};
+		req.user = {...req.user, ...response};
 		next();
 	}
 

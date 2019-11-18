@@ -33,7 +33,7 @@ import jose from 'jose';
 import CrowdClient from 'atlassian-crowd-client';
 import User from 'atlassian-crowd-client/lib/models/user';
 
-import {formatUrl, mapRole} from '../utils';
+import {formatUrl, mapRoleToGroup} from '../utils';
 import {
 	UI_URL,
 	SMTP_URL,
@@ -200,7 +200,7 @@ export function local() {
 			displayName: `${doc.givenName}${doc.familyName}`,
 			emails: [{value: doc.email, type: 'work'}],
 			organization: [],
-			groups: [mapRole(doc.role)]
+			groups: [mapRoleToGroup(doc.role)]
 		};
 
 		if (containsObject(newData, data)) {
@@ -274,7 +274,7 @@ export function crowd() {
 	async function create({doc}) {
 		const payload = new User(doc.givenName, doc.familyName, `${doc.givenName} ${doc.familyName}`, doc.email, doc.email, Math.random().toString(36).slice(2));
 		const response = await crowdClient.user.create(payload);
-		await crowdClient.user.groups.add(response.email, mapRole(doc.role));
+		await crowdClient.user.groups.add(response.email, mapRoleToGroup(doc.role));
 		return {...response, groups: await getUserGroup(response.username)};
 	}
 

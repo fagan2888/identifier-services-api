@@ -90,6 +90,7 @@ export default function () {
 	}
 
 	async function queryRequestISSN(db, {queries, offset}, user) {
+		console.log('user', user)
 		let protectedProperties;
 		const result = await publicationsRequestsIssnInterface.query(db, {queries, offset}, protectedProperties);
 		if (hasPermission(user, 'publicationIssnRequests', 'queryRequestISSN')) {
@@ -108,9 +109,22 @@ export default function () {
 					result.results.map(k =>
 						k.publisher === i.email && acc.push(k)
 					);
-					return {results: acc};
+					return {results: acc.map(item => filterResult(item))};
 				}, []);
-			} 
+			}
+
+			if (user.role === 'publisher') {
+				const userQueries = [{
+					query: {id: user.id}
+				}];
+				const issnQueries = [{
+					query: {publisher: 'co_incidence9999@yahoo.com'} // Need to discuss
+				}];
+				const response = await userInterface.query(db, {queries: userQueries, offset});
+				console.log('res', response)
+				const result = await publicationsRequestsIssnInterface.query(db, {queries: issnQueries, offset});
+				return result;
+			}
 
 			return result;
 		}

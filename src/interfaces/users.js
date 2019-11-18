@@ -32,6 +32,7 @@ import {ApiError} from '@natlibfi/identifier-services-commons';
 import {hasPermission, createLinkAndSendEmail, local, crowd} from './utils';
 import interfaceFactory from './interfaceModules';
 import {CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL} from '../config';
+import {mapGroupToRole} from '../utils';
 
 const userInterface = interfaceFactory('userMetadata', 'UserContent');
 
@@ -76,6 +77,7 @@ export default function () {
 		} else {
 			const {localUser} = local();
 			result = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, email: response.email});
+			result = {...result, role: mapGroupToRole(result.groups)};
 		}
 
 		if (hasPermission(user, 'users', 'read')) {

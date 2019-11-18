@@ -34,6 +34,7 @@ import {hasPermission} from './utils';
 
 const userInterface = interfaceFactory('usersRequest', 'UserRequest');
 const userInitialInterface = interfaceFactory('usersRequest', 'UserRequestContent');
+const publisherInterface = interfaceFactory('PublisherMetadata', 'PublisherContent');
 
 export default function () {
 	return {
@@ -47,19 +48,23 @@ export default function () {
 
 	async function createRequest(db, doc, user) {
 		console.log('createrequerst', user);
+		debugger;
+		const queries = [{
+			query: {id: user.id}
+		}];
+		// const result = await publisherInterface.query()
 		if (hasPermission(user, 'userRequests', 'createRequest')) {
 			const newDoc = {
 				...doc,
 				state: 'new',
 				backgroundProcessingState: 'pending',
-				role: 'publisher',
-				publisher: user.id,
+				publisher: 'user\'s publisher mongoId', // some function to get publisher's mongo id.
 				preferences: {
 					defaultLanguage: 'fin'
 				}
 			};
-			const result = await userInitialInterface.create(db, newDoc, user);
-			return result;
+			// const result = await userInitialInterface.create(db, newDoc, user);
+			// return result;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);

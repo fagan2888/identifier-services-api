@@ -31,9 +31,12 @@ import HttpStatus from 'http-status';
 import fs from 'fs';
 import jose from 'jose';
 import CrowdClient from 'atlassian-crowd-client';
+const Ajv = require('ajv');
+const {readFileSync} = require('fs');
+const path = require('path');
 import User from 'atlassian-crowd-client/lib/models/user';
 
-import {formatUrl, mapRoleToGroup} from '../utils';
+import {formatUrl, mapRoleToGroup, mapGroupToRole} from '../utils';
 import {
 	UI_URL,
 	SMTP_URL,
@@ -48,8 +51,6 @@ import {
 } from '../config';
 
 const {sendEmail} = Utils;
-
-const Ajv = require('ajv');
 
 const crowdClient = new CrowdClient({
 	baseUrl: CROWD_URL,
@@ -153,20 +154,6 @@ export function hasPermission(user, type, command) {
 
 export function convertLanguage(language) {
 	return language === 'fi' ? 'fin' : (language === 'sv' ? 'swe' : 'eng');
-}
-
-export function getValidator(schemaName) {
-	const str = fs.readFileSync('api.json', 'utf8')
-		.replace(/#\/components\/schemas/gm, 'defs#/definitions');
-
-	const obj = JSON.parse(str);
-
-	return new Ajv({allErrors: true})
-		.addSchema({
-			$id: 'defs',
-			definitions: obj.components.schemas
-		})
-		.compile(obj.components.schemas[schemaName]);
 }
 
 export function filterResult(result) {
@@ -286,8 +273,9 @@ export function crowd() {
 		}
 	}
 
-	async function remove({id, role}) {
-		await crowdClient.user.groups.remove(id, role);
+	async function remove({id}) {
+		const group = await getUserGroup(id);
+		await crowdClient.user.groups.remove(id, mapGroupToRole(group));
 		const response = await crowdClient.user.remove(id);
 		return response;
 	}
@@ -366,3 +354,22 @@ export async function getTemplate(query, cache) {
 	return cache[key];
 }
 
+export function validateDoc(doc, collectionContent) {
+	const validate = getValidator(collectionContent);
+	if (!validate(doc)) {
+		throw new Error(JSON.stringify(validate.errors, undefined, 2));
+	}
+}
+
+function getValidator(schemaName) {
+	const str = readFileSync(path.join(__dirname, '..', 'api.json'), 'utf8')
+		.replace(/#\/components\/schemas/gm, 'defs#/definitions');
+	const obj = JSON.parse(str);
+
+	return new Ajv({allErrors: true})
+		.addSchema({
+			$id: 'defs',
+			definitions: obj.components.schemas
+		})
+		.compile(obj.components.schemas[schemaName]);
+}

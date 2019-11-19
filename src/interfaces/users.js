@@ -29,12 +29,12 @@
 import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
-import {hasPermission, createLinkAndSendEmail, local, crowd} from './utils';
+import {hasPermission, createLinkAndSendEmail, local, crowd, validateDoc} from './utils';
 import interfaceFactory from './interfaceModules';
 import {CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL} from '../config';
 import {mapGroupToRole} from '../utils';
 
-const userInterface = interfaceFactory('userMetadata', 'UserContent');
+const userInterface = interfaceFactory('userMetadata');
 
 export default function () {
 	return {
@@ -47,6 +47,16 @@ export default function () {
 	};
 
 	async function create(db, doc, user) {
+		if (doc.SSOId) {
+			// ¤¤¤¤¤¤¤¤¤¤¤¤ Validate SSOId remains ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+			doc.userId = doc.SSOId;
+			const {role, givenName, familyName, SSOId, email, ...rest} = {...doc};
+			const result = await userInterface.create(db, rest, user);
+			return result;
+		}
+
+		doc.userId = doc.email;
+		validateDoc(doc, 'UserContent');
 		if (hasPermission(user, 'users', 'create')) {
 			try {
 				if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
@@ -60,8 +70,8 @@ export default function () {
 				throw new ApiError(err.status);
 			}
 
-			const newDoc = {...doc, id: doc.email};
-			const result = await userInterface.create(db, newDoc, user);
+			const {role, givenName, familyName, email, ...rest} = {...doc};
+			const result = await userInterface.create(db, rest, user);
 			return result;
 		}
 
@@ -73,10 +83,10 @@ export default function () {
 		let result;
 		if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
 			const {crowdUser} = crowd();
-			result = await crowdUser.read({id: response.id});
+			result = await crowdUser.read({id: response.userId ? response.userId : response.id});
 		} else {
 			const {localUser} = local();
-			result = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, email: response.email});
+			result = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, email: response.userId ? response.userId : response.id}); // Delete id later
 			result = {...result, role: mapGroupToRole(result.groups)};
 		}
 
@@ -89,6 +99,7 @@ export default function () {
 	}
 
 	async function update(db, id, doc, user) {
+		validateDoc(doc, 'UserContent');
 		if (hasPermission(user, 'users', update)) {
 			const result = await userInterface.update(db, id, doc, user);
 			return result;
@@ -102,10 +113,10 @@ export default function () {
 			const response = await userInterface.read(db, id);
 			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
 				const {crowdUser} = crowd();
-				await crowdUser.remove({id: response.id, role: response.role});
+				await crowdUser.remove({id: response.userId ? response.userId : response.id});
 			} else {
 				const {localUser} = local();
-				await localUser.remove({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, id: response.id});
+				await localUser.remove({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, id: response.userId ? response.userId : response.id});
 			}
 
 			const result = await userInterface.remove(db, id);

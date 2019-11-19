@@ -47,7 +47,7 @@ export default function () {
 	};
 
 	async function createRequest(db, doc, user) {
-		console.log('createrequerst', user);
+		//console.log('createrequerst', user);
 		debugger;
 		const queries = [{
 			query: {id: user.id}
@@ -58,7 +58,6 @@ export default function () {
 				...doc,
 				state: 'new',
 				backgroundProcessingState: 'pending',
-				publisher: 'user\'s publisher mongoId', // some function to get publisher's mongo id.
 				preferences: {
 					defaultLanguage: 'fin'
 				}

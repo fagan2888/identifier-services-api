@@ -90,7 +90,6 @@ export default function () {
 	}
 
 	async function queryRequestISSN(db, {queries, offset}, user) {
-		console.log('user', user)
 		let protectedProperties;
 		const result = await publicationsRequestsIssnInterface.query(db, {queries, offset}, protectedProperties);
 		if (hasPermission(user, 'publicationIssnRequests', 'queryRequestISSN')) {

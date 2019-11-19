@@ -29,14 +29,9 @@
 import {QUERY_LIMIT} from '../config';
 
 const {ObjectId} = require('mongodb');
-const Ajv = require('ajv');
 const moment = require('moment');
-const {readFileSync} = require('fs');
-const path = require('path');
 
-export default function (collectionName, collectionContent) {
-	const validate = getValidator(collectionContent);
-
+export default function (collectionName) {
 	return {
 		create,
 		read,
@@ -46,8 +41,6 @@ export default function (collectionName, collectionContent) {
 	};
 
 	async function create(db, doc, user) {
-		validateDoc(doc);
-
 		const {insertedId} = await db.collection(collectionName).insertOne({
 			...doc,
 			lastUpdated: {
@@ -69,7 +62,7 @@ export default function (collectionName, collectionContent) {
 	}
 
 	async function update(db, id, doc, user) {
-		validateDoc(format(doc));
+		format(doc);
 
 		return db.collection(collectionName).findOneAndReplace({
 			_id: new ObjectId(id)
@@ -145,7 +138,6 @@ export default function (collectionName, collectionContent) {
 					}
 				});
 				function processData(doc) {
-					doc.userId = doc.id;	// ****** Need during development only should be removed later **********
 					doc.id = doc._id.toString();
 					delete doc._id;
 					results.push(doc);
@@ -216,25 +208,5 @@ export default function (collectionName, collectionContent) {
 				}
 			}, {});
 		}
-	}
-
-	function validateDoc(doc) {
-		if (!validate(doc)) {
-			throw new Error(JSON.stringify(validate.errors, undefined, 2));
-		}
-	}
-
-	function getValidator(schemaName) {
-		const str = readFileSync(path.join(__dirname, '..', 'api.json'), 'utf8')
-			.replace(/#\/components\/schemas/gm, 'defs#/definitions');
-
-		const obj = JSON.parse(str);
-
-		return new Ajv({allErrors: true})
-			.addSchema({
-				$id: 'defs',
-				definitions: obj.components.schemas
-			})
-			.compile(obj.components.schemas[schemaName]);
 	}
 }

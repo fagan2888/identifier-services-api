@@ -63,13 +63,13 @@ export default function (db) {
 	async function updateRequest(req, res, next) {
 		const id = req.params.id;
 		try {
-			let result;
-			if (req.body.initialRequest) {
-				delete req.body.initialRequest;
-				result = await usersRequests.updateInitialRequest(db, id, req.body, req.user);
-			} else {
-				result = await usersRequests.updateRequest(db, id, req.body, req.user);
-			}
+			// let result;
+			// if (req.body.initialRequest) {
+			// 	delete req.body.initialRequest;
+			// 	result = await usersRequests.updateInitialRequest(db, id, req.body, req.user);
+			// } else {
+				const result = await usersRequests.updateRequest(db, id, req.body, req.user);
+			// }
 
 			res.json(result);
 		} catch (err) {

@@ -27,11 +27,11 @@
  */
 
 import interfaceFactory from './interfaceModules';
-import {hasPermission} from './utils';
+import {hasPermission, validateDoc} from './utils';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 import HttpStatus from 'http-status';
 
-const publisherRequestsInterface = interfaceFactory('PublisherRequest', 'PublisherRequestContent');
+const publisherRequestsInterface = interfaceFactory('PublisherRequest');
 
 export default function () {
 	return {
@@ -43,6 +43,7 @@ export default function () {
 	};
 
 	async function createRequest(db, doc, user) {
+		validateDoc(doc, 'PublisherRequestContent');
 		const newDoc = {...doc, state: 'new', backgroundProcessingState: 'pending'};
 		if (hasPermission(user, 'publisherRequests', 'createRequest')) {
 			const result = await publisherRequestsInterface.create(db, newDoc, user);

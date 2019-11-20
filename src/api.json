@@ -2877,7 +2877,7 @@
         ]
       },
       "UserCreation": {
-        "oneOf": [
+        "anyOf": [
           {
             "$ref": "#/components/schemas/UserContent"
           },

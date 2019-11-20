@@ -30,29 +30,20 @@ import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
 import interfaceFactory from './interfaceModules';
-import {hasPermission} from './utils';
+import {hasPermission, validateDoc} from './utils';
 
-const userInterface = interfaceFactory('usersRequest', 'UserRequest');
-const userInitialInterface = interfaceFactory('usersRequest', 'UserRequestContent');
-const publisherInterface = interfaceFactory('PublisherMetadata', 'PublisherContent');
+const userInterface = interfaceFactory('usersRequest');
 
 export default function () {
 	return {
 		createRequest,
 		readRequest,
-		updateInitialRequest,
 		updateRequest,
 		removeRequest,
 		queryRequest
 	};
 
 	async function createRequest(db, doc, user) {
-		//console.log('createrequerst', user);
-		debugger;
-		const queries = [{
-			query: {id: user.id}
-		}];
-		// const result = await publisherInterface.query()
 		if (hasPermission(user, 'userRequests', 'createRequest')) {
 			const newDoc = {
 				...doc,
@@ -60,58 +51,63 @@ export default function () {
 				backgroundProcessingState: 'pending',
 				preferences: {
 					defaultLanguage: 'fin'
-				}
+				},
+				role: 'publisher',
+				userId: doc.SSOId ? doc.SSOId : doc.email,
+				publisher: user._id.toString()
 			};
-			// const result = await userInitialInterface.create(db, newDoc, user);
-			// return result;
+			validateDoc(newDoc, 'UserRequestContent');
+			const result = await userInterface.create(db, newDoc, user);
+			return result;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
 	async function readRequest(db, id, user) {
-		const protectedProperties = {_id: 0};
+		let protectedProperties = user.role === 'publisher-admin' ? {_id: 0, state: 0} : {_id: 0};
 		const result = await userInterface.read(db, id, protectedProperties);
 		if (hasPermission(user, 'userRequests', 'readRequest')) {
-			if (user.role === 'publisher-admin' && result.publisher === user.id) {
-				delete result.state;
-				return result;
-			}
-
 			return result;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
-	async function updateInitialRequest(db, id, doc, user) {
-		const newDoc = {...doc, backgroundProcessingState: doc.backgroundProcessingState ? doc.backgroundProcessingState : 'pending'};
-		const readResult = await readRequest(db, id, user);
-		if (hasPermission(user, 'userRequests', 'updateInitialRequest')) {
-			if (user.role === 'publisher-admin' && readResult.publisher === user.id) {
-				const result = await userInitialInterface.update(db, id, newDoc, user);
-				delete result.state;
-				return result;
-			}
+	// async function updateInitialRequest(db, id, doc, user) {
+	// 	const newDoc = {...doc, backgroundProcessingState: doc.backgroundProcessingState ? doc.backgroundProcessingState : 'pending'};
+	// 	const readResult = await readRequest(db, id, user);
+	// 	if (hasPermission(user, 'userRequests', 'updateInitialRequest')) {
+	// 		if (user.role === 'publisher-admin' && readResult.publisher === user._id.toString()) {
+	// 			const result = await userInitialInterface.update(db, id, newDoc, user);
+	// 			delete result.state;
+	// 			return result;
+	// 		}
 
-			const result = await userInitialInterface.update(db, id, newDoc, user);
-			return result;
-		}
+	// 		const result = await userInitialInterface.update(db, id, newDoc, user);
+	// 		return result;
+	// 	}
 
-		throw new ApiError(HttpStatus.FORBIDDEN);
-	}
+	// 	throw new ApiError(HttpStatus.FORBIDDEN);
+	// }
 
 	async function updateRequest(db, id, doc, user) {
 		const newDoc = {...doc, backgroundProcessingState: doc.backgroundProcessingState ? doc.backgroundProcessingState : 'pending'};
+		if (newDoc.initialRequest) {
+			validateDoc(newDoc, 'UserRequestContent');
+		} else {
+			validateDoc(newDoc, 'UserRequest');
+		}
+
 		const readResult = await readRequest(db, id, user);
 		if (hasPermission(user, 'userRequests', 'updateRequest')) {
-			if (user.role === 'publisher-admin' && readResult.publisher === user.id) {
-				const result = await userInitialInterface.update(db, id, newDoc, user);
+			if (user.role === 'publisher-admin' && readResult.publisher === user._id.toString()) {
+				const result = await userInterface.update(db, id, newDoc, user);
 				delete result.state;
 				return result;
 			}
 
-			const result = await userInitialInterface.update(db, id, newDoc, user);
+			const result = await userInterface.update(db, id, newDoc, user);
 			return result;
 		}
 
@@ -131,10 +127,12 @@ export default function () {
 		const result = await userInterface.query(db, {queries, offset});
 		if (hasPermission(user, 'userRequests', 'queryRequest')) {
 			if (user.role === 'publisher-admin') {
-				const newResult = result.results.filter(item => item.publisher === user.id && delete item.state);
-				return {
-					...result, results: newResult
-				};
+				const queries = [{
+					query: {publisher: user._id.toString()}
+				}];
+				const protectedProperties = {state: 0};
+				const response = await userInterface.query(db, {queries, offset}, protectedProperties);
+				return response;
 			}
 
 			return result;

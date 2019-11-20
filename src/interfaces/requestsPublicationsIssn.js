@@ -120,7 +120,6 @@ export default function () {
 					query: {publisher: 'co_incidence9999@yahoo.com'} // Need to discuss
 				}];
 				const response = await userInterface.query(db, {queries: userQueries, offset});
-				console.log('res', response)
 				const result = await publicationsRequestsIssnInterface.query(db, {queries: issnQueries, offset});
 				return result;
 			}

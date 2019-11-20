@@ -74,7 +74,7 @@ export default function () {
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
-	// async function updateInitialRequest(db, id, doc, user) {
+	// Async function updateInitialRequest(db, id, doc, user) {
 	// 	const newDoc = {...doc, backgroundProcessingState: doc.backgroundProcessingState ? doc.backgroundProcessingState : 'pending'};
 	// 	const readResult = await readRequest(db, id, user);
 	// 	if (hasPermission(user, 'userRequests', 'updateInitialRequest')) {

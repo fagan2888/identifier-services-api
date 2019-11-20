@@ -119,7 +119,7 @@ export default function () {
 				const issnQueries = [{
 					query: {publisher: 'co_incidence9999@yahoo.com'} // Need to discuss
 				}];
-				const response = await userInterface.query(db, {queries: userQueries, offset});
+				await userInterface.query(db, {queries: userQueries, offset});
 				const result = await publicationsRequestsIssnInterface.query(db, {queries: issnQueries, offset});
 				return result;
 			}
@@ -127,7 +127,7 @@ export default function () {
 			return result;
 		}
 
-		// if (user) {
+		// If (user) {
 		// 	const response = await db.collection('userMetadata').findOne({id: user.id});
 		// 	return {results: result.results.filter(item => item.publisher === response.id && filterResult(item))};
 		// }

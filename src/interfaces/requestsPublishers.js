@@ -43,8 +43,8 @@ export default function () {
 	};
 
 	async function createRequest(db, doc, user) {
-		validateDoc(doc, 'PublisherRequestContent');
-		const newDoc = {...doc, state: 'new', backgroundProcessingState: 'pending'};
+		const newDoc = {...doc, state: 'new', backgroundProcessingState: 'pending', replyTo: user.emails[0].value};
+		validateDoc(newDoc, 'PublisherRequestContent');
 		if (hasPermission(user, 'publisherRequests', 'createRequest')) {
 			const result = await publisherRequestsInterface.create(db, newDoc, user);
 			return result;

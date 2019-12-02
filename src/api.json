@@ -3158,6 +3158,9 @@
           },
           "additionalDetails": {
             "type": "string"
+          },
+          "identifier": {
+            "type": "string"
           }
         },
         "required": [

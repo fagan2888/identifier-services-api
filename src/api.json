@@ -3162,9 +3162,6 @@
           },
           "additionalDetails": {
             "type": "string"
-          },
-          "identifier": {
-            "type": "string"
           }
         },
         "required": [
@@ -3363,6 +3360,9 @@
               },
               "id": {
                 "description": "Identifier of the publication",
+                "type": "string"
+              },
+              "identifier": {
                 "type": "string"
               },
               "associatedRange": {
@@ -3587,6 +3587,9 @@
               },
               "associatedRange": {
                 "description": "Identifier of the identifier range resource this publication is associated with",
+                "type": "string"
+              },
+              "identifier": {
                 "type": "string"
               }
             },

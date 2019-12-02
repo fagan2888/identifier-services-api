@@ -52,11 +52,20 @@ export default function (collectionName) {
 	}
 
 	async function read(db, id, protectedProperties) {
-		const doc = await db.collection(collectionName).findOne({
-			_id: new ObjectId(id)
-		}, {
-			projection: protectedProperties
-		});
+		let doc;
+		if (collectionName === 'userMetadata') {
+			doc = await db.collection(collectionName).findOne({
+				id: id
+			}, {
+				projection: protectedProperties
+			});
+		} else {
+			doc = await db.collection(collectionName).findOne({
+				_id: new ObjectId(id)
+			}, {
+				projection: protectedProperties
+			});
+		}
 
 		return doc;
 	}
@@ -69,8 +78,8 @@ export default function (collectionName) {
 		}, {
 			...doc,
 			lastUpdated: {
-				timestamp: moment().toISOString(),
-				user: user.id
+				timestamp: doc.state === 'new' ? doc.lastUpdated.timestamp : moment().toISOString(),
+				user: doc.state === 'new' ? doc.lastUpdated.user : user.id
 			}
 		});
 
@@ -89,7 +98,7 @@ export default function (collectionName) {
 		});
 	}
 
-	async function query(db, {queries, offset}) {
+	async function query(db, {queries, offset}, protectedProperties) {
 		if (offset) {
 			if (queries.length > 0) {
 				const result = await queries.reduce((acc, {query}) => {
@@ -120,7 +129,7 @@ export default function (collectionName) {
 			const results = [];
 			const totalDoc = await db.collection(collectionName).find({}).count();
 			const cursor = await db.collection(collectionName)
-				.find(query)
+				.find(query, {projection: protectedProperties})
 				.limit(QUERY_LIMIT);
 			const queryDocCount = await cursor.count();
 			return new Promise(resolve => {
@@ -129,7 +138,7 @@ export default function (collectionName) {
 					if (results.length > 0) {
 						resolve({
 							results,
-							offset: results.slice(-1).shift().id,
+							offset: results.slice(-1).shift().mongoId ? results.slice(-1).shift().mongoId : results.slice(-1).shift().id,
 							totalDoc: totalDoc,
 							queryDocCount: queryDocCount
 						});
@@ -138,9 +147,15 @@ export default function (collectionName) {
 					}
 				});
 				function processData(doc) {
-					doc.id = doc._id.toString();
-					delete doc._id;
-					results.push(doc);
+					if (collectionName === 'userMetadata') {
+						doc.mongoId = doc._id.toString();
+						delete doc._id;
+						results.push(doc);
+					} else {
+						doc.id = doc._id.toString();
+						delete doc._id;
+						results.push(doc);
+					}
 				}
 			});
 		}

@@ -29,11 +29,10 @@
 import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
-import {filterResult, hasPermission} from './utils';
+import {filterResult, hasPermission, validateDoc} from './utils';
 import interfaceFactory from './interfaceModules';
 
-const publicationsRequestsIssnInterface = interfaceFactory('PublicationRequest_ISSN', 'PublicationIssnRequestContent');
-const userInterface = interfaceFactory('userMetadata', 'UserContent');
+const publicationsRequestsIssnInterface = interfaceFactory('PublicationRequest_ISSN');
 
 export default function () {
 	return {
@@ -45,7 +44,8 @@ export default function () {
 	};
 
 	async function createRequestISSN(db, doc, user) {
-		const newDoc = {...doc, state: 'new', backgroundProcessingState: 'pending'};
+		const newDoc = {...doc, state: 'new', backgroundProcessingState: 'pending', creator: user.id};
+		validateDoc(newDoc, 'PublicationIssnRequestContent');
 		if (hasPermission(user, 'publicationIssnRequests', 'createRequestISSN')) {
 			const result = await publicationsRequestsIssnInterface.create(db, newDoc, user);
 			return result;
@@ -53,27 +53,36 @@ export default function () {
 	}
 
 	async function readRequestISSN(db, id, user) {
+		let protectedProperties;
 		const result = await publicationsRequestsIssnInterface.read(db, id);
 		if (hasPermission(user, 'publicationIssnRequests', 'readRequestISSN')) {
-			return result;
-		}
+			if (user.role === 'publisher-admin' || user.role === 'publisher') {
+				protectedProperties = {
+					state: 0,
+					publisher: 0,
+					lastUpdated: 0
+				};
+				const res = await publicationsRequestsIssnInterface.read(db, id, protectedProperties);
+				return res;
+			}
 
-		if (user && result.publisher === user.id) {
-			return filterResult(result);
+			return result;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
 	async function updateRequestISSN(db, id, doc, user) {
+		let newDoc;
+		newDoc = {...doc, backgroundProcessingState: doc.backgroundProcessingState ? doc.backgroundProcessingState : 'pending'};
 		const readResult = await readRequestISSN(db, id, user);
 		if (hasPermission(user, 'publicationIssnRequests', 'updateRequestISSN')) {
-			const result = await publicationsRequestsIssnInterface.update(db, id, doc, user);
+			const result = await publicationsRequestsIssnInterface.update(db, id, newDoc, user);
 			return result;
 		}
 
 		if (user && readResult.publisher === user.id) {
-			const result = await publicationsRequestsIssnInterface.update(db, id, doc, user);
+			const result = await publicationsRequestsIssnInterface.update(db, id, newDoc, user);
 			return filterResult(result);
 		}
 
@@ -91,46 +100,23 @@ export default function () {
 
 	async function queryRequestISSN(db, {queries, offset}, user) {
 		let protectedProperties;
-		const result = await publicationsRequestsIssnInterface.query(db, {queries, offset}, protectedProperties);
+		const result = await publicationsRequestsIssnInterface.query(db, {queries, offset});
 		if (hasPermission(user, 'publicationIssnRequests', 'queryRequestISSN')) {
-			if (user.role === 'publisher-admin') {
+			if (user.role === 'publisher-admin' || user.role === 'publisher') {
 				protectedProperties = {
 					state: 0,
 					publisher: 0,
 					lastUpdated: 0
 				};
 				const queries = [{
-					query: {publisher: user.id}
+					query: {publisher: user.publisher}
 				}];
-				const response = await userInterface.query(db, {queries, offset});
-
-				return response.results.reduce((acc, i) => {
-					result.results.map(k =>
-						k.publisher === i.email && acc.push(k)
-					);
-					return {results: acc.map(item => filterResult(item))};
-				}, []);
-			}
-
-			if (user.role === 'publisher') {
-				const userQueries = [{
-					query: {id: user.id}
-				}];
-				const issnQueries = [{
-					query: {publisher: 'co_incidence9999@yahoo.com'} // Need to discuss
-				}];
-				await userInterface.query(db, {queries: userQueries, offset});
-				const result = await publicationsRequestsIssnInterface.query(db, {queries: issnQueries, offset});
-				return result;
+				const response = await publicationsRequestsIssnInterface.query(db, {queries, offset}, protectedProperties);
+				return response;
 			}
 
 			return result;
 		}
-
-		// If (user) {
-		// 	const response = await db.collection('userMetadata').findOne({id: user.id});
-		// 	return {results: result.results.filter(item => item.publisher === response.id && filterResult(item))};
-		// }
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}

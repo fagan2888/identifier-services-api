@@ -2770,6 +2770,10 @@
           "createdResource": {
             "description": "Identifier of the resource that was created based on this request",
             "type": "string"
+          },
+          "creator": {
+            "description": "UserId of the user who created the request",
+            "type": "string"
           }
         },
         "required": [

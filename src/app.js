@@ -111,6 +111,8 @@ export default async function run() {
 		Logger.log('info', 'Started identifier-services-api');
 	});
 
+	return server;
+
 	async function combineUserInfo(req, res, next) {
 		const response = await db.collection('userMetadata').findOne({id: req.user.id});
 		req.user = {...req.user, role: mapGroupToRole(req.user.groups), ...response};

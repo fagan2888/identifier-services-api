@@ -28,12 +28,14 @@
  *
  */
 import HttpStatus from 'http-status';
-import {HTTP_PORT} from '../config';
+import {HTTP_PORT, USERNAME, PASSWORD} from '../config';
+import fetch from 'node-fetch';
 import fixtureFactory, {READERS} from '@natlibfi/fixura';
 import mongoFixturesFactory from '@natlibfi/fixura-mongo';
 import startApp, {__RewireAPI__ as RewireAPI} from '../app'; // eslint-disable-line import/named
 import chai, {expect} from 'chai';
 import chaiHttp from 'chai-http';
+import base64 from 'base-64';
 
 chai.use(chaiHttp);
 
@@ -49,7 +51,6 @@ describe('routes/publishers', () => {
 	beforeEach(async () => {
 		mongoFixtures = await mongoFixturesFactory({rootPath: fixturesPath, useObjectId: true});
 		RewireAPI.__Rewire__('MONGO_URI', await mongoFixtures.getConnectionString());
-		RewireAPI.__Rewire__('API_URL', API_URL);
 
 		const app = await startApp();
 
@@ -60,15 +61,32 @@ describe('routes/publishers', () => {
 		await requester.close();
 		await mongoFixtures.close();
 		RewireAPI.__ResetDependency__('MONGO_URI');
-		RewireAPI.__ResetDependency__('API_URL');
 	});
 
+	async function adminAuth() {
+		const result = await fetch(`${API_URL}/auth`, {
+			method: 'POST',
+			headers: {
+				Authorization: 'Basic ' + base64.encode(USERNAME + ':' + PASSWORD)
+			}
+		});
+		return result.headers.get('Token');
+		// const app = await startApp();
+		// return chai.request(app).get(`${API_URL}/auth`).set('Authorization': 'Basic ' + base64.encode(USERNAME + ':' + PASSWORD));
+	}
 	// *********************Testing for Publishers starts ************************
 
 	describe('#read Publishers', () => {
-		it('Should succeed', async (index = '0') => {
+		it('Should succeed for admin', async (index = '0') => {
 			const {expectedPayload} = await init(index, true);
-			const response = await requester.get(`${requestPath}/5cd702693c30e77663e2b3ce`);
+			const token = await adminAuth();
+			const response = await requester.get(`${requestPath}/5dd69c4d1c9d440000d04f84`).set('Authorization', `Bearer ${token}`);
+			expect(response).to.have.status(HttpStatus.OK);
+			expect(response.body).to.eql(expectedPayload);
+		});
+		it('Should succeed for public', async (index = '1') => {
+			const {expectedPayload} = await init(index, true);
+			const response = await requester.get(`${requestPath}/5dd69c4d1c9d440000d04f84`);
 			expect(response).to.have.status(HttpStatus.OK);
 			expect(response.body).to.eql(expectedPayload);
 		});

@@ -1,12 +1,14 @@
 {
     "userMetadata": [
         {
-            "userId":"foobar",
+            "_id": "5cd90e696a1e930789dfaa48",
+            "id":"admin",
             "preferences": {
-                "defaultLanguage": "foo"
+                "defaultLanguage": "fin"
             },
             "lastUpdated": {
-                "timestamp": "838383838"
+                "timestamp": "838383838",
+                "user": "bar"
             }
         }
     ]

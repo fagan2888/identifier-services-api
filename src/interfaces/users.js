@@ -126,6 +126,10 @@ export default function () {
 
 	async function read(db, id, user) {
 		const response = await userInterface.read(db, id);
+		if (response === null) {
+			throw new ApiError(HttpStatus.NOT_FOUND);
+		}
+
 		let result;
 		if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
 			const {crowdUser} = crowd();
@@ -146,13 +150,19 @@ export default function () {
 	}
 
 	async function update(db, id, doc, user) {
-		validateDoc(doc, 'UserContent');
-		if (hasPermission(user, 'users', update)) {
-			const result = await userInterface.update(db, id, doc, user);
-			return result;
-		}
+		try {
+			validateDoc(doc, 'UserContent');
+			if (hasPermission(user, 'users', 'update')) {
+				const result = await userInterface.update(db, id, doc, user);
+				return result;
+			}
 
-		throw new ApiError(HttpStatus.FORBIDDEN);
+			throw new ApiError(HttpStatus.FORBIDDEN);
+		} catch (err) {
+			if (err) {
+				throw new ApiError(err.status);
+			}
+		}
 	}
 
 	async function remove(db, id, user) {

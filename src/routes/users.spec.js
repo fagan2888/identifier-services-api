@@ -222,9 +222,23 @@ describe('routes/users', () => {
 			expect(formatDump(db)).to.eql(formatDump(expectedDb));
 		});
 
+		it.skip('Should fail, not enough authority', async (index = '0') => {
+			await mongoFixtures.populate(['delete', index, 'dbContents.json']);
+			const token = await auth(publisherAdmin);
+			const response = await requester.delete(`${requestPath}/publisher`).set('Authorization', `Bearer ${token}`);
+			expect(response).to.have.status(HttpStatus.FORBIDDEN);
+		});
+
+		it.skip('Should fail not authenticated', async (index = '1') => {
+			await mongoFixtures.populate(['delete', index, 'dbContents.json']);
+			const response = await requester.delete(`${requestPath}/publisher`);
+			expect(response).to.have.status(HttpStatus.UNAUTHORIZED);
+		});
+
 		it.skip('Should fail because of wrong parameters', async (index = '1') => {
 			await mongoFixtures.populate(['delete', index, 'dbContents.json']);
-			const response = await requester.delete(`${requestPath}/`);
+			const token = await auth(publisherAdmin);
+			const response = await requester.delete(`${requestPath}`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.NOT_FOUND);
 		});
 

@@ -93,9 +93,8 @@ export default function (collectionName) {
 	}
 
 	async function remove(db, id) {
-		await db.collection(collectionName).findOneAndDelete({
-			_id: new ObjectId(id)
-		});
+		const query = ObjectId.isValid(id) ? {_id: new ObjectId(id)} : {id: id};
+		await db.collection(collectionName).findOneAndDelete(query);
 	}
 
 	async function query(db, {queries, offset}, protectedProperties) {

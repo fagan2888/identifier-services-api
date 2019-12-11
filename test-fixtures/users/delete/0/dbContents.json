@@ -12,8 +12,8 @@
             }
         },
         {
-            "_id": "5cd90e696a1e930789dfaa49",
-            "id":"publisher-admin",
+            "_id": "5cd90e696a1e930789dfaa51",
+            "id":"publisher",
             "publisher": "foobar",
             "preferences": {
                 "defaultLanguage": "eng"

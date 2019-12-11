@@ -166,8 +166,8 @@ export default function () {
 				await localUser.remove({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, id: response.userId ? response.userId : response.id});
 			}
 
-			const result = await userInterface.remove(db, id);
-			return result;
+			userInterface.remove(db, id);
+			return HttpStatus.OK;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);

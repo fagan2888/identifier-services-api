@@ -206,10 +206,14 @@ describe('routes/users', () => {
 	});
 
 	describe('#delete', () => {
+		afterEach(async () => {
+			fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), readAuthProvider, 'utf-8');
+		});
+
 		it.skip('Should succeed', async (index = '0') => {
 			await mongoFixtures.populate(['delete', index, 'dbContents.json']);
 			const token = await auth(admin);
-			const response = await requester.delete(`${requestPath}/5cd90e696a1e930789dfaa48`).set('Authorization', `Bearer ${token}`);
+			const response = await requester.delete(`${requestPath}/publisher`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.OK);
 
 			const db = await mongoFixtures.dump();
@@ -218,7 +222,7 @@ describe('routes/users', () => {
 			expect(formatDump(db)).to.eql(formatDump(expectedDb));
 		});
 
-		it('Should fail because of wrong parameters', async (index = '1') => {
+		it.skip('Should fail because of wrong parameters', async (index = '1') => {
 			await mongoFixtures.populate(['delete', index, 'dbContents.json']);
 			const response = await requester.delete(`${requestPath}/`);
 			expect(response).to.have.status(HttpStatus.NOT_FOUND);

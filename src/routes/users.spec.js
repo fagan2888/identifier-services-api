@@ -45,8 +45,9 @@ describe('routes/users', () => {
 	const fixturesPath = [__dirname, '..', '..', 'test-fixtures', 'users'];
 	const requestPath = '/users';
 	const {getFixture} = fixtureFactory({root: fixturesPath});
+	const readAuthProvider = fs.readFileSync(formatUrl(PASSPORT_LOCAL_USERS), 'utf-8');
 	const readLocalUsers = fs.readFileSync(formatUrl(LOCAL_USERS_TEST), 'utf-8');
-	const localUsers = JSON.parse(readLocalUsers);
+	const localUsersCredentials = JSON.parse(readLocalUsers);
 
 	beforeEach(async () => {
 		mongoFixtures = await mongoFixturesFactory({rootPath: fixturesPath, useObjectId: true});
@@ -67,7 +68,7 @@ describe('routes/users', () => {
 	const publisherAdmin = 1;
 
 	async function auth(role) {
-		const result = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(localUsers[role].user + ':' + localUsers[role].password)
+		const result = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(localUsersCredentials[role].user + ':' + localUsersCredentials[role].password)
 		);
 		return result.headers.token;
 	}
@@ -113,6 +114,10 @@ describe('routes/users', () => {
 	});
 
 	describe('#create', () => {
+		afterEach(async () => {
+			fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), readAuthProvider, 'utf-8');
+		});
+
 		it.skip('Should succeed direct create User by Admin without SSOID', async (index = '0') => {
 			await mongoFixtures.populate(['create', index, 'dbContents.json']);
 			const {payload} = await init(index, true);

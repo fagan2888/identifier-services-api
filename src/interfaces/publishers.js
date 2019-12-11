@@ -30,8 +30,9 @@ import interfaceFactory from './interfaceModules';
 import {hasPermission} from './utils';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 import HttpStatus from 'http-status';
+import {validateDoc} from './utils';
 
-const publisherInterface = interfaceFactory('PublisherMetadata', 'PublisherContent');
+const publisherInterface = interfaceFactory('PublisherMetadata');
 
 export default function () {
 	return {
@@ -42,12 +43,19 @@ export default function () {
 	};
 
 	async function create(db, doc, user) {
-		if (hasPermission(user, 'publishers', 'create')) {
-			const result = await publisherInterface.create(db, doc, user);
-			return result;
-		}
+		try {
+			validateDoc(doc, 'PublisherContent');
+			if (hasPermission(user, 'publishers', 'create')) {
+				const result = await publisherInterface.create(db, doc, user);
+				return result;
+			}
 
-		throw new ApiError(HttpStatus.FORBIDDEN);
+			throw new ApiError(HttpStatus.FORBIDDEN);
+		} catch (err) {
+			if (err) {
+				throw new ApiError(HttpStatus.BAD_REQUEST);
+			}
+		}
 	}
 
 	async function read(db, id, user) {

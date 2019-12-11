@@ -1,13 +1,14 @@
+
 {
-    "PublisherRequest": [{},
+    "PublisherRequest": [
         {
+            "_id": "5cdff4db937aed356a2b5817",
             "lastUpdated": {
                 "user": "tasks"
             },
             "backgroundProcessingState": "pending",
             "creator": "tasks",
             "state": "new",
-            "name": "sanjog",
             "postalAddress": {
                 "address": "foo",
                 "city": "foo",
@@ -25,3 +26,4 @@
         }
     ]
 }
+

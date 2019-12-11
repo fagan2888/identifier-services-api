@@ -43,14 +43,20 @@ export default function () {
 	};
 
 	async function createRequest(db, doc, user) {
-		const newDoc = {...doc, state: 'new', backgroundProcessingState: 'pending', creator: user.id};
-		validateDoc(newDoc, 'PublisherRequestContent');
-		if (hasPermission(user, 'publisherRequests', 'createRequest')) {
-			const result = await publisherRequestsInterface.create(db, newDoc, user);
-			return result;
-		}
+		try {
+			const newDoc = {...doc, state: 'new', backgroundProcessingState: 'pending', creator: user.id};
+			validateDoc(newDoc, 'PublisherRequestContent');
+			if (hasPermission(user, 'publisherRequests', 'createRequest')) {
+				const result = await publisherRequestsInterface.create(db, newDoc, user);
+				return result;
+			}
 
-		throw new ApiError(HttpStatus.FORBIDDEN);
+			throw new ApiError(HttpStatus.FORBIDDEN);
+		} catch (err) {
+			if (err) {
+				throw new ApiError(HttpStatus.BAD_REQUEST);
+			}
+		}
 	}
 
 	async function readRequest(db, id, user) {

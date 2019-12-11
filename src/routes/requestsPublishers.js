@@ -30,6 +30,7 @@ import {Router} from 'express';
 import {publisherRequestsFactory} from '../interfaces';
 import {API_URL} from '../config';
 import HttpStatus from 'http-status';
+import {ApiError} from '@natlibfi/identifier-services-commons';
 
 export default function (db) {
 	const publisherRequests = publisherRequestsFactory({url: API_URL});
@@ -42,8 +43,12 @@ export default function (db) {
 
 	async function createRequest(req, res, next) {
 		try {
-			const result = await publisherRequests.createRequest(db, req.body, req.user);
-			res.json(result);
+			if (Object.keys(req.body).length === 0 && req.body.constructor === Object) {
+				throw new ApiError(HttpStatus.BAD_REQUEST);
+			} else {
+				const result = await publisherRequests.createRequest(db, req.body, req.user);
+				res.json(result);
+			}
 		} catch (err) {
 			next(err);
 		}

@@ -81,7 +81,7 @@ const permissions = {
 		queryRequest: ['system', 'admin', 'publisher-admin']
 	},
 	publishers: {
-		create: ['admin'],
+		create: ['admin', 'system'],
 		read: ['all'],
 		update: ['publisher-admin'],
 		query: ['all']

@@ -30,6 +30,8 @@ import {QUERY_LIMIT} from '../config';
 
 const {ObjectId} = require('mongodb');
 const moment = require('moment');
+import {ApiError} from '@natlibfi/identifier-services-commons';
+import HttpStatus from 'http-status';
 
 export default function (collectionName) {
 	return {
@@ -60,11 +62,17 @@ export default function (collectionName) {
 				projection: protectedProperties
 			});
 		} else {
-			doc = await db.collection(collectionName).findOne({
-				_id: new ObjectId(id)
-			}, {
-				projection: protectedProperties
-			});
+			try {
+				doc = await db.collection(collectionName).findOne({
+					_id: new ObjectId(id)
+				}, {
+					projection: protectedProperties
+				});
+			} catch (err) {
+				if (err) {
+					throw new ApiError(HttpStatus.NOT_FOUND);
+				}
+			}
 		}
 
 		return doc;

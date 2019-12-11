@@ -80,3 +80,4 @@ export function checkRoleInGroup(group) {
 export function formatUrl(url) {
 	return url.replace(/^file:\/\//, '');
 }
+

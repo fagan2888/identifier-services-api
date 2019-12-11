@@ -68,5 +68,6 @@ export const USER_AGENT_LOGGING_BLACKLIST = readEnvironmentVariable('USER_AGENT_
 
 export const GROUPS_AND_ROLES = readEnvironmentVariable('GROUPS_AND_ROLES');
 
-export const USERNAME = readEnvironmentVariable('USERNAME');
-export const PASSWORD = readEnvironmentVariable('PASSWORD');
+export const LOCAL_USERS_TESTING = readEnvironmentVariable('LOCAL_USERS_TESTING', {
+	defaultValue: null
+});

@@ -29,6 +29,9 @@ import {Utils, Authentication} from '@natlibfi/melinda-commons';
 import express from 'express';
 import cors from 'cors';
 import {MongoClient} from 'mongodb';
+import {ApiError} from '@natlibfi/identifier-services-commons';
+import HttpStatus from 'http-status';
+
 import {
 	createUsersRouter,
 	createRequestsUsersRouter,
@@ -63,7 +66,6 @@ export default async function run() {
 	const client = new MongoClient(MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 	const connection = await client.connect();
 	const db = connection.db();
-
 	const passportMiddlewares = await generatePassportMiddlewares({
 		crowd: {
 			appName: CROWD_APP_NAME, appPassword: CROWD_APP_PASSWORD,
@@ -111,15 +113,22 @@ export default async function run() {
 		Logger.log('info', 'Started identifier-services-api');
 	});
 
+	registerSignalHandlers();
 	return server;
 
 	async function combineUserInfo(req, res, next) {
-		const response = await db.collection('userMetadata').findOne({id: req.user.id});
-		req.user = {...req.user, role: mapGroupToRole(req.user.groups), ...response};
-		next();
-	}
+		try {
+			const response = await db.collection('userMetadata').findOne({id: req.user.id});
+			if (response === null) {
+				throw new ApiError(HttpStatus.NOT_FOUND);
+			}
 
-	registerSignalHandlers();
+			req.user = {...req.user, role: mapGroupToRole(req.user.groups), ...response};
+			next();
+		} catch (err) {
+			next(err);
+		}
+	}
 
 	function registerSignalHandlers() {
 		process

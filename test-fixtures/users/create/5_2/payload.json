@@ -4,7 +4,7 @@
     "givenName": "test",
     "familyName": "publisher",
     "role": "publisher",
-    "publisher": "admin",
+    "publisher": "5cd90e696a1e930789dfaa34",
     "preferences": {
         "defaultLanguage": "eng"
     }

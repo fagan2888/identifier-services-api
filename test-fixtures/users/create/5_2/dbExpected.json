@@ -9,7 +9,7 @@
         },
         {
             "id": "testPublisher@foo.bar",
-            "publisher": "admin",
+            "publisher": "5cd90e696a1e930789dfaa34",
             "preferences": {
                 "defaultLanguage": "eng"
             },

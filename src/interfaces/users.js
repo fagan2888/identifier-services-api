@@ -51,7 +51,14 @@ export default function () {
 		let isUserExit;
 		if (doc.email) {
 			doc.id = doc.email;
-			validateDoc(doc, 'UserContent');
+			try {
+				validateDoc(doc, 'UserContent');
+			} catch (err) {
+				if (err) {
+					throw new ApiError(HttpStatus.UNPROCESSABLE_ENTITY);
+				}
+			}
+
 			if (hasPermission(user, 'users', 'create')) {
 				try {
 					if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
@@ -61,13 +68,13 @@ export default function () {
 						const {localUser} = local();
 						await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
 					}
+
+					const {role, givenName, userId, familyName, email, ...rest} = {...doc};
+					const result = await userInterface.create(db, rest, user);
+					return result;
 				} catch (err) {
 					throw new ApiError(err.status);
 				}
-
-				const {role, givenName, userId, familyName, email, ...rest} = {...doc};
-				const result = await userInterface.create(db, rest, user);
-				return result;
 			}
 
 			throw new ApiError(HttpStatus.FORBIDDEN);
@@ -81,7 +88,6 @@ export default function () {
 			} else {
 				const {localUser} = local();
 				const allLocalUsers = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
-
 				if (allLocalUsers.some(item => item.id === doc.userId)) {
 					const newLocalUsers = allLocalUsers.map(item => {
 						if (!checkRoleInGroup(item.groups)) {
@@ -90,9 +96,10 @@ export default function () {
 
 						return item;
 					});
-
 					fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), JSON.stringify(newLocalUsers, null, 4), 'utf-8');
 					isUserExit = true;
+				} else {
+					throw new ApiError(HttpStatus.NOT_FOUND);
 				}
 			}
 
@@ -103,7 +110,7 @@ export default function () {
 					query: {id: doc.id}
 				}];
 				const response = await userInterface.query(db, {queries});
-				if (response.results[0].id === doc.id) {
+				if (response.result && (response.results[0].id === doc.id)) {
 					throw new ApiError(HttpStatus.CONFLICT);
 				} else {
 					const result = await userInterface.create(db, rest, user);
@@ -112,6 +119,8 @@ export default function () {
 			}
 
 			throw new ApiError(HttpStatus.NOT_FOUND);
+		} else {
+			throw new ApiError(HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
 
@@ -129,6 +138,7 @@ export default function () {
 
 		if (hasPermission(user, 'users', 'read')) {
 			// Need to filter user information after combining and before returning to clientSide
+			delete result.password;
 			return {...response, ...result};
 		}
 

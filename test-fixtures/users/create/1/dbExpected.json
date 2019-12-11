@@ -8,8 +8,8 @@
             "lastUpdated": {}
         },
         {
-            "id": "testPublisher@foo.bar",
-            "publisher": "admin",
+            "id": "publisher",
+            "publisher": "foo",
             "preferences": {
                 "defaultLanguage": "eng"
             },

@@ -1,15 +1,27 @@
 {
-    "data": {
-        "userMetadata": {
-            "_id": "5cd90e696a1e930789dfaa48",
-            "userId":"foobar",
-            "preferences": {
-                "defaultLanguage": "foo"
-            },
-            "lastUpdated": {
-                "timestamp": "838383838",
-                "user": "bar"
-            }
+    "_id": "5cd90e696a1e930789dfaa48",
+    "preferences": {
+        "defaultLanguage": "foo"
+    },
+    "lastUpdated": {
+        "timestamp": "838383838",
+        "user": "bar"
+    },
+    "id": "admin",
+    "name": {
+        "givenName": "test",
+        "familyName": "admin"
+    },
+    "displayName": "testAdmin",
+    "emails": [
+        {
+            "value": "admin@foo.bar",
+            "type": "work"
         }
-    }
+    ],
+    "organization": [],
+    "groups": [
+        "identifier-services-test-admin"
+    ],
+    "role": "admin"
 }

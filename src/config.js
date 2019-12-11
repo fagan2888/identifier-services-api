@@ -39,9 +39,8 @@ export const HTTP_PORT = readEnvironmentVariable('HTTP_PORT', {
 export const MONGO_URI = readEnvironmentVariable('MONGO_URI', {
 	defaultValue: 'mongodb://localhost:27017/db'
 });
-export const PASSPORT_LOCAL_USERS = readEnvironmentVariable('PASSPORT_LOCAL_USERS', {
-	defaultValue: null
-});
+export const PASSPORT_LOCAL_USERS = readEnvironmentVariable('PASSPORT_LOCAL_USERS');
+export const LOCAL_USERS_TEST = readEnvironmentVariable('LOCAL_USERS_TEST');
 
 export const PRIVATE_KEY_URL = readEnvironmentVariable('PRIVATE_KEY_URL');
 export const UI_URL = readEnvironmentVariable('UI_URL', {defaultValue: 'http://localhost:8080'});
@@ -67,6 +66,3 @@ export const USER_AGENT_LOGGING_BLACKLIST = readEnvironmentVariable('USER_AGENT_
 });
 
 export const GROUPS_AND_ROLES = readEnvironmentVariable('GROUPS_AND_ROLES');
-
-export const USERNAME = readEnvironmentVariable('USERNAME');
-export const PASSWORD = readEnvironmentVariable('PASSWORD');

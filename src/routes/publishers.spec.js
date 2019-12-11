@@ -71,7 +71,7 @@ describe('routes/publishers', () => {
 			}
 		});
 		return result.headers.get('Token');
-		// const app = await startApp();
+		// Const app = await startApp();
 		// return chai.request(app).get(`${API_URL}/auth`).set('Authorization': 'Basic ' + base64.encode(USERNAME + ':' + PASSWORD));
 	}
 	// *********************Testing for Publishers starts ************************

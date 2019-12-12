@@ -36,7 +36,7 @@ import chai, {expect} from 'chai';
 import chaiHttp from 'chai-http';
 import base64 from 'base-64';
 import fs from 'fs';
-import {formatUrl} from '../utils';
+import {formatUrl, auth} from '../utils';
 
 chai.use(chaiHttp);
 
@@ -63,24 +63,33 @@ describe('routes/publishers', () => {
 		RewireAPI.__ResetDependency__('MONGO_URI');
 	});
 
-	async function adminAuth() {
-		const res = fs.readFileSync(formatUrl(LOCAL_USERS_TESTING), 'utf-8');
-		const result = JSON.parse(res);
-		const tok = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(result[0].user + ':' + result[0].password));
-		return tok.headers.token;
-	}
+	// async function auth(admin) {
+	// 	const res = fs.readFileSync(formatUrl(LOCAL_USERS_TESTING), 'utf-8');
+	// 	const result = JSON.parse(res);
+	// 	const tok = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(result[0].user + ':' + result[0].password));
+	// 	return tok.headers.token;
+	// }
 
-	async function pubAdminAuth() {
-		const res = fs.readFileSync(formatUrl(LOCAL_USERS_TESTING), 'utf-8');
-		const result = JSON.parse(res);
-		const tok = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(result[1].user + ':' + result[1].password));
-		return tok.headers.token;
-	}
+	// async function pubauth(admin) {
+	// 	const res = fs.readFileSync(formatUrl(LOCAL_USERS_TESTING), 'utf-8');
+	// 	const result = JSON.parse(res);
+	// 	const tok = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(result[1].user + ':' + result[1].password));
+	// 	return tok.headers.token;
+	// }
 
-	async function systemAuth() {
+	// async function systemAuth() {
+	// 	const res = fs.readFileSync(formatUrl(LOCAL_USERS_TESTING), 'utf-8');
+	// 	const result = JSON.parse(res);
+	// 	const tok = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(result[2].user + ':' + result[2].password));
+	// 	return tok.headers.token;
+	// }
+	const admin = 0;
+	const system = 1;
+	const publisherAdmin = 2;
+	async function auth(role) {
 		const res = fs.readFileSync(formatUrl(LOCAL_USERS_TESTING), 'utf-8');
 		const result = JSON.parse(res);
-		const tok = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(result[2].user + ':' + result[2].password));
+		const tok = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(result[role].user + ':' + result[role].password));
 		return tok.headers.token;
 	}
 	// *********************Testing for Publishers starts ************************
@@ -88,14 +97,14 @@ describe('routes/publishers', () => {
 	describe('#read Publishers', () => {
 		it('Should succeed for admin', async (index = '0') => {
 			const {expectedPayload} = await init(index, true);
-			const token = await adminAuth();
+			const token = await auth(admin, requester);
 			const response = await requester.get(`/${requestPath}/5dd69c4d1c9d440000d04f84`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.OK);
 			expect(response.body).to.eql(expectedPayload);
 		});
 		it('Should succeed for publisher-admin', async (index = '1') => {
 			const {expectedPayload} = await init(index, true);
-			const token = await pubAdminAuth();
+			const token = await auth(publisherAdmin);
 			const response = await requester.get(`/${requestPath}/5dd69c4d1c9d440000d04f84`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.OK);
 			expect(response.body).to.eql(expectedPayload);
@@ -124,7 +133,7 @@ describe('routes/publishers', () => {
 	describe('#create', () => {
 		it('Should create a new Publisher', async (index = '0') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.post(`/${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.CREATED);
 			const db = await mongoFixtures.dump();
@@ -134,14 +143,14 @@ describe('routes/publishers', () => {
 
 		it('Should fail to create because content is not provided', async (index = '1') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.post(`/${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.BAD_REQUEST);
 		});
 
 		it('Should fail to create because of invalid syntax', async (index = '2') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.post(`/${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.BAD_REQUEST);
 		});
@@ -172,7 +181,7 @@ describe('routes/publishers', () => {
 	describe('#update', () => {
 		it('Should update Publisher', async (index = '0') => {
 			const {payload} = await init(index, true);
-			const token = await adminAuth();
+			const token = await auth(admin);
 			const response = await requester.put(`/${requestPath}/5dd69c4d1c9d440000d04f84`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.OK);
 			const db = await mongoFixtures.dump();
@@ -206,7 +215,7 @@ describe('routes/publishers', () => {
 	// describe('#delete', () => {
 	// 	it('Should delete a publisher', async (index = '0') => {
 	// 		await init(index, false);
-	// 		const token = await adminAuth();
+	// 		const token = await auth(admin);
 	// 		const response = await requester.delete(`${requestPath}/5dcebad7d05e8545d96e9899`).set('Authorization', `Bearer ${token}`);
 	// 		console.log('response', response.status)
 	// 		expect(response).to.have.status(HttpStatus.OK);
@@ -233,7 +242,7 @@ describe('routes/publishers', () => {
 	describe('#read Publishers Requests', () => {
 		it('Should succeed for Admin', async (index = '0') => {
 			const {expectedPayload} = await init(index, true);
-			const token = await adminAuth();
+			const token = await auth(admin);
 			const response = await requester.get(`/requests/${requestPath}/5cdff4db937aed356a2b5817`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.OK);
 			expect(response.body).to.eql(expectedPayload);
@@ -241,14 +250,14 @@ describe('routes/publishers', () => {
 
 		it('Should succeed for System', async (index = '0') => {
 			const {expectedPayload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.get(`/requests/${requestPath}/5cdff4db937aed356a2b5817`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.OK);
 			expect(response.body).to.eql(expectedPayload);
 		});
 
 		it('Should fail because the resource does not exist', async () => {
-			const token = await adminAuth();
+			const token = await auth(admin);
 			const response = await requester.get(`/requests/${requestPath}/foo`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.NOT_FOUND);
 		});
@@ -271,7 +280,7 @@ describe('routes/publishers', () => {
 	describe('#create Publisher Requests', () => {
 		it('Should create a new Publisher Requests', async (index = '0') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.post(`/requests/${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.OK);
 			const db = await mongoFixtures.dump();
@@ -281,14 +290,14 @@ describe('routes/publishers', () => {
 
 		it('Should fail to create because content is not provided', async (index = '1') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.post(`/requests/${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.BAD_REQUEST);
 		});
 
 		it('Should fail to create because of invalid syntax', async (index = '2') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.post(`/requests/${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.BAD_REQUEST);
 		});
@@ -319,7 +328,7 @@ describe('routes/publishers', () => {
 	describe('#update requests', () => {
 		it('Should update Publisher Requests without background procesing state', async (index = '0') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.put(`/requests/${requestPath}/5cdff4db937aed356a2b5817`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.OK);
 			const db = await mongoFixtures.dump();
@@ -328,7 +337,7 @@ describe('routes/publishers', () => {
 		});
 		it('Should update Publisher Requests with background processing state', async (index = '1') => {
 			const {payload} = await init(index, true);
-			const token = await systemAuth();
+			const token = await auth(system);
 			const response = await requester.put(`/requests/${requestPath}/5cdff4db937aed356a2b5817`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.OK);
 			const db = await mongoFixtures.dump();

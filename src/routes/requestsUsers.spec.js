@@ -123,7 +123,7 @@ describe('routes/requests/users', () => {
 	});
 
 	describe('#createRequest', () => {
-		it('Should succeed', async (index = '0') => {
+		it.skip('Should succeed without SSOID', async (index = '0') => {
 			await mongoFixtures.populate(['createRequest', index, 'dbContents.json']);
 			const {payload} = await init(index, true);
 			const token = await auth(publisherAdmin);
@@ -135,14 +135,29 @@ describe('routes/requests/users', () => {
 			expect(formatDump(db)).to.eql(formatDump(expectedDb));
 		});
 
-		it.skip('Should not succeed because content is not provided', async () => {
-			const response = await requester.post(`${requestPath}`).set('content-type', 'application/json').send();
-			expect(response).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);
+		it.skip('Should succeed using SSOID', async (index = '0') => {
+			await mongoFixtures.populate(['createRequest', index, 'dbContents.json']);
+			const {payload} = await init(index, true);
+			const token = await auth(publisherAdmin);
+			const response = await requester.post(`${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
+			expect(response).to.have.status(HttpStatus.OK);
+
+			const db = await mongoFixtures.dump();
+			const {expectedDb} = await init(index, false);
+			expect(formatDump(db)).to.eql(formatDump(expectedDb));
 		});
 
-		it.skip('Should not succeed because of invalid syntax', async (index = '2') => {
+		it.skip('Should fail because no db connected', async (index = '2') => {
+			const token = await auth(publisherAdmin);
 			const {payload} = await init(index, true);
-			const response = await requester.post(`${requestPath}`).set('content-type', 'application/json').send(payload);
+			const response = await requester.post(`${requestPath}`).set('Authorization', `Bearer ${token}`).send(payload);
+			expect(response).to.have.status(HttpStatus.NOT_FOUND);
+		});
+
+		it.skip('Should not succeed because resource is empty', async (index = '3') => {
+			await mongoFixtures.populate(['createRequest', index, 'dbContents.json']);
+			const token = await auth(publisherAdmin);
+			const response = await requester.post(`${requestPath}`).set('Authorization', `Bearer ${token}`).send();
 			expect(response).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);
 		});
 
@@ -162,18 +177,30 @@ describe('routes/requests/users', () => {
 	describe('#deleteRequest', () => {
 		it.skip('Should succeed', async (index = '0') => {
 			await mongoFixtures.populate(['deleteRequest', index, 'dbContents.json']);
-			const response = await requester.delete(`${requestPath}/5cdc1706d435475787f4751d`);
+			const token = await auth(system);
+			const response = await requester.delete(`${requestPath}/5cd3e9e5f2376736726e4d23`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.OK);
-
 			const db = await mongoFixtures.dump();
 			const {expectedDb} = await init(index);
 			expect(response).to.have.status(HttpStatus.OK);
-			expect(formatDump(db)).to.eql(formatDump({expectedDb}));
+			expect(formatDump(db)).to.eql(formatDump(expectedDb));
+		});
+
+		it.skip('Should fails, not enough access to admin', async (index = '0') => {
+			await mongoFixtures.populate(['deleteRequest', index, 'dbContents.json']);
+			const token = await auth(admin);
+			const adminResponse = await requester.delete(`${requestPath}/5cd3e9e5f2376736726e4d23`).set('Authorization', `Bearer ${token}`);
+			expect(adminResponse).to.have.status(HttpStatus.FORBIDDEN);
+
+			const publisherAdmintoken = await auth(publisherAdmin);
+			const publisherAdminResponse = await requester.delete(`${requestPath}/5cd3e9e5f2376736726e4d23`).set('Authorization', `Bearer ${publisherAdmintoken}`);
+			expect(publisherAdminResponse).to.have.status(HttpStatus.FORBIDDEN);
 		});
 
 		it.skip('Should not succeed because of wrong parameters', async (index = '1') => {
 			await mongoFixtures.populate(['deleteRequest', index, 'dbContents.json']);
-			const response = await requester.delete(`${requestPath}/`);
+			const token = await auth(publisherAdmin);
+			const response = await requester.delete(`${requestPath}/`).set('Authorization', `Bearer ${token}`);
 			expect(response).to.have.status(HttpStatus.NOT_FOUND);
 		});
 
@@ -188,7 +215,8 @@ describe('routes/requests/users', () => {
 		it.skip('Should succeed', async (index = '0') => {
 			await mongoFixtures.populate(['updateRequest', index, 'dbContents.json']);
 			const {payload} = await init(index, true);
-			const response = await requester.put(`${requestPath}/5cdc1706d435475787f4751d`).set('content-type', 'application/json').send(payload);
+			const token = await auth(admin);
+			const response = await requester.put(`${requestPath}/5cd3e9e5f2376736726e4d23`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.OK);
 
 			const db = await mongoFixtures.dump();
@@ -199,7 +227,8 @@ describe('routes/requests/users', () => {
 		it.skip('Should not succeed because of worng parameter', async (index = '1') => {
 			await mongoFixtures.populate(['updateRequest', index, 'dbContents.json']);
 			const {payload} = await init(index, true);
-			const response = await requester.put(`${requestPath}/fooo`).set('content-type', 'application/json').send(payload);
+			const token = await auth(admin);
+			const response = await requester.put(`${requestPath}/foo`).set('Authorization', `Bearer ${token}`).send(payload);
 			expect(response).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);
 		});
 

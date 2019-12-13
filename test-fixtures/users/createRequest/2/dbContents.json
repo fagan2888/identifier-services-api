@@ -1,0 +1,19 @@
+{
+    "usersRequest": [
+        {}
+    ],
+    "userMetadata": [
+        {
+            "_id": "5cd90e696a1e930789dfaa49",
+            "id": "publisher-admin",
+            "publisher": "5dde33ad22f69862179e3d22",
+            "preferences": {
+                "defaultLanguage": "eng"
+            },
+            "lastUpdated": {
+                "timestamp": "838383838",
+                "user": "bar"
+            }
+        }
+    ]
+}

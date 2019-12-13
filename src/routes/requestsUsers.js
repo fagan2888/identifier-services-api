@@ -73,7 +73,7 @@ export default function (db) {
 	async function removeRequest(req, res, next) {
 		const id = req.params.id;
 		try {
-			const result = await usersRequests.removeRequest(db, id);
+			const result = await usersRequests.removeRequest(db, id, req.user);
 			res.json(result);
 		} catch (err) {
 			next(err);

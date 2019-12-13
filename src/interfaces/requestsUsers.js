@@ -47,6 +47,10 @@ export default function () {
 
 	async function createRequest(db, doc, user) {
 		let isUserExist;
+		if (Object.keys(doc).length === 0) {
+			throw new ApiError(HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+
 		if (doc.userId) {
 			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
 				const {crowdUser} = crowd();

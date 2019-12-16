@@ -54,8 +54,11 @@ import {
 	CROWD_URL,
 	CROWD_APP_NAME,
 	CROWD_APP_PASSWORD,
-	PASSPORT_LOCAL_USERS
+	PASSPORT_LOCAL_USERS,
+	PRIVATE_KEY_URL
 } from './config';
+
+import generateUserProviderFactory from './userProviderFactory';
 
 const {createLogger, createExpressLogger, handleInterrupt} = Utils;
 const {Crowd: {generatePassportMiddlewares}} = Authentication;
@@ -72,6 +75,15 @@ export default async function run() {
 			url: `${CROWD_URL}/rest`, useCache: true, fetchGroupMembership: true
 		},
 		localUsers: PASSPORT_LOCAL_USERS
+	});
+
+	const userProviderFactory = generateUserProviderFactory({
+		CROWD_URL,
+		CROWD_APP_NAME,
+		CROWD_APP_PASSWORD,
+		PASSPORT_LOCAL_USERS,
+		PRIVATE_KEY_URL,
+		db
 	});
 
 	const corsOptions = {
@@ -98,7 +110,7 @@ export default async function run() {
 	app.use(bodyParse());
 
 	app.use('/templates', passportMiddlewares.token, combineUserInfo, createMessageTemplate(db));
-	app.use('/users', passportMiddlewares.token, combineUserInfo, createUsersRouter(db));
+	app.use('/users', passportMiddlewares.token, combineUserInfo, createUsersRouter(userProviderFactory));
 	app.use('/requests/users', passportMiddlewares.token, combineUserInfo, createRequestsUsersRouter(db));
 	app.use('/publishers', createPublishersRouter(db, passportMiddlewares, combineUserInfo));
 	app.use('/requests/publishers', passportMiddlewares.token, combineUserInfo, createPublishersRequestsRouter(db));

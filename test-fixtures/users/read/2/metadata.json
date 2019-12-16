@@ -4,6 +4,5 @@
     "username": "admin",
     "password": "0l1gq69q6nxh",
     "expectedStatus": 401,
-    "method": "get",
-    "skip": true
+    "method": "get"
 }

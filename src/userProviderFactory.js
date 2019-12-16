@@ -30,14 +30,13 @@ import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 import fs from 'fs';
 
-import {hasPermission, createLinkAndSendEmail, local, crowd, validateDoc} from './utils';
-import interfaceFactory from './interfaceModules';
-import {CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL} from '../config';
-import {formatUrl, mapGroupToRole, checkRoleInGroup, mapRoleToGroup} from '../utils';
+import {hasPermission, createLinkAndSendEmail, local, crowd, validateDoc} from './interfaces/utils';
+import interfaceFactory from './interfaces/interfaceModules';
+import {formatUrl, mapGroupToRole, checkRoleInGroup, mapRoleToGroup} from './utils';
 
 const userInterface = interfaceFactory('userMetadata');
 
-export default function () {
+export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 	return {
 		create,
 		read,
@@ -47,20 +46,101 @@ export default function () {
 		query
 	};
 
-	async function create(userProviderFactory, doc, user) {
-		try {
-			console.log(userProviderFactory)
-		} catch (err) {
-			console.log(err)
+	async function create(doc, user) {
+		let isUserExit;
+		if (doc.email) {
+			doc.id = doc.email;
+			validateDoc(doc, 'UserContent');
+			if (hasPermission(user, 'users', 'create')) {
+				try {
+					if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
+						const {crowdUser} = crowd();
+						await crowdUser.create({doc: doc});
+					} else {
+						const {localUser} = local();
+						await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
+					}
+				} catch (err) {
+					throw new ApiError(err.status);
+				}
+
+				const {role, givenName, userId, familyName, email, ...rest} = {...doc};
+				const result = await userInterface.create(db, rest, user);
+				return result;
+			}
+
+			throw new ApiError(HttpStatus.FORBIDDEN);
+		}
+
+		if (doc.userId && !doc.email) {
+			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
+				const {crowdUser} = crowd();
+				const allCrowdUsers = await crowdUser.query();
+				isUserExit = allCrowdUsers.includes(doc.userId);
+			} else {
+				const {localUser} = local();
+				const allLocalUsers = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
+
+				if (allLocalUsers.some(item => item.id === doc.userId)) {
+					const newLocalUsers = allLocalUsers.map(item => {
+						if (!checkRoleInGroup(item.groups)) {
+							item.groups.push(mapRoleToGroup(doc.role));
+						}
+
+						return item;
+					});
+
+					fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), JSON.stringify(newLocalUsers, null, 4), 'utf-8');
+					isUserExit = true;
+				}
+			}
+
+			if (isUserExit) {
+				doc.id = doc.userId;
+				const {role, givenName, familyName, userId, email, ...rest} = {...doc};
+				const queries = [{
+					query: {id: doc.id}
+				}];
+				const response = await userInterface.query(db, {queries});
+				if (response.results[0].id === doc.id) {
+					throw new ApiError(HttpStatus.CONFLICT);
+				} else {
+					const result = await userInterface.create(db, rest, user);
+					return result;
+				}
+			}
+
+			throw new ApiError(HttpStatus.NOT_FOUND);
 		}
 	}
 
-	async function read(userProviderFactory, id, user) {
-		try {
-			return userProviderFactory.read(id, user);
-		} catch (err) {
-			throw new ApiError(err.status);
+	async function read(id, user) {
+		const response = await userInterface.read(db, id);
+		let result;
+		if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
+			const {crowdUser} = crowd();
+			result = await crowdUser.read({id: response.userId ? response.userId : response.id});
+		} else {
+			const {localUser} = local();
+			result = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, value: response.userId ? response.userId : response.id}); // Delete id later
+			result = {...result, role: mapGroupToRole(result.groups)};
 		}
+
+		if (hasPermission(user, 'users', 'read')) {
+			// Need to filter user information after combining and before returning to clientSide
+			delete result.password;
+			if (user.role === 'publisher-admin') {
+				if (user.id === result.publisher || user.id === result.id) {
+					return {...response, ...result};
+				}
+
+				throw new ApiError(HttpStatus.UNAUTHORIZED);
+			}
+
+			return {...response, ...result};
+		}
+
+		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
 	async function update(db, id, doc, user) {

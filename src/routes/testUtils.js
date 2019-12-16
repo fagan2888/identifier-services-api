@@ -37,8 +37,6 @@ import {join as joinPath} from 'path';
 import {PASSPORT_LOCAL_USERS} from '../config';
 import {ApiError} from '@natlibfi/identifier-services-commons/dist/error';
 import base64 from 'base-64';
-// import fs from 'fs';
-// import {formatUrl} from '../utils';
 
 chai.use(chaiHttp);
 
@@ -66,7 +64,7 @@ export default ({rootPath}) => {
 				const sub = subDirs.shift();
 
 				if (sub) {
-					const {descr, skip, expectedPayload, requestUrl, username, password} = getData(sub);
+					const {descr, skip, expectedPayload, requestUrl, method, username, password, expectedStatus, expectedDb} = getData(sub);
 					if (skip) {
 						it.skip(`${sub} ${descr}`);
 					} else {
@@ -77,35 +75,52 @@ export default ({rootPath}) => {
 							const app = await startApp();
 							requester = chai.request(app).keepOpen();
 
+							await mongoFixtures.populate([sub, 'dbContents.json']);
+							const token = await auth(username, password);
 							if (expectedPayload) {
-								await mongoFixtures.populate([sub, 'dbContents.json']);
-								const token = await auth(username, password);
-								const response = await requester.get(requestUrl).set('Authorization', `Bearer ${token}`);
-								expect(response).to.have.status(HttpStatus.OK);
+								const response = await requester[method](requestUrl).set('Authorization', `Bearer ${token}`);
+								expect(response).to.have.status(expectedStatus);
+								expect(response.body).to.eql(expectedPayload);
+							}
+
+							if (expectedDb) {
+								const response = await requester[method](requestUrl).set('Authorization', `Bearer ${token}`);
+								expect(response).to.have.status(expectedStatus);
+								const db = await mongoFixtures.dump();
+								expect(formatDump(db)).to.eql(expectedDb);
 							}
 						});
 					}
 
-					// iterate();
+					iterate();
 				}
 			}
 
 			function getData(subDir) {
-				const {descr, requestUrl, skip, username, password} = getFixture({
+				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected} = getFixture({
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});
-
 				if (skip) {
 					return {descr, skip};
 				}
 
 				try {
+					if (dbExpected) {
+						const expectedDb = getFixture({
+							components: [subDir, dbExpected],
+							reader: READERS.JSON
+						});
+
+						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb};
+					}
+
 					const expectedPayload = getFixture({
 						components: [subDir, 'expectedPayload.json'],
 						reader: READERS.JSON
 					});
-					return {expectedPayload, descr, requestUrl, username, password};
+
+					return {expectedPayload, descr, requestUrl, method, username, password, expectedStatus};
 				} catch (err) {
 					if (err.code === 'ENOENT') {
 						return {descr, requestUrl};
@@ -119,6 +134,15 @@ export default ({rootPath}) => {
 				const result = await requester.post('/auth').set('Authorization', 'Basic ' + base64.encode(username + ':' + password)
 				);
 				return result.headers.token;
+			}
+
+			function formatDump(dump) {
+				dump.userMetadata.forEach(doc =>
+					Object.values(doc).forEach(field => Object.keys(field).filter(item =>
+						item === 'timestamp' || item === 'user'
+					).forEach(i => delete doc.lastUpdated[i]))
+				);
+				return dump;
 			}
 		};
 	};

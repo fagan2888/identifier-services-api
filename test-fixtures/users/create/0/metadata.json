@@ -1,0 +1,9 @@
+{
+    "descr": "Should succeed direct create User by Admin without SSOID",
+    "requestUrl": "/users",
+    "username": "admin",
+    "password": "0l1gq69q6nxh",
+    "expectedStatus": 201,
+    "dbExpected": "dbExpected.json",
+    "method": "post"
+}

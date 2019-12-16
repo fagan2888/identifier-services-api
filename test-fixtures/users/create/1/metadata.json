@@ -1,0 +1,9 @@
+{
+    "descr": "Should succeed create User by Admin using SSOID",
+    "requestUrl": "/users/foooobbbbbadmin",
+    "username": "admin",
+    "password": "0l1gq69q6nxh",
+    "expectedStatus": 201,
+    "dbExpected": "dbExpected.json",
+    "method": "post"
+}

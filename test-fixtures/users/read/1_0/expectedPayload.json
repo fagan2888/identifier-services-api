@@ -19,10 +19,10 @@
             "type": "work"
         }
     ],
+    "publisher": "foobar",
     "organization": [],
     "groups": [
         "identifier-services-test-publisherAdmin"
     ],
-    "publisher": "foobar",
     "role": "publisher-admin"
 }

@@ -56,7 +56,6 @@ export default function (db) {
 		const id = req.params.id;
 		try {
 			const result = await users.read(db, id, req.user);
-			console.log(result);
 			res.json(result);
 		} catch (err) {
 			next(err);

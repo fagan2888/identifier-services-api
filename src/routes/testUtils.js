@@ -67,7 +67,19 @@ export default ({rootPath}) => {
 				const sub = subDirs.shift();
 
 				if (sub) {
-					const {descr, skip, expectedPayload, requestUrl, method, username, password, expectedStatus, expectedDb} = getData(sub);
+					const {
+						descr,
+						skip,
+						expectedPayload,
+						requestUrl,
+						method,
+						username,
+						password,
+						expectedStatus,
+						expectedDb,
+						payloadData
+					} = getData(sub);
+
 					if (skip) {
 						it.skip(`${sub} ${descr}`);
 					} else {
@@ -81,7 +93,8 @@ export default ({rootPath}) => {
 							await mongoFixtures.populate([sub, 'dbContents.json']);
 							const token = await auth(username, password);
 							if (expectedPayload) {
-								const response = await requester[method](requestUrl).set('Authorization', `Bearer ${token}`);
+								const response = await requester[method](requestUrl)
+									.set('Authorization', `Bearer ${token}`);
 								expect(response).to.have.status(expectedStatus);
 								if (expectedStatus === HttpStatus.OK) {
 									expect(response.body).to.eql(expectedPayload);
@@ -89,7 +102,8 @@ export default ({rootPath}) => {
 							}
 
 							if (expectedDb) {
-								const response = await requester[method](requestUrl).set('Authorization', `Bearer ${token}`);
+								const response = await requester[method](requestUrl)
+									.set('Authorization', `Bearer ${token}`).send(payloadData);
 								expect(response).to.have.status(expectedStatus);
 								const db = await mongoFixtures.dump();
 								expect(formatDump(db)).to.eql(expectedDb);
@@ -102,12 +116,21 @@ export default ({rootPath}) => {
 			}
 
 			function getData(subDir) {
-				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected} = getFixture({
+				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected, payload} = getFixture({
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});
+				let payloadData;
+
 				if (skip) {
 					return {descr, skip};
+				}
+
+				if (payload) {
+					payloadData = getFixture({
+						components: [subDir, payload],
+						reader: READERS.JSON
+					});
 				}
 
 				try {
@@ -117,7 +140,7 @@ export default ({rootPath}) => {
 							reader: READERS.JSON
 						});
 
-						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb};
+						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, payloadData};
 					}
 
 					const expectedPayload = getFixture({

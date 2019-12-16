@@ -51,6 +51,9 @@ export default ({rootPath}) => {
 	afterEach(async () => {
 		await requester.close();
 		await mongoFixtures.close();
+		RewireAPI.__ResetDependency__('MONGO_URI');
+		RewireAPI.__ResetDependency__('PASSPORT_LOCAL_USERS');
+
 	});
 
 	return (...args) => {
@@ -80,7 +83,9 @@ export default ({rootPath}) => {
 							if (expectedPayload) {
 								const response = await requester[method](requestUrl).set('Authorization', `Bearer ${token}`);
 								expect(response).to.have.status(expectedStatus);
-								expect(response.body).to.eql(expectedPayload);
+								if (expectedStatus === HttpStatus.OK) {
+									expect(response.body).to.eql(expectedPayload);
+								}
 							}
 
 							if (expectedDb) {

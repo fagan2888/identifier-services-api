@@ -142,6 +142,15 @@ export default function () {
 
 		if (hasPermission(user, 'users', 'read')) {
 			// Need to filter user information after combining and before returning to clientSide
+			if (user.role === 'publisher-admin') {
+				delete result.password;
+				if (user.id === response.id || user.id === response.publisher) {
+					return {...response, ...result};
+				}
+
+				throw new ApiError(HttpStatus.UNAUTHORIZED);
+			}
+
 			delete result.password;
 			return {...response, ...result};
 		}

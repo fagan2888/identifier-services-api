@@ -27,16 +27,28 @@
  */
 
 import HttpStatus from 'http-status';
-import {ApiError} from '@natlibfi/identifier-services-commons';
+import {ApiError, Utils} from '@natlibfi/identifier-services-commons';
+import CrowdClient from 'atlassian-crowd-client';
+import User from 'atlassian-crowd-client/lib/models/user';
+import jose from 'jose';
 import fs from 'fs';
 
-import {hasPermission, createLinkAndSendEmail, local, crowd, validateDoc} from './interfaces/utils';
-import interfaceFactory from './interfaces/interfaceModules';
-import {formatUrl, mapGroupToRole, checkRoleInGroup, mapRoleToGroup} from './utils';
+import {hasPermission, getTemplate, validateDoc} from '../interfaces/utils';
+import interfaceFactory from '../interfaces/interfaceModules';
+import {mapGroupToRole, mapRoleToGroup} from '../utils';
+import {UI_URL, SMTP_URL} from '../config';
 
 const userInterface = interfaceFactory('userMetadata');
+const {sendEmail} = Utils;
 
-export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
+export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PRIVATE_KEY_URL, db}) {
+	const crowdClient = new CrowdClient({
+		baseUrl: CROWD_URL,
+		application: {
+			name: CROWD_APP_NAME,
+			password: CROWD_APP_PASSWORD
+		}
+	});
 	return {
 		create,
 		read,
@@ -47,19 +59,13 @@ export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPOR
 	};
 
 	async function create(doc, user) {
-		let isUserExit;
 		if (doc.email) {
 			doc.id = doc.email;
 			validateDoc(doc, 'UserContent');
 			if (hasPermission(user, 'users', 'create')) {
 				try {
-					if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-						const {crowdUser} = crowd();
-						await crowdUser.create({doc: doc});
-					} else {
-						const {localUser} = local();
-						await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
-					}
+					const {crowdUser} = crowd();
+					await crowdUser.create({doc: doc});
 				} catch (err) {
 					throw new ApiError(err.status);
 				}
@@ -73,27 +79,9 @@ export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPOR
 		}
 
 		if (doc.userId && !doc.email) {
-			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-				const {crowdUser} = crowd();
-				const allCrowdUsers = await crowdUser.query();
-				isUserExit = allCrowdUsers.includes(doc.userId);
-			} else {
-				const {localUser} = local();
-				const allLocalUsers = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
-
-				if (allLocalUsers.some(item => item.id === doc.userId)) {
-					const newLocalUsers = allLocalUsers.map(item => {
-						if (!checkRoleInGroup(item.groups)) {
-							item.groups.push(mapRoleToGroup(doc.role));
-						}
-
-						return item;
-					});
-
-					fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), JSON.stringify(newLocalUsers, null, 4), 'utf-8');
-					isUserExit = true;
-				}
-			}
+			const {crowdUser} = crowd();
+			const allCrowdUsers = await crowdUser.query();
+			const isUserExit = allCrowdUsers.includes(doc.userId);
 
 			if (isUserExit) {
 				doc.id = doc.userId;
@@ -116,15 +104,8 @@ export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPOR
 
 	async function read(id, user) {
 		const response = await userInterface.read(db, id);
-		let result;
-		if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-			const {crowdUser} = crowd();
-			result = await crowdUser.read({id: response.userId ? response.userId : response.id});
-		} else {
-			const {localUser} = local();
-			result = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, value: response.userId ? response.userId : response.id}); // Delete id later
-			result = {...result, role: mapGroupToRole(result.groups)};
-		}
+		const {crowdUser} = crowd();
+		const result = await crowdUser.read({id: response.userId ? response.userId : response.id});
 
 		if (hasPermission(user, 'users', 'read')) {
 			// Need to filter user information after combining and before returning to clientSide
@@ -156,14 +137,8 @@ export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPOR
 	async function remove(db, id, user) {
 		if (hasPermission(user, 'users', 'remove')) {
 			const response = await userInterface.read(db, id);
-			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-				const {crowdUser} = crowd();
-				await crowdUser.remove({id: response.userId ? response.userId : response.id});
-			} else {
-				const {localUser} = local();
-				await localUser.remove({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, id: response.userId ? response.userId : response.id});
-			}
-
+			const {crowdUser} = crowd();
+			await crowdUser.remove({id: response.userId ? response.userId : response.id});
 			const result = await userInterface.remove(db, id);
 			return result;
 		}
@@ -174,21 +149,18 @@ export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPOR
 	async function changePwd(doc, user) {
 		if (doc.newPassword) {
 			if (hasPermission(user, 'users', 'changePwd')) {
-				if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-					const {crowdUser} = crowd();
-					await crowdUser.update({doc});
-				}
-
-				const {localUser} = local();
-				await localUser.update({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, user: doc});
+				const {crowdUser} = crowd();
+				await crowdUser.update({doc});
 			} else {
 				throw new ApiError(HttpStatus.FORBIDDEN);
 			}
 		} else {
-			const {localUser} = local();
-			const response = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, value: doc.id});
+			const {crowdUser} = crowd();
+			const response = await crowdUser.read({id: doc.id});
+			console.log(response);
+			// ************ DO SOMETHING HERE NOT COMLETE ******************
 			const email = response.emails[0].value;
-			const result = await createLinkAndSendEmail({request: {...doc, email: email}, PRIVATE_KEY_URL: PRIVATE_KEY_URL, PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
+			const result = await createLinkAndSendEmail({request: {...doc, email: email}, PRIVATE_KEY_URL: PRIVATE_KEY_URL});
 			if (result !== undefined && result.status === 404) {
 				throw new ApiError(HttpStatus.NOT_FOUND);
 			}
@@ -210,5 +182,81 @@ export default function ({CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPOR
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
+	}
+
+	function crowd() {
+		return {
+			crowdUser: {
+				read,
+				create,
+				update,
+				remove,
+				query
+			}
+
+		};
+
+		async function read({id}) {
+			const response = await crowdClient.user.get(id);
+			return {...response, groups: await getUserGroup(id)};
+		}
+
+		async function create({doc}) {
+			const payload = new User(doc.givenName, doc.familyName, `${doc.givenName} ${doc.familyName}`, doc.email, doc.email, Math.random().toString(36).slice(2));
+			const response = await crowdClient.user.create(payload);
+			await crowdClient.user.groups.add(response.email, mapRoleToGroup(doc.role));
+			return {...response, groups: await getUserGroup(response.username)};
+		}
+
+		async function update({doc}) {
+			const userCheckResponse = await crowdClient.user.get(doc.id);
+			if (userCheckResponse) {
+				const response = await crowdClient.user.password.set(doc.id, doc.newPassword);
+				return response;
+			}
+		}
+
+		async function remove({id}) {
+			const group = await getUserGroup(id);
+			await crowdClient.user.groups.remove(id, mapGroupToRole(group));
+			const response = await crowdClient.user.remove(id);
+			return response;
+		}
+
+		async function query() {
+			const users = await crowdClient.search.user('');
+			return users;
+		}
+
+		async function getUserGroup(id) {
+			// Const nestedGroup = await client.user.groups.list(id, 'nested');
+			const directGroup = await crowdClient.user.groups.list(id, 'direct');
+			// DirectGroup.concat(nestedGroup)
+			// Retruning Only direct Group for this project
+			return directGroup;
+		}
+	}
+
+	async function createLinkAndSendEmail({request, PRIVATE_KEY_URL}) {
+		const {JWK, JWE} = jose;
+		const key = JWK.asKey(fs.readFileSync(PRIVATE_KEY_URL));
+		const response = await crowdClient.user.get(request.id);
+		if (response) {
+			const payload = jose.JWT.sign(request, key, {
+				expiresIn: '24 hours',
+				iat: true
+			});
+			const token = await JWE.encrypt(payload, key, {kid: key.kid});
+			const link = `${UI_URL}/users/passwordReset/${token}`;
+			const result = sendEmail({
+				name: 'forgot password',
+				args: {link: link},
+				getTemplate: getTemplate,
+
+				SMTP_URL: SMTP_URL,
+				API_EMAIL: request.email
+			});
+			return result;
+		}
 	}
 }

@@ -69,6 +69,7 @@ export default async function run() {
 	const client = new MongoClient(MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 	const connection = await client.connect();
 	const db = connection.db();
+
 	const passportMiddlewares = await generatePassportMiddlewares({
 		crowd: {
 			appName: CROWD_APP_NAME, appPassword: CROWD_APP_PASSWORD,
@@ -78,12 +79,12 @@ export default async function run() {
 	});
 
 	const userProviderFactory = generateUserProviderFactory({
-		CROWD_URL,
-		CROWD_APP_NAME,
-		CROWD_APP_PASSWORD,
-		PASSPORT_LOCAL_USERS,
-		PRIVATE_KEY_URL,
-		db
+		CROWD_URL: CROWD_URL,
+		CROWD_APP_NAME: CROWD_APP_NAME,
+		CROWD_APP_PASSWORD: CROWD_APP_PASSWORD,
+		PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS,
+		PRIVATE_KEY_URL: PRIVATE_KEY_URL,
+		db: db
 	});
 
 	const corsOptions = {

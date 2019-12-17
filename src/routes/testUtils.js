@@ -34,7 +34,6 @@ import mongoFixturesFactory from '@natlibfi/fixura-mongo';
 import startApp, {__RewireAPI__ as RewireAPI} from '../app'; // eslint-disable-line import/named
 import {readdirSync} from 'fs';
 import {join as joinPath} from 'path';
-import {PASSPORT_LOCAL_USERS} from '../config';
 import {ApiError} from '@natlibfi/identifier-services-commons/dist/error';
 import base64 from 'base-64';
 
@@ -86,7 +85,7 @@ export default ({rootPath}) => {
 						it(`${sub} ${descr}`, async () => {
 							mongoFixtures = await mongoFixturesFactory({rootPath: dir, useObjectId: true});
 							RewireAPI.__Rewire__('MONGO_URI', await mongoFixtures.getConnectionString());
-							RewireAPI.__Rewire__('PASSPORT_LOCAL_USERS', PASSPORT_LOCAL_USERS);
+							RewireAPI.__Rewire__('PASSPORT_LOCAL_USERS', `file://${joinPath.apply(undefined, dir)}/${sub}/local.json`);
 							const app = await startApp();
 							requester = chai.request(app).keepOpen();
 

@@ -28,9 +28,8 @@
 
 import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
-import fs from 'fs';
 
-import {hasPermission, createLinkAndSendEmail, local, crowd, validateDoc} from './utils';
+import {hasPermission, createLinkAndSendEmail, validateDoc} from './utils';
 import interfaceFactory from './interfaceModules';
 import {CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL} from '../config';
 import {formatUrl, mapGroupToRole, checkRoleInGroup, mapRoleToGroup} from '../utils';
@@ -49,9 +48,9 @@ export default function () {
 
 	async function create(userProviderFactory, doc, user) {
 		try {
-			console.log(userProviderFactory)
+			console.log('userProviderFactory');
 		} catch (err) {
-			console.log(err)
+			console.log(err);
 		}
 	}
 
@@ -63,57 +62,33 @@ export default function () {
 		}
 	}
 
-	async function update(db, id, doc, user) {
+	async function update(userProviderFactory, id, doc, user) {
 		validateDoc(doc, 'UserContent');
 		if (hasPermission(user, 'users', update)) {
-			const result = await userInterface.update(db, id, doc, user);
+			const result = await userProviderFactory.update(id, doc, user);
 			return result;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
-	async function remove(db, id, user) {
+	async function remove(userProviderFactory, id, user) {
 		if (hasPermission(user, 'users', 'remove')) {
-			const response = await userInterface.read(db, id);
-			if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-				const {crowdUser} = crowd();
-				await crowdUser.remove({id: response.userId ? response.userId : response.id});
-			} else {
-				const {localUser} = local();
-				await localUser.remove({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, id: response.userId ? response.userId : response.id});
+			try {
+				await userProviderFactory.remove(id);
+			} catch (err) {
+				throw new ApiError(err.status);
 			}
-
-			const result = await userInterface.remove(db, id);
-			return result;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
-	async function changePwd(doc, user) {
-		if (doc.newPassword) {
-			if (hasPermission(user, 'users', 'changePwd')) {
-				if (CROWD_URL && CROWD_APP_NAME && CROWD_APP_PASSWORD) {
-					const {crowdUser} = crowd();
-					await crowdUser.update({doc});
-				}
-
-				const {localUser} = local();
-				await localUser.update({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, user: doc});
-			} else {
-				throw new ApiError(HttpStatus.FORBIDDEN);
-			}
-		} else {
-			const {localUser} = local();
-			const response = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, value: doc.id});
-			const email = response.emails[0].value;
-			const result = await createLinkAndSendEmail({request: {...doc, email: email}, PRIVATE_KEY_URL: PRIVATE_KEY_URL, PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
-			if (result !== undefined && result.status === 404) {
-				throw new ApiError(HttpStatus.NOT_FOUND);
-			}
-
-			return result;
+	async function changePwd(userProviderFactory, doc, user) {
+		try {
+			await userProviderFactory.changePwd(doc, user);
+		} catch (err) {
+			throw new ApiError(err.status);
 		}
 	}
 

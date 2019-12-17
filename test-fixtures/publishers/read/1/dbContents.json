@@ -9,13 +9,12 @@
 			},
 			"name": "foo",
 			"postalAddress": {
-				"public": false,
+				"public": true,
 				"address": "foo",
 				"city": "foo",
 				"zip": "foo"
 			},
-			"classification": ["foo"],
-			"primaryContact": ["foobar", "foo"]
+			"classification": ["foo"]
 		}
     ]
 }

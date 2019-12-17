@@ -1,9 +1,7 @@
 {
     "PublisherMetadata": [{},
         {
-            "lastUpdated":{
-                "user": "tasks"
-            },
+            "lastUpdated":{},
             "name": "foo",
             "postalAddress": {
                 "address":"foo",

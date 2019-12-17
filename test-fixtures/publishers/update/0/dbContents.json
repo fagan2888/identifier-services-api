@@ -1,24 +1,36 @@
 {
     "PublisherMetadata": [
         {
-            "_id":"5dd69c4d1c9d440000d04f84",
-            "lastUpdated":{
-                "user": "admin"
-            },
-            "name": "foo",
-            "postalAddress": {
-                "address":"foo",
-                "city":"foo",
-                "zip":"foo",
-                "public:": false
-            },
-            "classification": ["foo"],
-            "metadataDelivery": "manual",
-            "primaryContact": ["foobar", "foo"],
-            "activity":{
+            "_id": "5cdfe76e46c65d23f7cf94d3",
+            "name": "Sanjog",
+            "language": "fin",
+            "metadataDelivery": "external",
+            "primaryContact": [
+                "foobar",
+                "bar.foo@bar.foo"
+            ],
+            "email": "asiakaspalvelu@otava.fi",
+            "phone": "050123456",
+            "website": "http://www.otava.fi",
+            "aliases": [
+                "Kustannusosakeyhtiö Nemo"
+            ],
+            "notes": [
+                "foo",
+                "foo"
+            ],
+            "activity": {
                 "active": true,
                 "yearInactivated": 111
-            }   
+            },
+            "streetAddress": {
+                "address": "Uudenmaankatu 10",
+                "city": "Helsinki",
+                "zip": "00120"
+            },
+            "lastUpdated": {
+                "user": "foobar"
+            }
         }
     ]
 }

@@ -29,10 +29,8 @@
 import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
-import {hasPermission, createLinkAndSendEmail, validateDoc} from './utils';
+import {hasPermission, validateDoc} from './utils';
 import interfaceFactory from './interfaceModules';
-import {CROWD_URL, CROWD_APP_NAME, CROWD_APP_PASSWORD, PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL} from '../config';
-import {formatUrl, mapGroupToRole, checkRoleInGroup, mapRoleToGroup} from '../utils';
 
 const userInterface = interfaceFactory('userMetadata');
 

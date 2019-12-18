@@ -1,10 +1,10 @@
 {
-    "descr": "Should succeed create User by Admin using SSOID",
-    "requestUrl": "/users/foooobbbbbadmin",
+    "descr": "Should fail because payload is invalid",
+    "requestUrl": "/users",
     "username": "admin",
-    "password": "0l1gq69q6nxh",
-    "expectedStatus": 201,
-    "dbExpected": "dbExpected.json",
+    "password": "gM3RsfxAr7e5VwsSPAC6",
+    "expectedStatus": 400,
+    "payload": "payload.json",
     "method": "post",
-    "skip": true
+    "payloadExpected": false
 }

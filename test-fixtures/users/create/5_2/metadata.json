@@ -1,10 +1,10 @@
 {
-    "descr": "Should succeed create User by Admin using SSOID",
-    "requestUrl": "/users/foooobbbbbadmin",
+    "descr": "Should succeed create User through userRequest without SSOID",
+    "requestUrl": "/users",
     "username": "admin",
-    "password": "0l1gq69q6nxh",
+    "password": "gM3RsfxAr7e5VwsSPAC6",
     "expectedStatus": 201,
     "dbExpected": "dbExpected.json",
-    "method": "post",
-    "skip": true
+    "payload": "payload.json",
+    "method": "post"
 }

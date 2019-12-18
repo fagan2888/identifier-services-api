@@ -6,6 +6,5 @@
     "expectedStatus": 201,
     "dbExpected": "dbExpected.json",
     "payload": "payload.json",
-    "method": "post",
-    "skip" : true
+    "method": "post"
 }

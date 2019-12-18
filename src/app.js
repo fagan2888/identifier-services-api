@@ -58,7 +58,7 @@ import {
 	PRIVATE_KEY_URL
 } from './config';
 
-import generateUserProviderFactory from './userProviderFactory';
+import generateUserProvider from './userProvider';
 
 const {createLogger, createExpressLogger, handleInterrupt} = Utils;
 const {Crowd: {generatePassportMiddlewares}} = Authentication;
@@ -78,7 +78,7 @@ export default async function run() {
 		localUsers: PASSPORT_LOCAL_USERS
 	});
 
-	const userProviderFactory = generateUserProviderFactory({
+	const userProvider = generateUserProvider({
 		CROWD_URL: CROWD_URL,
 		CROWD_APP_NAME: CROWD_APP_NAME,
 		CROWD_APP_PASSWORD: CROWD_APP_PASSWORD,
@@ -111,7 +111,7 @@ export default async function run() {
 	app.use(bodyParse());
 
 	app.use('/templates', passportMiddlewares.token, combineUserInfo, createMessageTemplate(db));
-	app.use('/users', passportMiddlewares.token, combineUserInfo, createUsersRouter(userProviderFactory));
+	app.use('/users', passportMiddlewares.token, combineUserInfo, createUsersRouter(userProvider));
 	app.use('/requests/users', passportMiddlewares.token, combineUserInfo, createRequestsUsersRouter(db));
 	app.use('/publishers', createPublishersRouter(db, passportMiddlewares, combineUserInfo));
 	app.use('/requests/publishers', passportMiddlewares.token, combineUserInfo, createPublishersRequestsRouter(db));

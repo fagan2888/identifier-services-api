@@ -104,7 +104,6 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 	}
 
 	async function read(id, user) {
-		console.log('readLocal', id);
 		const response = await userInterface.read(db, id);
 		let result;
 		const {localUser} = local();

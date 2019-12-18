@@ -36,6 +36,7 @@ import {readdirSync} from 'fs';
 import {join as joinPath} from 'path';
 import {ApiError} from '@natlibfi/identifier-services-commons/dist/error';
 import base64 from 'base-64';
+import generateUserProvider from '../../test-fixtures/mockUserProvider';
 
 chai.use(chaiHttp);
 
@@ -64,6 +65,7 @@ export default ({rootPath}) => {
 
 			async function iterate() {
 				const sub = subDirs.shift();
+				const PASSPORT_LOCAL_USERS = `file://${joinPath.apply(undefined, dir)}/${sub}/local.json`;
 
 				if (sub) {
 					const {
@@ -76,7 +78,8 @@ export default ({rootPath}) => {
 						password,
 						expectedStatus,
 						expectedDb,
-						payloadData
+						payloadData,
+						payloadExpected
 					} = getData(sub);
 
 					if (skip) {
@@ -85,7 +88,9 @@ export default ({rootPath}) => {
 						it(`${sub} ${descr}`, async () => {
 							mongoFixtures = await mongoFixturesFactory({rootPath: dir, useObjectId: true});
 							RewireAPI.__Rewire__('MONGO_URI', await mongoFixtures.getConnectionString());
-							RewireAPI.__Rewire__('PASSPORT_LOCAL_USERS', `file://${joinPath.apply(undefined, dir)}/${sub}/local.json`);
+							RewireAPI.__Rewire__('PASSPORT_LOCAL_USERS', PASSPORT_LOCAL_USERS);
+							RewireAPI.__Rewire__('generateUserProvider', generateUserProvider);
+
 							const app = await startApp();
 							requester = chai.request(app).keepOpen();
 
@@ -107,6 +112,12 @@ export default ({rootPath}) => {
 								const db = await mongoFixtures.dump();
 								expect(formatDump(db)).to.eql(expectedDb);
 							}
+
+							if (!expectedDb && !payloadExpected) {
+								const response = await requester[method](requestUrl)
+									.set('Authorization', `Bearer ${token}`).send(payloadData);
+								expect(response).to.have.status(expectedStatus);
+							}
 						});
 					}
 
@@ -115,21 +126,12 @@ export default ({rootPath}) => {
 			}
 
 			function getData(subDir) {
-				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected, payload} = getFixture({
+				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected, payload, payloadExpected = true} = getFixture({
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});
-				let payloadData;
-
 				if (skip) {
 					return {descr, skip};
-				}
-
-				if (payload) {
-					payloadData = getFixture({
-						components: [subDir, payload],
-						reader: READERS.JSON
-					});
 				}
 
 				try {
@@ -139,15 +141,27 @@ export default ({rootPath}) => {
 							reader: READERS.JSON
 						});
 
-						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, payloadData};
+						if (payload) {
+							const payloadData = getFixture({
+								components: [subDir, payload],
+								reader: READERS.JSON
+							});
+							return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, payloadData};
+						}
+
+						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb};
 					}
 
-					const expectedPayload = getFixture({
-						components: [subDir, 'expectedPayload.json'],
-						reader: READERS.JSON
-					});
+					if (payloadExpected) {
+						const expectedPayload = getFixture({
+							components: [subDir, 'expectedPayload.json'],
+							reader: READERS.JSON
+						});
+						return {expectedPayload, descr, requestUrl, method, username, password, expectedStatus};
+					}
 
-					return {expectedPayload, descr, requestUrl, method, username, password, expectedStatus};
+					return {descr, requestUrl, method, username, password, expectedStatus};
+
 				} catch (err) {
 					if (err.code === 'ENOENT') {
 						return {descr, requestUrl};

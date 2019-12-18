@@ -48,9 +48,9 @@ export default function () {
 
 	async function create(userProviderFactory, doc, user) {
 		try {
-			console.log('userProviderFactory');
+			return userProviderFactory.create(doc, user);
 		} catch (err) {
-			console.log(err);
+			throw new ApiError(err.status);
 		}
 	}
 

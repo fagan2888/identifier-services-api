@@ -1,5 +1,5 @@
 {
-    "descr": "Should fail to create publisher because content is not provided",
+    "descr": "Should fail to create publisher because of invalid syntax",
     "requestUrl": "/publishers",
     "username": "tasks",
     "password": "J22omfqCU8ZgCrrKrOOB",

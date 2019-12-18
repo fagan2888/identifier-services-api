@@ -211,7 +211,7 @@
 // 			return dump;
 // 		}
 // 	});
-// 	// *************NOT Implemented in the backend *************************/
+// 	// *************NOT Implemented igetFixturen the backend *************************/
 // 	// describe('#delete', () => {
 // 	// 	it('Should delete a publisher', async (index = '0') => {
 // 	// 		await init(index, false);
@@ -401,5 +401,6 @@ describe('app', () => {
 	describe('publishers', () => {
 		describe('#read', generateTestSuite('publishers', 'read'));
 		describe('#create', generateTestSuite('publishers', 'create'));
+		describe('#update', generateTestSuite('publishers', 'update'));
 	});
 });

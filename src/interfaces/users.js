@@ -103,7 +103,7 @@ export default function () {
 					query: {id: doc.id}
 				}];
 				const response = await userInterface.query(db, {queries});
-				if (response.results[0].id === doc.id) {
+				if (response.results.length > 0 && response.results[0].id === doc.id) {
 					throw new ApiError(HttpStatus.CONFLICT);
 				} else {
 					const result = await userInterface.create(db, rest, user);

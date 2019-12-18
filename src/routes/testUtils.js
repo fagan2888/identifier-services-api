@@ -61,9 +61,8 @@ export default ({rootPath}) => {
 
 			async function iterate() {
 				const sub = subDirs.shift();
-
 				if (sub) {
-					const {descr, skip, expectedPayload, requestUrl, method, role, username, password, expectedStatus, expectedDb, payloadData} = getData(sub);
+					const {descr, skip, expectedPayload, requestUrl, method, role, username, password, expectedStatus, expectedDb, payloadData, payloadExpected} = getData(sub);
 					if (skip) {
 						it.skip(`${sub} ${descr}`);
 					} else {
@@ -73,7 +72,6 @@ export default ({rootPath}) => {
 							RewireAPI.__Rewire__('PASSPORT_LOCAL_USERS', PASSPORT_LOCAL_USERS);
 							const app = await startApp();
 							requester = chai.request(app).keepOpen();
-
 							await mongoFixtures.populate([sub, 'dbContents.json']);
 							const token = await auth(username, password);
 							if (expectedPayload) {
@@ -94,6 +92,11 @@ export default ({rootPath}) => {
 								const db = await mongoFixtures.dump();
 								expect(formatDump(db, 'PublisherMetadata')).to.eql(expectedDb);
 							}
+
+							if (!payloadExpected) {
+								const response = await requester[method](requestUrl).set('Authorization', `Bearer ${token}`).send(payloadData);
+								expect(response).to.have.status(expectedStatus);
+							}
 						});
 					}
 
@@ -102,7 +105,7 @@ export default ({rootPath}) => {
 			}
 
 			function getData(subDir) {
-				const {descr, requestUrl, method, skip, role, username, password, expectedStatus, dbExpected, payload} = getFixture({
+				const {descr, requestUrl, method, skip, role, username, password, expectedStatus, dbExpected, payload, payloadExpected} = getFixture({
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});
@@ -116,7 +119,6 @@ export default ({rootPath}) => {
 							components: [subDir, dbExpected],
 							reader: READERS.JSON
 						});
-
 						if (payload) {
 							const payloadData = getFixture({
 								components: [subDir, payload],
@@ -127,6 +129,10 @@ export default ({rootPath}) => {
 						}
 
 						return {descr, requestUrl, method, role, username, password, expectedStatus, expectedDb};
+					}
+
+					if (payloadExpected === false) {
+						return {descr, requestUrl, method, role, username, password, expectedStatus, payloadExpected};
 					}
 
 					const expectedPayload = getFixture({

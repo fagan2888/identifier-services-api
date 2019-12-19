@@ -81,7 +81,7 @@ export default function () {
 
 	async function changePwd(userProvider, doc, user) {
 		try {
-			await userProvider.changePwd(doc, user);
+			return userProvider.changePwd(doc, user); // Changes made during unit test if problem persist `await` instead of `return`
 		} catch (err) {
 			throw new ApiError(err.status);
 		}

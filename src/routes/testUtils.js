@@ -139,6 +139,11 @@ export default ({rootPath}) => {
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});
+				const payloadData = payload && getFixture({
+					components: [subDir, payload],
+					reader: READERS.JSON
+				});
+
 				if (skip) {
 					return {descr, skip};
 				}
@@ -151,10 +156,6 @@ export default ({rootPath}) => {
 						});
 
 						if (payload) {
-							const payloadData = getFixture({
-								components: [subDir, payload],
-								reader: READERS.JSON
-							});
 							return {descr, collectionName, requestUrl, method, username, password, expectedStatus, expectedDb, payloadData};
 						}
 
@@ -167,17 +168,13 @@ export default ({rootPath}) => {
 							reader: READERS.JSON
 						});
 						if (payload) {
-							const payloadData = getFixture({
-								components: [subDir, payload],
-								reader: READERS.JSON
-							});
 							return {expectedPayload, descr, collectionName, requestUrl, method, username, password, expectedStatus, payloadData};
 						}
 
 						return {expectedPayload, descr, collectionName, requestUrl, method, username, password, expectedStatus};
 					}
 
-					return {descr, requestUrl, method, username, password, expectedStatus};
+					return {descr, requestUrl, method, username, password, expectedStatus, payloadData};
 				} catch (err) {
 					if (err.code === 'ENOENT') {
 						return {descr, requestUrl};

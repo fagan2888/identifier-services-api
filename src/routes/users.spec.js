@@ -340,6 +340,7 @@ describe('app', () => {
 	describe('users', () => {
 		describe('#read', generateTestSuite('users', 'read'));
 		describe('#create', generateTestSuite('users', 'create'));
+		describe('#changePwd', generateTestSuite('users', 'changePwd'));
 		describe('#query', generateTestSuite('users', 'query'));
 	});
 });

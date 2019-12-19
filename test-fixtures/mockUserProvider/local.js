@@ -153,13 +153,15 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 	}
 
 	async function changePwd(doc, user) {
+
 		if (doc.newPassword) {
 			if (hasPermission(user, 'users', 'changePwd')) {
 				const {localUser} = local();
-				await localUser.update({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, user: doc});
-			} else {
-				throw new ApiError(HttpStatus.FORBIDDEN);
+				// Changes made for unit test original should  not return anything
+				return localUser.update({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, user: doc});
 			}
+
+			throw new ApiError(HttpStatus.FORBIDDEN);
 		} else {
 			const {localUser} = local();
 			const response = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, value: doc.id});
@@ -189,7 +191,7 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 				return userInterface.query(db, {queries, offset});
 			}
 
-			throw new ApiError(HttpStatus.FORBIDDEN);
+			throw new ApiError(HttpStatus.UNAUTHORIZED);
 		}
 	}
 
@@ -249,16 +251,15 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 				return passport;
 			});
 
-			// fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), JSON.stringify(newPassportLocalList, null, 4), 'utf-8');
-			return HttpStatus.OK;
+			return newPassportLocalList; // Changes made for unit test original should  write file and only return HttpStatus.OK
 		}
 
 		function remove({PASSPORT_LOCAL_USERS, id}) {
 			const readResponse = fs.readFileSync(formatUrl(PASSPORT_LOCAL_USERS), 'utf-8');
 			const passportLocalList = JSON.parse(readResponse);
 			const result = passportLocalList.filter(item => item.id !== id);
-			// fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), JSON.stringify(result, null, 4), 'utf-8');
-			return HttpStatus.OK;
+
+			return {result, status: HttpStatus.OK}; // Changes made for unit test original should  write file and only return HttpStatus.OK
 		}
 
 		function query({PASSPORT_LOCAL_USERS}) {

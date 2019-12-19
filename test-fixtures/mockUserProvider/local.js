@@ -50,60 +50,60 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 		let isUserExit;
 		if (Object.keys(doc).length === 0) {
 			throw new ApiError(HttpStatus.BAD_REQUEST);
-		}
-
-		if (doc.email) {
-			doc.id = doc.email;
-			validateDoc(doc, 'UserContent');
-			if (hasPermission(user, 'users', 'create')) {
-				try {
-					const {localUser} = local();
-					await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
-				} catch (err) {
-					throw new ApiError(err.status);
-				}
-
-				const {role, givenName, userId, familyName, email, ...rest} = {...doc};
-				const result = await userInterface.create(db, rest, user);
-				return result;
-			}
-
-			throw new ApiError(HttpStatus.FORBIDDEN);
-		}
-
-		if (doc.userId && !doc.email) {
-			const {localUser} = local();
-			const allLocalUsers = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
-
-			if (allLocalUsers.some(item => item.id === doc.userId)) {
-				allLocalUsers.map(item => {
-					if (!checkRoleInGroup(item.groups)) {
-						item.groups.push(mapRoleToGroup(doc.role));
+		} else {
+			if (doc.email) {
+				doc.id = doc.email;
+				validateDoc(doc, 'UserContent');
+				if (hasPermission(user, 'users', 'create')) {
+					try {
+						const {localUser} = local();
+						await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
+					} catch (err) {
+						throw new ApiError(err.status);
 					}
 
-					return item;
-				});
+					const {role, givenName, userId, familyName, email, ...rest} = {...doc};
+					const result = await userInterface.create(db, rest, user);
+					return result;
+				}
 
-				isUserExit = true;
+				throw new ApiError(HttpStatus.FORBIDDEN);
 			}
-		}
 
-		if (isUserExit) {
-			doc.id = doc.userId;
-			const {role, givenName, familyName, userId, email, ...rest} = {...doc};
-			const queries = [{
-				query: {id: doc.id}
-			}];
-			const response = await userInterface.query(db, {queries});
-			if (response.results.length > 0 && response.results[0].id === doc.id) {
-				throw new ApiError(HttpStatus.CONFLICT);
-			} else {
-				const result = await userInterface.create(db, rest, user);
-				return result;
+			if (doc.userId && !doc.email) {
+				const {localUser} = local();
+				const allLocalUsers = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
+
+				if (allLocalUsers.some(item => item.id === doc.userId)) {
+					allLocalUsers.map(item => {
+						if (!checkRoleInGroup(item.groups)) {
+							item.groups.push(mapRoleToGroup(doc.role));
+						}
+
+						return item;
+					});
+
+					isUserExit = true;
+				}
 			}
-		}
 
-		throw new ApiError(HttpStatus.NOT_FOUND);
+			if (isUserExit) {
+				doc.id = doc.userId;
+				const {role, givenName, familyName, userId, email, ...rest} = {...doc};
+				const queries = [{
+					query: {id: doc.id}
+				}];
+				const response = await userInterface.query(db, {queries});
+				if (response.results.length > 0 && response.results[0].id === doc.id) {
+					throw new ApiError(HttpStatus.CONFLICT);
+				} else {
+					const result = await userInterface.create(db, rest, user);
+					return result;
+				}
+			}
+
+			throw new ApiError(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	async function read(id, user) {
@@ -173,19 +173,24 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 		}
 	}
 
-	async function query(db, {queries, offset}, user) {
-		if (hasPermission(user, 'users', 'query')) {
-			if (user.role === 'publisher-admin') {
-				const queries = [{
-					query: {publisher: user.publisher}
-				}];
+	async function query(doc, user) {
+		if (Object.keys(doc).length === 0) {
+			throw new ApiError(HttpStatus.BAD_REQUEST);
+		} else {
+			const {queries, offset} = doc;
+			if (hasPermission(user, 'users', 'query')) {
+				if (user.role === 'publisher-admin') {
+					const queries = [{
+						query: {publisher: user.publisher}
+					}];
+					return userInterface.query(db, {queries, offset});
+				}
+
 				return userInterface.query(db, {queries, offset});
 			}
 
-			return userInterface.query(db, {queries, offset});
+			throw new ApiError(HttpStatus.FORBIDDEN);
 		}
-
-		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
 	function local() {

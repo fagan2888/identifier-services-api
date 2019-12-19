@@ -340,5 +340,6 @@ describe('app', () => {
 	describe('users', () => {
 		describe('#read', generateTestSuite('users', 'read'));
 		describe('#create', generateTestSuite('users', 'create'));
+		describe('#query', generateTestSuite('users', 'query'));
 	});
 });

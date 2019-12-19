@@ -1,6 +1,7 @@
 {
     "descr": "Should succeed create User by Admin using SSOID",
     "requestUrl": "/users",
+    "collectionName": "userMetadata",
     "username": "admin",
     "password": "gM3RsfxAr7e5VwsSPAC6",
     "expectedStatus": 201,

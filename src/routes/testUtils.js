@@ -1,4 +1,3 @@
-
 /**
  *
  * @licstart  The following is the entire license notice for the JavaScript code in this file.
@@ -53,7 +52,6 @@ export default ({rootPath}) => {
 		await mongoFixtures.close();
 		RewireAPI.__ResetDependency__('MONGO_URI');
 		RewireAPI.__ResetDependency__('PASSPORT_LOCAL_USERS');
-
 	});
 
 	return (...args) => {
@@ -79,9 +77,10 @@ export default ({rootPath}) => {
 						expectedStatus,
 						expectedDb,
 						payloadData,
-						payloadExpected
+						payloadExpected,
+						collectionName,
+						role
 					} = getData(sub);
-
 					if (skip) {
 						it.skip(`${sub} ${descr}`);
 					} else {
@@ -93,15 +92,24 @@ export default ({rootPath}) => {
 
 							const app = await startApp();
 							requester = chai.request(app).keepOpen();
-
 							await mongoFixtures.populate([sub, 'dbContents.json']);
 							const token = await auth(username, password);
 							if (expectedPayload) {
-								const response = await requester[method](requestUrl)
-									.set('Authorization', `Bearer ${token}`);
-								expect(response).to.have.status(expectedStatus);
-								if (expectedStatus === HttpStatus.OK) {
-									expect(response.body).to.eql(expectedPayload);
+								if (payloadData) {
+									const response = await requester[method](requestUrl)
+										.set('Authorization', `Bearer ${token}`).send(payloadData);
+									expect(response).to.have.status(expectedStatus);
+									if (expectedStatus === HttpStatus.OK) {
+										expect(response.body).to.eql(expectedPayload);
+									}
+								} else {
+									const response = (role === 'public') ?
+										await requester[method](requestUrl) :
+										await requester[method](requestUrl).set('Authorization', `Bearer ${token}`);
+									expect(response).to.have.status(expectedStatus);
+									if (expectedStatus === HttpStatus.OK) {
+										expect(response.body).to.eql(expectedPayload);
+									}
 								}
 							}
 
@@ -110,7 +118,7 @@ export default ({rootPath}) => {
 									.set('Authorization', `Bearer ${token}`).send(payloadData);
 								expect(response).to.have.status(expectedStatus);
 								const db = await mongoFixtures.dump();
-								expect(formatDump(db)).to.eql(expectedDb);
+								expect(formatDump(db, collectionName)).to.eql(expectedDb);
 							}
 
 							if (!expectedDb && !payloadExpected) {
@@ -126,7 +134,7 @@ export default ({rootPath}) => {
 			}
 
 			function getData(subDir) {
-				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected, payload, payloadExpected = true} = getFixture({
+				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected, collectionName, payload, role, payloadExpected = true} = getFixture({
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});
@@ -146,10 +154,10 @@ export default ({rootPath}) => {
 								components: [subDir, payload],
 								reader: READERS.JSON
 							});
-							return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, payloadData};
+							return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, collectionName, payloadData};
 						}
 
-						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb};
+						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, collectionName};
 					}
 
 					if (payloadExpected) {
@@ -157,11 +165,10 @@ export default ({rootPath}) => {
 							components: [subDir, 'expectedPayload.json'],
 							reader: READERS.JSON
 						});
-						return {expectedPayload, descr, requestUrl, method, username, password, expectedStatus};
+						return {expectedPayload, descr, requestUrl, method, role, username, password, expectedStatus, payloadExpected};
 					}
 
 					return {descr, requestUrl, method, username, password, expectedStatus};
-
 				} catch (err) {
 					if (err.code === 'ENOENT') {
 						return {descr, requestUrl};
@@ -177,8 +184,8 @@ export default ({rootPath}) => {
 				return result.headers.token;
 			}
 
-			function formatDump(dump) {
-				dump.userMetadata.forEach(doc =>
+			function formatDump(dump, collectionName) {
+				dump[collectionName].forEach(doc =>
 					Object.values(doc).forEach(field => Object.keys(field).filter(item =>
 						item === 'timestamp' || item === 'user'
 					).forEach(i => delete doc.lastUpdated[i]))

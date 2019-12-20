@@ -237,7 +237,7 @@
 // 	// 	}
 // 	// });
 
-// 	// ***********************Testing for Publisher requests starts************************
+// 	// ***********************Testing for Publisher requests starts**************************************************************************************************************************************
 
 // 	describe('#read Publishers Requests', () => {
 // 		it('Should succeed for Admin', async (index = '0') => {
@@ -402,5 +402,6 @@ describe('app', () => {
 		describe('#read', generateTestSuite('publishers', 'read'));
 		describe('#create', generateTestSuite('publishers', 'create'));
 		describe('#update', generateTestSuite('publishers', 'update'));
+		describe('#read requests', generateTestSuite('publishers', '/requests/read'));
 	});
 });

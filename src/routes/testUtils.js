@@ -134,7 +134,7 @@ export default ({rootPath}) => {
 			}
 
 			function getData(subDir) {
-				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected, collectionName, payload, role, payloadExpected = true} = getFixture({
+				const {descr, requestUrl, method, skip, username, password, expectedStatus, dbExpected, collectionName, payload, role, payloadExpected} = getFixture({
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});

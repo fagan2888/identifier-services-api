@@ -1,6 +1,7 @@
 {
     "descr": "Should succeed create User through userRequest using SSOID",
     "requestUrl": "/users",
+    "collectionName": "userMetadata",
     "username": "system",
     "password": "fCjHs1BHYn8yf4mAODOU",
     "expectedStatus": 201,

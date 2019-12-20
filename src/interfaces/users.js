@@ -30,9 +30,6 @@ import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
 import {hasPermission, validateDoc} from './utils';
-import interfaceFactory from './interfaceModules';
-
-const userInterface = interfaceFactory('userMetadata');
 
 export default function () {
 	return {
@@ -44,36 +41,36 @@ export default function () {
 		query
 	};
 
-	async function create(userProviderFactory, doc, user) {
+	async function create(userProvider, doc, user) {
 		try {
-			return userProviderFactory.create(doc, user);
+			return userProvider.create(doc, user);
 		} catch (err) {
 			throw new ApiError(err.status);
 		}
 	}
 
-	async function read(userProviderFactory, id, user) {
+	async function read(userProvider, id, user) {
 		try {
-			return userProviderFactory.read(id, user);
+			return userProvider.read(id, user);
 		} catch (err) {
 			throw new ApiError(err.status);
 		}
 	}
 
-	async function update(userProviderFactory, id, doc, user) {
+	async function update(userProvider, id, doc, user) {
 		validateDoc(doc, 'UserContent');
 		if (hasPermission(user, 'users', update)) {
-			const result = await userProviderFactory.update(id, doc, user);
+			const result = await userProvider.update(id, doc, user);
 			return result;
 		}
 
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
-	async function remove(userProviderFactory, id, user) {
+	async function remove(userProvider, id, user) {
 		if (hasPermission(user, 'users', 'remove')) {
 			try {
-				await userProviderFactory.remove(id);
+				await userProvider.remove(id);
 			} catch (err) {
 				throw new ApiError(err.status);
 			}
@@ -82,26 +79,19 @@ export default function () {
 		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
-	async function changePwd(userProviderFactory, doc, user) {
+	async function changePwd(userProvider, doc, user) {
 		try {
-			await userProviderFactory.changePwd(doc, user);
+			return userProvider.changePwd(doc, user); // Changes made during unit test if problem persist `await` instead of `return`
 		} catch (err) {
 			throw new ApiError(err.status);
 		}
 	}
 
-	async function query(db, {queries, offset}, user) {
-		if (hasPermission(user, 'users', 'query')) {
-			if (user.role === 'publisher-admin') {
-				const queries = [{
-					query: {publisher: user.publisher}
-				}];
-				return userInterface.query(db, {queries, offset});
-			}
-
-			return userInterface.query(db, {queries, offset});
+	async function query(userProvider, doc, user) {
+		try {
+			return userProvider.query(doc, user);
+		} catch (err) {
+			throw new ApiError(err.status);
 		}
-
-		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 }

@@ -106,6 +106,7 @@ export default ({rootPath}) => {
 									const response = (role === 'public') ?
 										await requester[method](requestUrl) :
 										await requester[method](requestUrl).set('Authorization', `Bearer ${token}`);
+
 									expect(response).to.have.status(expectedStatus);
 									if (expectedStatus === HttpStatus.OK) {
 										expect(response.body).to.eql(expectedPayload);
@@ -121,7 +122,8 @@ export default ({rootPath}) => {
 								expect(formatDump(db, collectionName)).to.eql(expectedDb);
 							}
 
-							if (!expectedDb && !payloadExpected) {
+							if (!expectedDb && !expectedPayload) {
+								console.log('****')
 								const response = await requester[method](requestUrl)
 									.set('Authorization', `Bearer ${token}`).send(payloadData);
 								expect(response).to.have.status(expectedStatus);
@@ -138,6 +140,11 @@ export default ({rootPath}) => {
 					components: [subDir, 'metadata.json'],
 					reader: READERS.JSON
 				});
+				const payloadData = payload && getFixture({
+					components: [subDir, payload],
+					reader: READERS.JSON
+				});
+
 				if (skip) {
 					return {descr, skip};
 				}
@@ -150,14 +157,10 @@ export default ({rootPath}) => {
 						});
 
 						if (payload) {
-							const payloadData = getFixture({
-								components: [subDir, payload],
-								reader: READERS.JSON
-							});
-							return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, collectionName, payloadData};
+							return {descr, collectionName, requestUrl, method, username, password, expectedStatus, expectedDb, payloadData};
 						}
 
-						return {descr, requestUrl, method, username, password, expectedStatus, expectedDb, collectionName};
+						return {descr, collectionName, requestUrl, method, username, password, expectedStatus, expectedDb};
 					}
 
 					if (payloadExpected) {
@@ -165,10 +168,14 @@ export default ({rootPath}) => {
 							components: [subDir, 'expectedPayload.json'],
 							reader: READERS.JSON
 						});
-						return {expectedPayload, descr, requestUrl, method, role, username, password, expectedStatus, payloadExpected};
+						if (payload) {
+							return {expectedPayload, descr, collectionName, requestUrl, method, username, password, expectedStatus, payloadData};
+						}
+
+						return {expectedPayload, descr, collectionName, requestUrl, method, role, username, password, expectedStatus};
 					}
 
-					return {descr, requestUrl, method, username, password, expectedStatus};
+					return {descr, requestUrl, method, username, password, expectedStatus, payloadData};
 				} catch (err) {
 					if (err.code === 'ENOENT') {
 						return {descr, requestUrl};

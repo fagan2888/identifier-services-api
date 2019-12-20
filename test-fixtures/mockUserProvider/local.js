@@ -50,60 +50,60 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 		let isUserExit;
 		if (Object.keys(doc).length === 0) {
 			throw new ApiError(HttpStatus.BAD_REQUEST);
-		}
-
-		if (doc.email) {
-			doc.id = doc.email;
-			validateDoc(doc, 'UserContent');
-			if (hasPermission(user, 'users', 'create')) {
-				try {
-					const {localUser} = local();
-					await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
-				} catch (err) {
-					throw new ApiError(err.status);
-				}
-
-				const {role, givenName, userId, familyName, email, ...rest} = {...doc};
-				const result = await userInterface.create(db, rest, user);
-				return result;
-			}
-
-			throw new ApiError(HttpStatus.FORBIDDEN);
-		}
-
-		if (doc.userId && !doc.email) {
-			const {localUser} = local();
-			const allLocalUsers = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
-
-			if (allLocalUsers.some(item => item.id === doc.userId)) {
-				allLocalUsers.map(item => {
-					if (!checkRoleInGroup(item.groups)) {
-						item.groups.push(mapRoleToGroup(doc.role));
+		} else {
+			if (doc.email) {
+				doc.id = doc.email;
+				validateDoc(doc, 'UserContent');
+				if (hasPermission(user, 'users', 'create')) {
+					try {
+						const {localUser} = local();
+						await localUser.create({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, doc: doc});
+					} catch (err) {
+						throw new ApiError(err.status);
 					}
 
-					return item;
-				});
+					const {role, givenName, userId, familyName, email, ...rest} = {...doc};
+					const result = await userInterface.create(db, rest, user);
+					return result;
+				}
 
-				isUserExit = true;
+				throw new ApiError(HttpStatus.FORBIDDEN);
 			}
-		}
 
-		if (isUserExit) {
-			doc.id = doc.userId;
-			const {role, givenName, familyName, userId, email, ...rest} = {...doc};
-			const queries = [{
-				query: {id: doc.id}
-			}];
-			const response = await userInterface.query(db, {queries});
-			if (response.results.length > 0 && response.results[0].id === doc.id) {
-				throw new ApiError(HttpStatus.CONFLICT);
-			} else {
-				const result = await userInterface.create(db, rest, user);
-				return result;
+			if (doc.userId && !doc.email) {
+				const {localUser} = local();
+				const allLocalUsers = await localUser.query({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS});
+
+				if (allLocalUsers.some(item => item.id === doc.userId)) {
+					allLocalUsers.map(item => {
+						if (!checkRoleInGroup(item.groups)) {
+							item.groups.push(mapRoleToGroup(doc.role));
+						}
+
+						return item;
+					});
+
+					isUserExit = true;
+				}
 			}
-		}
 
-		throw new ApiError(HttpStatus.NOT_FOUND);
+			if (isUserExit) {
+				doc.id = doc.userId;
+				const {role, givenName, familyName, userId, email, ...rest} = {...doc};
+				const queries = [{
+					query: {id: doc.id}
+				}];
+				const response = await userInterface.query(db, {queries});
+				if (response.results.length > 0 && response.results[0].id === doc.id) {
+					throw new ApiError(HttpStatus.CONFLICT);
+				} else {
+					const result = await userInterface.create(db, rest, user);
+					return result;
+				}
+			}
+
+			throw new ApiError(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	async function read(id, user) {
@@ -153,13 +153,15 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 	}
 
 	async function changePwd(doc, user) {
+
 		if (doc.newPassword) {
 			if (hasPermission(user, 'users', 'changePwd')) {
 				const {localUser} = local();
-				await localUser.update({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, user: doc});
-			} else {
-				throw new ApiError(HttpStatus.FORBIDDEN);
+				// Changes made for unit test original should  not return anything
+				return localUser.update({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, user: doc});
 			}
+
+			throw new ApiError(HttpStatus.FORBIDDEN);
 		} else {
 			const {localUser} = local();
 			const response = await localUser.read({PASSPORT_LOCAL_USERS: PASSPORT_LOCAL_USERS, value: doc.id});
@@ -173,19 +175,24 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 		}
 	}
 
-	async function query(db, {queries, offset}, user) {
-		if (hasPermission(user, 'users', 'query')) {
-			if (user.role === 'publisher-admin') {
-				const queries = [{
-					query: {publisher: user.publisher}
-				}];
+	async function query(doc, user) {
+		if (Object.keys(doc).length === 0) {
+			throw new ApiError(HttpStatus.BAD_REQUEST);
+		} else {
+			const {queries, offset} = doc;
+			if (hasPermission(user, 'users', 'query')) {
+				if (user.role === 'publisher-admin') {
+					const queries = [{
+						query: {publisher: user.publisher}
+					}];
+					return userInterface.query(db, {queries, offset});
+				}
+
 				return userInterface.query(db, {queries, offset});
 			}
 
-			return userInterface.query(db, {queries, offset});
+			throw new ApiError(HttpStatus.UNAUTHORIZED);
 		}
-
-		throw new ApiError(HttpStatus.FORBIDDEN);
 	}
 
 	function local() {
@@ -244,16 +251,15 @@ export default function ({PASSPORT_LOCAL_USERS, PRIVATE_KEY_URL, db}) {
 				return passport;
 			});
 
-			// fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), JSON.stringify(newPassportLocalList, null, 4), 'utf-8');
-			return HttpStatus.OK;
+			return newPassportLocalList; // Changes made for unit test original should  write file and only return HttpStatus.OK
 		}
 
 		function remove({PASSPORT_LOCAL_USERS, id}) {
 			const readResponse = fs.readFileSync(formatUrl(PASSPORT_LOCAL_USERS), 'utf-8');
 			const passportLocalList = JSON.parse(readResponse);
 			const result = passportLocalList.filter(item => item.id !== id);
-			// fs.writeFileSync(formatUrl(PASSPORT_LOCAL_USERS), JSON.stringify(result, null, 4), 'utf-8');
-			return HttpStatus.OK;
+
+			return {result, status: HttpStatus.OK}; // Changes made for unit test original should  write file and only return HttpStatus.OK
 		}
 
 		function query({PASSPORT_LOCAL_USERS}) {

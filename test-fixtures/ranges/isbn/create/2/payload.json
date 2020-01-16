@@ -1,0 +1,10 @@
+{            
+    "prefix": "foo",
+    "language": "cow",
+    "rangeStart": 100,
+    "rangeEnd": "100",
+    "active": false,
+    "lastUpdated": {
+        "user": "foo"
+    }
+}

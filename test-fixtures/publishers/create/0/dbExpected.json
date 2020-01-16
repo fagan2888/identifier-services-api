@@ -1,0 +1,30 @@
+{
+    "PublisherMetadata": [{},
+        {
+            "lastUpdated":{},
+            "name": "foo",
+            "postalAddress": {
+                "address":"foo",
+                "city":"foo",
+                "zip":"foo",
+                "public:": false
+            },
+            "classification": ["foo"],
+            "metadataDelivery": "manual",
+            "primaryContact": ["foobar", "foo"],
+            "activity":{
+                "active": true,
+                "yearInactivated": 111
+            }   
+        }
+    ],
+    "userMetadata": [
+        {
+            "id":"system",
+            "preferences": {
+                "defaultLanguage": "eng"
+            },
+            "lastUpdated": {}
+        }
+    ]
+}

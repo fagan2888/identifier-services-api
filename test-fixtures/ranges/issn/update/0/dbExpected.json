@@ -1,0 +1,24 @@
+{
+    "RangeIssnContent": [
+        { 
+            "prefix": "foo",
+            "rangeStart": "111",
+            "rangeEnd": "100",
+            "active": false,
+            "reservedCount": 100,
+            "lastUpdated": {}
+        }
+    ],
+    "userMetadata": [
+        {
+            "id":"admin",
+            "preferences": {
+                "defaultLanguage": "fin"
+            },
+            "lastUpdated": {
+                "timestamp": "838383838",
+                "user": "bar"
+            }
+        }
+    ]
+}

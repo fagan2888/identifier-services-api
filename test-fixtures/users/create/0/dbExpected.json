@@ -1,0 +1,19 @@
+{
+    "userMetadata": [
+        {
+            "id": "admin",
+            "preferences": {
+                "defaultLanguage": "eng"
+            },
+            "lastUpdated": {}
+        },
+        {
+            "id": "testPublisher@foo.bar",
+            "publisher": "admin",
+            "preferences": {
+                "defaultLanguage": "eng"
+            },
+            "lastUpdated": {}
+        }
+    ]
+}

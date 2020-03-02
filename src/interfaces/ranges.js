@@ -56,7 +56,7 @@ export default function () {
 		try {
 			if (validateDoc(doc, 'RangeIsbnContent')) {
 				if (hasPermission(user, 'ranges', 'createIsbn')) {
-					return await rangesISBNInterface.create(db, doc, user);
+					return rangesISBNInterface.create(db, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -97,7 +97,7 @@ export default function () {
 
 			if (validate(doc, 'RangeIsbnContent')) {
 				if (hasPermission(user, 'ranges', 'updateIsbn')) {
-					return await rangesISBNInterface.update(db, id, doc, user);
+					return rangesISBNInterface.update(db, id, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -130,7 +130,7 @@ export default function () {
 		try {
 			if (validateDoc(doc, 'RangeIsmnContent')) {
 				if (hasPermission(user, 'ranges', 'createIsmn')) {
-					return await rangesISMNInterface.create(db, doc, user);
+					return rangesISMNInterface.create(db, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -171,7 +171,7 @@ export default function () {
 
 			if (validateDoc(doc, 'RangeIsmnContent')) {
 				if (hasPermission(user, 'ranges', 'updateIsmn')) {
-					return await rangesISMNInterface.update(db, id, doc, user);
+					return rangesISMNInterface.update(db, id, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -188,7 +188,7 @@ export default function () {
 	async function queryIsmn(db, {queries, offset}, user) {
 		try {
 			if (hasPermission(user, 'ranges', 'queryIsmn')) {
-				return await rangesISMNInterface.query(db, {queries, offset});
+				return rangesISMNInterface.query(db, {queries, offset});
 			}
 
 			throw new ApiError(HttpStatus.FORBIDDEN);
@@ -245,7 +245,7 @@ export default function () {
 
 			if (validateDoc(doc, 'RangeIsmnContent')) {
 				if (hasPermission(user, 'ranges', 'updateIssn')) {
-					return await rangesISSNInterface.update(db, id, doc, user);
+					return rangesISSNInterface.update(db, id, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -262,7 +262,7 @@ export default function () {
 	async function queryIssn(db, {queries, offset}, user) {
 		try {
 			if (hasPermission(user, 'ranges', 'queryIssn')) {
-				return await rangesISSNInterface.query(db, {queries, offset});
+				return rangesISSNInterface.query(db, {queries, offset});
 			}
 
 			throw new ApiError(HttpStatus.FORBIDDEN);

@@ -51,7 +51,7 @@ export default function () {
 
 			if (validateDoc(doc, 'PublicationIssnContent')) {
 				if (hasPermission(user, 'publicationIssn', 'createISSN')) {
-					return await publicationsIssnInterface.create(db, doc, user);
+					return publicationsIssnInterface.create(db, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -100,7 +100,7 @@ export default function () {
 
 			if (validateDoc(doc, 'PublicationIssnContent')) {
 				if (hasPermission(user, 'publicationIssn', 'updateISSN')) {
-					return await publicationsIssnInterface.update(db, id, doc, user);
+					return publicationsIssnInterface.update(db, id, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);

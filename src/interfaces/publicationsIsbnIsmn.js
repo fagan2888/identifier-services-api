@@ -53,7 +53,7 @@ export default function () {
 					doc.publisher = user.id;
 					doc.metadataReference =	{state: 'pending'};
 					doc.associatedRange = 'string';
-					return await publicationsIsbnIsmnInterface.create(db, doc, user);
+					return publicationsIsbnIsmnInterface.create(db, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -102,7 +102,7 @@ export default function () {
 
 			if (validateDoc(doc, 'PublicationIsbnIsmnContent')) {
 				if (hasPermission(user, 'publicationIsbnIsmn', 'updateIsbnIsmn')) {
-					return await publicationsIsbnIsmnInterface.update(db, id, doc, user);
+					return publicationsIsbnIsmnInterface.update(db, id, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);

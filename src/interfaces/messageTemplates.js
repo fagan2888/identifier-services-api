@@ -51,7 +51,7 @@ export default function () {
 
 			if (validateDoc(doc, 'MessageTemplateContent')) {
 				if (hasPermission(user, 'messageTemplates', 'create')) {
-					return await templateInterface.create(db, doc, user);
+					return templateInterface.create(db, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -90,7 +90,7 @@ export default function () {
 				throw new ApiError(HttpStatus.BAD_REQUEST);
 			} else if (validateDoc(doc, 'MessageTemplateContent')) {
 				if (hasPermission(user, 'messageTemplates', 'update')) {
-					return await templateInterface.update(db, id, doc, user);
+					return templateInterface.update(db, id, doc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);
@@ -120,7 +120,7 @@ export default function () {
 	async function query(db, {queries, offset}, user) {
 		try {
 			if (hasPermission(user, 'messageTemplates', 'query')) {
-				return await templateInterface.query(db, {queries, offset});
+				return templateInterface.query(db, {queries, offset});
 			}
 
 			throw new ApiError(HttpStatus.FORBIDDEN);

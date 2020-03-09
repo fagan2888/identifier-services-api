@@ -93,7 +93,7 @@ const permissions = {
 		queryRequests: ['system', 'admin']
 	},
 	publicationIsbnIsmn: {
-		createIsbnIsmn: ['admin', 'system'],
+		createIsbnIsmn: ['admin', 'system', 'publisher-admin', 'publisher'],
 		readIsbnIsmn: ['admin', 'publisher-admin'],
 		updateIsbnIsmn: ['system', 'admin'],
 		queryIsbnIsmn: ['system', 'admin', 'publisher-admin', 'publisher']
@@ -106,7 +106,7 @@ const permissions = {
 		queryRequestIsbnIsmn: ['system', 'admin', 'publisher-admin', 'publisher']
 	},
 	publicationIssn: {
-		createISSN: ['admin', 'system'],
+		createISSN: ['admin', 'system', 'publisher-admin', 'publisher'],
 		readISSN: ['admin', 'publisher-admin'],
 		updateISSN: ['system', 'admin'],
 		queryISSN: ['system', 'admin', 'publisher-admin', 'publisher']

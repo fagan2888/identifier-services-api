@@ -33,13 +33,23 @@ import {API_URL} from '../../config';
 import HttpStatus from 'http-status';
 import {ApiError} from '@natlibfi/identifier-services-commons';
 
-export default function (db) {
+export default function (db, passportMiddlewares, combineUserInfo) {
 	const publications = publicationsIsbnIsmnFactory({url: API_URL});
 	return new Router()
-		.post('/', bodyParse(), create)
+		.post('/', bodyParse(), authenticated, combineUserInfo, create)
+		.use(passportMiddlewares.token)
+		.use(combineUserInfo)
 		.get('/:id', read)
 		.put('/:id', bodyParse(), update)
 		.post('/query', bodyParse(), query);
+
+	function authenticated(req, res, next) {
+		if ('authorization' in req.headers) {
+			return passportMiddlewares.token(req, res, next);
+		}
+
+		next();
+	}
 
 	async function create(req, res, next) {
 		try {

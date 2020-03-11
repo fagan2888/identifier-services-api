@@ -64,7 +64,8 @@ export default function () {
 	async function readRequest(db, id, user) {
 		try {
 			if (hasPermission(user, 'publisherRequests', 'readRequest')) {
-				return publisherRequestsInterface.read(db, id);
+				const result = await publisherRequestsInterface.read(db, id);
+				return result;
 			}
 
 			throw new ApiError(HttpStatus.FORBIDDEN);

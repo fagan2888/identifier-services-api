@@ -50,8 +50,14 @@ export default function () {
 
 			if (validateDoc(doc, 'PublicationIsbnIsmnContent')) {
 				if (hasPermission(user, 'publicationIsbnIsmn', 'createIsbnIsmn')) {
-					doc.publisher = user.id;
-					doc.metadataReference =	{state: 'pending'};
+					if (user.role === 'publisher' || user.role === 'publisher-admin') {
+						doc.publisher = user.publisher;
+						doc.metadataReference =	{state: 'pending'};
+						return publicationsIsbnIsmnInterface.create(db, doc, user);
+					}
+
+					// Background task will send publisher id
+					doc.metadataReference = {state: 'pending'};
 					return publicationsIsbnIsmnInterface.create(db, doc, user);
 				}
 

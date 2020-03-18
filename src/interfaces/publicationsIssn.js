@@ -27,12 +27,14 @@
  */
 
 import HttpStatus from 'http-status';
-import {ApiError} from '@natlibfi/identifier-services-commons';
+import {ApiError, Utils} from '@natlibfi/identifier-services-commons';
 
 import interfaceFactory from './interfaceModules';
 import {hasPermission, validateDoc} from './utils';
 
 const publicationsIssnInterface = interfaceFactory('Publication_ISSN', 'PublicationIssnContent');
+const rangesISSNInterface = interfaceFactory('RangeIssnContent');
+const {calculateNewISSN} = Utils;
 
 export default function () {
 	return {
@@ -45,14 +47,29 @@ export default function () {
 
 	async function createISSN(db, doc, user) {
 		try {
-			if (Object.keys(doc).length === 0) {
-				throw new ApiError(HttpStatus.BAD_REQUEST);
-			}
-
-			if (validateDoc(doc, 'PublicationIssnContent')) {
+			const rangeQueries = {queries: [{query: {active: true}}], offset: null};
+			const identifierLists = await rangesISSNInterface.query(db, rangeQueries);
+			const activeRange = identifierLists.results[0];
+			const queries = [{
+				query: {associatedRange: activeRange.id}
+			}];
+			const publicationList = await publicationsIssnInterface.query(db, {queries, offset: null});
+			const array = publicationList.results.map(item => item.identifier);
+			const newPublication = calculateNewISSN(array);
+			const newDoc = {
+				...doc,
+				metadataReference: {state: 'pending'},
+				associatedRange: activeRange.id,
+				identifier: newPublication
+			};
+			if (validateDoc(newDoc, 'PublicationIssnContent')) {
 				if (hasPermission(user, 'publicationIssn', 'createISSN')) {
-					doc.metadataReference =	{state: 'pending'};
-					return publicationsIssnInterface.create(db, doc, user);
+					if (user.role === 'publisher' || user.role === 'publisher-admin') {
+						newDoc.publisher = user.publisher;
+						return publicationsIssnInterface.create(db, newDoc, user);
+					}
+
+					return publicationsIssnInterface.create(db, newDoc, user);
 				}
 
 				throw new ApiError(HttpStatus.FORBIDDEN);

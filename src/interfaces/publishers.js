@@ -34,72 +34,69 @@ import {hasPermission, validateDoc} from './utils';
 const publisherInterface = interfaceFactory('PublisherMetadata', 'PublisherContent');
 
 export default function () {
-	return {
-		create,
-		read,
-		update,
-		query
-	};
+  return {
+    create,
+    read,
+    update,
+    query
+  };
 
-	async function create(db, doc, user) {
-		try {
-			if (validateDoc(doc, 'PublisherContent')) {
-				if (hasPermission(user, 'publishers', 'create')) {
-					const result = await publisherInterface.create(db, doc, user);
-					return result;
-				}
+  async function create(db, doc, user) {
+    try {
+      if (validateDoc(doc, 'PublisherContent')) {
+        if (hasPermission(user, 'publishers', 'create')) {
+          return publisherInterface.create(db, doc, user);
+        }
+        throw new ApiError(HttpStatus.FORBIDDEN);
+      }
+      throw new ApiError(HttpStatus.BAD_REQUEST);
+    } catch (err) {
+      if (err) { // eslint-disable-line functional/no-conditional-statement
+        throw new ApiError(err.status ? err.status : HttpStatus.BAD_REQUEST);
+      }
+    }
+  }
 
-				throw new ApiError(HttpStatus.FORBIDDEN);
-			} else {
-				throw new ApiError(HttpStatus.BAD_REQUEST);
-			}
-		} catch (err) {
-			if (err) {
-				throw new ApiError(err.status ? err.status : HttpStatus.BAD_REQUEST);
-			}
-		}
-	}
+  async function read(db, id, user) {
+    let protectedProperties; // eslint-disable-line functional/no-let
+    if (user === undefined) { // eslint-disable-line functional/no-conditional-statement
+      protectedProperties = {
+        publicationDetails: 0,
+        language: 0,
+        metadataDelivery: 0,
+        primaryContact: 0,
+        activity: 0
+      };
+    }
 
-	async function read(db, id, user) {
-		let protectedProperties;
-		if (user === undefined) {
-			protectedProperties = {
-				publicationDetails: 0,
-				language: 0,
-				metadataDelivery: 0,
-				primaryContact: 0,
-				activity: 0
-			};
-		}
+    const result = await publisherInterface.read(db, id, protectedProperties);
+    if (user === undefined && result.postalAddress.public === true) {
+      return result;
+    }
 
-		const result = await publisherInterface.read(db, id, protectedProperties);
-		if (user === undefined && result.postalAddress.public === true) {
-			return result;
-		}
+    if (user === undefined && result.postalAddress.public === false) {
+      const {postalAddress, ...rest} = result;
+      return rest;
+    }
 
-		if (user === undefined && result.postalAddress.public === false) {
-			const {postalAddress, ...rest} = result;
-			return rest;
-		}
+    if (user.role === 'publisher-admin') { // eslint-disable-line functional/no-conditional-statement
+      protectedProperties = {
+        publicationDetails: 0,
+        metadataDelivery: 0,
+        activity: 0
+      };
+    }
 
-		if (user.role === 'publisher-admin') {
-			protectedProperties = {
-				publicationDetails: 0,
-				metadataDelivery: 0,
-				activity: 0
-			};
-		}
+    return result;
+  }
 
-		return result;
-	}
+  async function update(db, id, doc, user) {
+    const result = await publisherInterface.update(db, id, doc, user);
+    return result;
+  }
 
-	async function update(db, id, doc, user) {
-		const result = await publisherInterface.update(db, id, doc, user);
-		return result;
-	}
-
-	async function query(db, {queries, offset}) {
-		const result = await publisherInterface.query(db, {queries, offset});
-		return result;
-	}
+  async function query(db, {queries, offset}) {
+    const result = await publisherInterface.query(db, {queries, offset});
+    return result;
+  }
 }
